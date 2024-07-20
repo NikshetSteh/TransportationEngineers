@@ -1,12 +1,12 @@
-from fastapi import APIRouter
-from auth.schemes import *
-from robot.schemes import Robot
-from db import DbDependency
 import bcrypt
+from fastapi import APIRouter, HTTPException
+from sqlalchemy import select, delete
+
+from auth.schemes import *
+from db import DbDependency
 from model.engineer import Engineer
 from model.robot import Robot as RobotModel
-from sqlalchemy import select
-from fastapi import HTTPException
+from robot.schemes import Robot
 
 router = APIRouter()
 
@@ -28,6 +28,10 @@ async def new_login(
 
         if not bcrypt.checkpw(data.password.encode(), user.password.encode()):
             raise HTTPException(status_code=401, detail="Invalid credentials")
+
+        await db_session.execute(
+            delete(RobotModel).where(RobotModel.robot_model_id == data.robot_model_id)
+        )
 
         robot = RobotModel(
             public_key=data.public_key,

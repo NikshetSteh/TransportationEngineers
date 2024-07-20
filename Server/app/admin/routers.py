@@ -14,8 +14,10 @@ from config import get_config
 from db import ChromaDependency, DbDependency
 from face_model import FaceModelDependency
 from model.engineer import Engineer as EngineerModel
+from model.robot import Robot as RobotModel
 from schemes import EmptyResponse
 from users.schemes import User
+from robot.schemes import Robot
 
 router = APIRouter()
 
@@ -188,6 +190,42 @@ async def update_engineer(
 
         engineer.privileges = privileges
         session.add(engineer)
+        await session.commit()
+
+    return EmptyResponse()
+
+
+@router.get("/robots")
+async def get_robots(
+        db: DbDependency
+) -> Page[Robot]:
+    async with db() as session:
+        robots = (await session.execute(
+            select(RobotModel)
+        )).fetchall()
+
+    data = list(
+        map(
+            lambda x: Robot(
+                id=str(x[0].id),
+                robot_model_name=x[0].robot_model_name,
+                robot_model_id=x[0].robot_model_id,
+            ),
+            robots
+        )
+    )
+    return paginate(data)
+
+
+@router.delete("/robots/{robot_id}")
+async def delete_robot(
+        robot_id: str,
+        db: DbDependency
+) -> EmptyResponse:
+    async with db() as session:
+        await session.execute(
+            delete(RobotModel).where(RobotModel.id == robot_id)
+        )
         await session.commit()
 
     return EmptyResponse()
