@@ -1,14 +1,13 @@
 import base64
 
+import cv2
 import numpy as np
 from fastapi import APIRouter, HTTPException
 
 from config import get_config
 from db import ChromaDependency
-from faces.schemes import *
 from face_model import FaceModelDependency
-
-import cv2
+from faces.schemes import *
 
 router = APIRouter()
 

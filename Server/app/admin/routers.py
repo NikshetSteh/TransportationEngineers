@@ -1,17 +1,16 @@
 import base64
+import uuid
 
-from fastapi import APIRouter
+import cv2
+import numpy as np
+from fastapi import APIRouter, HTTPException
 from fastapi_pagination import Page, paginate
 
-from fastapi import HTTPException
 from admin.schemes import *
-from users.schemes import User
+from config import get_config
 from db import ChromaDependency
 from face_model import FaceModelDependency
-import numpy as np
-import cv2
-import uuid
-from config import get_config
+from users.schemes import User
 
 router = APIRouter()
 
