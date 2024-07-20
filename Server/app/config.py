@@ -18,6 +18,13 @@ class Config(BaseSettings):
 
     SHOW_DB_ECHO: bool = False
 
+    REDIS_URI: str = "redis://server:MyServerBest@localhost:6379"
+
+    SYMBOLS_POOL: str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890!@#$%^&*()"
+    AUTH_CODE_LENGTH: int = 100
+    AUTH_REQUEST_TIMEOUT: int = 30
+    AUTH_SESSION_TIMEOUT: int = 3600
+
 
 @lru_cache()
 def get_config() -> Config:

@@ -8,9 +8,11 @@ from sqlalchemy.orm import sessionmaker
 
 from config import get_config
 from model.base import Base
+from redis_async import RedisPool
 
 chroma_client: AsyncClientAPI | None = None
 db_session_factory: sessionmaker[AsyncSession] | None = None
+redit_pool: RedisPool | None = None
 
 
 async def get_chroma_db() -> AsyncClientAPI:
@@ -57,5 +59,20 @@ async def get_db_connection_factory() -> sessionmaker[AsyncSession]:
     return db_session_factory
 
 
+async def get_redis() -> RedisPool:
+    global redit_pool
+
+    if redit_pool is not None:
+        return redit_pool
+
+    config = get_config()
+    redit_pool = RedisPool(config.REDIS_URI)
+    return redit_pool
+
+
 ChromaDependency = Annotated[AsyncClientAPI, Depends(get_chroma_db)]
 DbDependency = Annotated[sessionmaker[AsyncSession], Depends(get_db_connection_factory)]
+RedisDependency = Annotated[RedisPool, Depends(get_redis)]
+
+AUTH_REQUEST_DB = 0
+AUTH_SESSION_DB = 1

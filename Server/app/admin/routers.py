@@ -15,9 +15,9 @@ from db import ChromaDependency, DbDependency
 from face_model import FaceModelDependency
 from model.engineer import Engineer as EngineerModel
 from model.robot import Robot as RobotModel
+from robot.schemes import Robot
 from schemes import EmptyResponse
 from users.schemes import User
-from robot.schemes import Robot
 
 router = APIRouter()
 

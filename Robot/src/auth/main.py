@@ -1,3 +1,5 @@
+import json
+
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 
@@ -42,3 +44,31 @@ else:
     else:
         print(response.content.decode("utf-8"))
         print("Something went wrong. Try again.")
+        raise Exception("Something went wrong. Try again.")
+
+    response = requests.post("http://localhost:8000/auth/robot/login", json={
+        "id": json.loads(response.content.decode("utf-8"))["id"],
+    })
+    print(response)
+    print(response.content.decode("utf-8"))
+
+    response_json = json.loads(response.content.decode("utf-8"))
+    data, request_id = response_json["data"], response_json["request_id"]
+
+    decrypted_data = private_key.decrypt(
+        base64.b64decode(data),
+        padding.OAEP(
+            mgf=padding.MGF1(algorithm=hashes.SHA256()),
+            algorithm=hashes.SHA256(),
+            label=None
+        )
+    )
+    print(decrypted_data)
+    print(decrypted_data.decode("utf-8"))
+
+    response = requests.post("http://localhost:8000/auth/robot/login_code", json={
+        "request_id": request_id,
+        "data": decrypted_data.decode("utf-8"),
+    })
+    print(response)
+    print(response.content.decode("utf-8"))
