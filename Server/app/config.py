@@ -14,6 +14,10 @@ class Config(BaseSettings):
 
     THRESHOLD: int = 400
 
+    DB_URI: str = "postgresql+asyncpg://postgres:root@localhost:5432/TransportEngineers"
+
+    SHOW_DB_ECHO: bool = False
+
 
 @lru_cache()
 def get_config() -> Config:

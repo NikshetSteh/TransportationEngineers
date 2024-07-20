@@ -7,7 +7,7 @@ from fastapi import APIRouter, HTTPException
 from config import get_config
 from db import ChromaDependency
 from face_model import FaceModelDependency
-from faces.schemes import *
+from robot.schemes import *
 
 router = APIRouter()
 
