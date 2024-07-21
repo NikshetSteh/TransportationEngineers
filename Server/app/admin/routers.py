@@ -9,11 +9,11 @@ from db import DbDependency
 from face_api.service import delete_face, save_face
 from model.engineer import Engineer as EngineerModel
 from model.robot import Robot as RobotModel
+from model.ticket import Ticket as TicketModel
 from model.user import User as UserModel
 from robot.schemes import Robot
 from schemes import EmptyResponse
-from users.schemes import User, TicketCreation, Ticket
-from model.ticket import Ticket as TicketModel
+from users.schemes import Ticket, TicketCreation, User
 
 router = APIRouter()
 

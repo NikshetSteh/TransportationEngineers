@@ -2,8 +2,8 @@ from fastapi import APIRouter, HTTPException
 
 from db import DbDependency
 from robot.schemes import *
-from robot.service import identification_face
-from users.schemes import User
+from robot.service import check_user_place_in_wagon, identification_face
+from users.schemes import Ticket, User
 
 router = APIRouter()
 
@@ -18,3 +18,20 @@ async def identification(
         raise HTTPException(status_code=404, detail="User not found")
 
     return user
+
+
+@router.post("/ticket_validation")
+async def ticket_validation(
+        request: TicketValidationRequest,
+        db: DbDependency
+) -> Ticket:
+    user = await identification_face(request.face, db)
+    if user is None:
+        raise HTTPException(status_code=404, detail="Face not found")
+
+    return await check_user_place_in_wagon(
+        request.train_number,
+        request.wagon_number,
+        request.date,
+        db
+    )
