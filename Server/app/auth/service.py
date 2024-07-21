@@ -18,6 +18,7 @@ from model.engineer import Engineer
 from model.robot import Robot as RobotModel
 from redis_async import RedisPool
 from robot.schemes import Robot
+from auth.engineer_privileges import EngineerPrivileges, engineer_privileges_translations
 
 
 async def create_new_login(
@@ -40,6 +41,9 @@ async def create_new_login(
 
         if not bcrypt.checkpw(password.encode(), user.password.encode()):
             raise HTTPException(status_code=401, detail="Invalid credentials")
+
+        if user.privileges & engineer_privileges_translations[EngineerPrivileges.ROBOT_LOGIN] == 0:
+            raise HTTPException(status_code=403, detail="Insufficient privileges")
 
         await db_session.execute(
             db_delete(RobotModel).where(RobotModel.robot_model_id == robot_model_id)
