@@ -118,3 +118,32 @@ async def check_user_place_in_wagon(
             ))
 
         raise InvalidWithoutTickets()
+
+
+async def get_current_ticket(
+        user_id: str,
+        station_id: str,
+        db: sessionmaker[AsyncSession]
+) -> Ticket | None:
+    async with db() as session:
+        now_datetime = datetime.datetime.now()
+        tickets = (await session.execute(
+            select(TicketModel).where(
+                TicketModel.date >= now_datetime,
+                station_id == TicketModel.station_id,
+                user_id == TicketModel.user_id
+            )
+        )).one_or_none()
+
+        if tickets is None:
+            return None
+
+        return Ticket(
+            id=str(tickets[0].id),
+            user_id=str(tickets[0].user_id),
+            train_number=tickets[0].train_number,
+            wagon_number=tickets[0].wagon_number,
+            place_number=tickets[0].place_number,
+            station_id=tickets[0].station_id,
+            date=tickets[0].date
+        )

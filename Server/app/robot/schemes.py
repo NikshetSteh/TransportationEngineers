@@ -14,8 +14,8 @@ class Robot(BaseModel):
 
 
 class TicketValidationRequest(BaseModel):
+    station_id: str = Field(max_length=60)
     train_number: int
     wagon_number: int
     date: datetime.datetime
-    station_id: str = Field(max_length=60)
     face: str = Field(max_length=10_485_760)

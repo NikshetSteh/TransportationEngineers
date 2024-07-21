@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException
 from auth.dependecies import AuthRequired
 from db import DbDependency
 from robot.schemes import *
-from robot.service import check_user_place_in_wagon, identification_face
+from robot.service import check_user_place_in_wagon, identification_face, get_current_ticket
 from users.schemes import Ticket, User
 
 router = APIRouter()
@@ -33,8 +33,23 @@ async def ticket_validation(
         raise HTTPException(status_code=404, detail="Face not found")
 
     return await check_user_place_in_wagon(
+        request.station_id,
         request.train_number,
         request.wagon_number,
         request.date,
         db
     )
+
+
+@router.get("/station/{station_id}/user/{user_id}/current_ticket")
+async def get_user_current_ticket(
+        user_id: str,
+        station_id: str,
+        db: DbDependency,
+        _: AuthRequired
+) -> Ticket:
+    ticket = await get_current_ticket(user_id, station_id, db)
+    if ticket is None:
+        raise HTTPException(status_code=404, detail="Ticket not found")
+
+    return ticket
