@@ -12,7 +12,8 @@ from model.robot import Robot as RobotModel
 from model.user import User as UserModel
 from robot.schemes import Robot
 from schemes import EmptyResponse
-from users.schemes import User
+from users.schemes import User, TicketCreation, Ticket
+from model.ticket import Ticket as TicketModel
 
 router = APIRouter()
 
@@ -260,3 +261,78 @@ async def delete_robot(
         await session.commit()
 
     return EmptyResponse()
+
+
+@router.post("/ticket")
+async def create_ticket(
+        data: TicketCreation,
+        db: DbDependency
+) -> Ticket:
+    async with db() as session:
+        users = (await session.execute(
+            select(UserModel).where(UserModel.id == data.user_id)
+        )).one_or_none()
+
+        if users is None:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        ticket = TicketModel(
+            user_id=data.user_id,
+            train_number=data.train_number,
+            wagon_number=data.wagon_number,
+            place_number=data.place_number,
+            station_id=data.station_id,
+            date=data.date
+        )
+        session.add(ticket)
+        await session.commit()
+
+    return Ticket(
+        id=str(ticket.id),
+        user_id=ticket.user_id,
+        train_number=ticket.train_number,
+        wagon_number=ticket.wagon_number,
+        place_number=ticket.place_number,
+        station_id=ticket.station_id,
+        date=ticket.date
+    )
+
+
+@router.delete("/ticket/{ticket_id}")
+async def delete_ticket(
+        ticket_id: str,
+        db: DbDependency
+) -> EmptyResponse:
+    async with db() as session:
+        await session.execute(
+            delete(TicketModel).where(TicketModel.id == ticket_id)
+        )
+        await session.commit()
+
+    return EmptyResponse()
+
+
+@router.get("/tickets")
+async def get_tickets(
+        db: DbDependency
+) -> Page[Ticket]:
+    async with db() as session:
+        tickets = (await session.execute(
+            select(TicketModel)
+        )).fetchall()
+
+    data = list(
+        map(
+            lambda x: Ticket(
+                id=str(x[0].id),
+                user_id=str(x[0].user_id),
+                train_number=x[0].train_number,
+                wagon_number=x[0].wagon_number,
+                place_number=x[0].place_number,
+                station_id=x[0].station_id,
+                date=x[0].date
+            ),
+            tickets
+        )
+    )
+    return paginate(data)
