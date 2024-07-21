@@ -36,11 +36,56 @@ async def add_user(
         session.add(user)
         await session.flush()
 
-        await save_face(data.face, str(user.id))
+        if data.face is not None:
+            await save_face(data.face, str(user.id))
 
         await session.commit()
 
     return User(id=str(user.id), name=data.name)
+
+
+@router.patch("/user/{user_id}/face")
+async def update_user_face(
+        user_id: str,
+        data: UserFaceUpdate,
+        db: DbDependency
+) -> EmptyResponse:
+    async with db() as session:
+        user = (await session.execute(
+            select(UserModel).where(UserModel.id == user_id)
+        )).one_or_none()
+
+        if user is None:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        if data.face is not None:
+            await save_face(data.face, user_id)
+
+        session.add(user)
+        await session.commit()
+
+    return EmptyResponse()
+
+
+@router.delete("/user/face")
+async def delete_user_face(
+        user_id: str,
+        db: DbDependency
+) -> EmptyResponse:
+    async with db() as session:
+        user = (await session.execute(
+            select(UserModel).where(UserModel.id == user_id)
+        )).one_or_none()
+
+        if user is None:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        await delete_face(user_id)
+
+        session.add(user)
+        await session.commit()
+
+    return EmptyResponse()
 
 
 @router.get("/users")
