@@ -10,7 +10,7 @@ class Config(BaseSettings):
 
     SHOW_DB_ECHO: bool = False
 
-    REDIS_URI: str = "redis://server:MyServerBest@localhost:6379"
+    REDIS_URI: str = "redis://default:SuperPass@localhost:6379"
 
     SYMBOLS_POOL: str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890!@#$%^&*()"
     AUTH_CODE_LENGTH: int = 100

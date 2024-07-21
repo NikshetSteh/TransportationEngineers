@@ -5,25 +5,31 @@ from users.schemes import Ticket
 
 class InvalidTicketWagon(HTTPException):
     def __init__(self, ticket: Ticket):
+        buffer = ticket.model_dump()
+        buffer["date"] = buffer["date"].isoformat()
         super().__init__(status_code=400, detail={
             "message": "Invalid wagon number",
-            "right_ticket": ticket.model_dump()
+            "right_ticket": buffer
         })
 
 
 class InvalidTicketDate(HTTPException):
     def __init__(self, ticket: Ticket):
+        buffer = ticket.model_dump()
+        buffer["date"] = buffer["date"].isoformat()
         super().__init__(status_code=400, detail={
             "message": "Invalid date",
-            "right_ticket": ticket.model_dump()
+            "right_ticket": buffer
         })
 
 
 class InvalidTicketTrain(HTTPException):
     def __init__(self, ticket: Ticket):
+        buffer = ticket.model_dump()
+        buffer["date"] = buffer["date"].isoformat()
         super().__init__(status_code=400, detail={
             "message": "Invalid train number",
-            "right_ticket": ticket.model_dump()
+            "right_ticket": buffer
         })
 
 

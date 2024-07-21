@@ -16,7 +16,7 @@ async def lifespan(_):
 app = FastAPI(lifespan=lifespan)
 
 app.include_router(admin_router, prefix="/admin")
-app.include_router(robot_router, prefix="/faces")
+app.include_router(robot_router, prefix="/robot")
 app.include_router(auth_router, prefix="/auth")
 
 add_pagination(app)
