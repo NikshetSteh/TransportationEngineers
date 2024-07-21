@@ -34,6 +34,7 @@ async def identification_face(
 
 
 async def check_user_place_in_wagon(
+        station_id: str,
         train_number: int,
         wagon_number: int,
         date: datetime.datetime,
@@ -44,7 +45,8 @@ async def check_user_place_in_wagon(
             select(TicketModel).where(
                 TicketModel.train_number == train_number,
                 TicketModel.wagon_number == wagon_number,
-                TicketModel.date == date
+                TicketModel.date == date,
+                TicketModel.station_id == station_id
             ).limit(1)
         )).one_or_none()
 
@@ -63,7 +65,8 @@ async def check_user_place_in_wagon(
             select(TicketModel).where(
                 TicketModel.train_number == train_number,
                 TicketModel.wagon_number != wagon_number,
-                TicketModel.date == date
+                TicketModel.date == date,
+                TicketModel.station_id == station_id
             ).limit(1)
         )).one_or_none()
 
@@ -81,7 +84,8 @@ async def check_user_place_in_wagon(
         tickets = (await session.execute(
             select(TicketModel).where(
                 TicketModel.train_number == train_number,
-                TicketModel.date >= date
+                TicketModel.date >= date,
+                TicketModel.station_id == station_id
             ).limit(1)
         )).one_or_none()
 
