@@ -1,20 +1,15 @@
-import base64
-import uuid
-
 import bcrypt
-import cv2
-import numpy as np
 from fastapi import APIRouter, HTTPException
 from fastapi_pagination import Page, paginate
 from sqlalchemy import delete, select
 
 from admin.schemes import *
 from auth.engineer_privileges import engineer_privileges_translations
-from config import get_config
-from db import ChromaDependency, DbDependency
-from face_model import FaceModelDependency
+from db import DbDependency
+from face_api.service import delete_face, save_face
 from model.engineer import Engineer as EngineerModel
 from model.robot import Robot as RobotModel
+from model.user import User as UserModel
 from robot.schemes import Robot
 from schemes import EmptyResponse
 from users.schemes import User
@@ -25,79 +20,70 @@ router = APIRouter()
 @router.post("/user")
 async def add_user(
         data: UserCreation,
-        chroma: ChromaDependency,
-        model: FaceModelDependency
+        db: DbDependency
 ) -> User:
-    image_bytes = base64.b64decode(data.face)
-    image_array = np.frombuffer(image_bytes, dtype=np.uint8)
-    image = cv2.imdecode(image_array, flags=cv2.IMREAD_COLOR)
+    async with db() as session:
+        users = (await session.execute(
+            select(UserModel).where(UserModel.name == data.name)
+        )).one_or_none()
 
-    if image.shape[0] * image.shape[1] > 1000000:
-        raise HTTPException(status_code=400, detail="Image too big")
+        if users is not None:
+            raise HTTPException(status_code=409, detail="User already exists")
 
-    if image.shape[0] < 100 or image.shape[1] < 100:
-        raise HTTPException(status_code=400, detail="Image too small")
+        user = UserModel(
+            name=data.name
+        )
+        session.add(user)
+        await session.flush()
 
-    faces = model.get(image)
+        await save_face(data.face, str(user.id))
 
-    if len(faces) > 1:
-        raise HTTPException(status_code=400, detail="Too many faces")
+        await session.commit()
 
-    if len(faces) == 0:
-        raise HTTPException(status_code=400, detail="No faces")
-
-    face = faces[0]
-
-    x1, y1, x2, y2 = face["bbox"]
-    square = (x2 - x1) * (y2 - y1)
-
-    if square / image.shape[0] / image.shape[1] < 0.4:
-        raise HTTPException(status_code=400, detail="Face too small")
-
-    embedding = face["embedding"]
-
-    collection = await chroma.get_or_create_collection("faces")
-
-    user = await collection.query(
-        query_embeddings=embedding.tolist(),
-        n_results=1
-    )
-
-    config = get_config()
-    if len(user["distances"][0]) > 0 and user["distances"][0][0] < config.THRESHOLD:
-        raise HTTPException(status_code=400, detail="User already exists")
-
-    user_id = str(uuid.uuid4())
-
-    await collection.add(
-        ids=[user_id],
-        embeddings=[embedding.tolist()],
-        metadatas=[{"name": data.name}],
-    )
-
-    return User(id=user_id, name=data.name)
+    return User(id=str(user.id), name=data.name)
 
 
 @router.get("/users")
 async def get_users(
-        chroma: ChromaDependency,
+        db: DbDependency
 ) -> Page[User]:
-    collection = await chroma.get_or_create_collection("faces")
-    data = await collection.peek(limit=await collection.count())
-    users = []
-    for i in range(len(data["ids"])):
-        users.append(User(id=data["ids"][i], name=data["metadatas"][i]["name"]))
+    async with db() as session:
+        users = (await session.execute(
+            select(UserModel)
+        )).fetchall()
 
-    return paginate(users)
+    data = list(
+        map(
+            lambda x: User(
+                id=str(x[0].id),
+                name=x[0].name
+            ),
+            users
+        )
+    )
+
+    return paginate(data)
 
 
 @router.delete("/users/{user_id}")
 async def delete_user(
         user_id: str,
-        chroma: ChromaDependency
+        db: DbDependency
 ) -> EmptyResponse:
-    collection = await chroma.get_or_create_collection("faces")
-    await collection.delete(ids=[user_id])
+    async with db() as session:
+        user = (await session.execute(
+            select(UserModel).where(UserModel.id == user_id)
+        )).one_or_none()
+
+        if user is None:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        await session.execute(
+            delete(UserModel).where(UserModel.id == user_id)
+        )
+        await session.commit()
+
+    await delete_face(user_id)
 
     return EmptyResponse()
 
