@@ -6,8 +6,10 @@ from sqlalchemy.orm import sessionmaker
 
 from config import get_config
 from model.base import Base
+from redis_async.redis import RedisClient, RedisPool
 
 db_session_factory: sessionmaker[AsyncSession] | None = None
+redit_pool: RedisPool | None = None
 
 
 # TODO: Remove!!!
@@ -40,4 +42,18 @@ async def get_db_connection_factory() -> sessionmaker[AsyncSession]:
     return db_session_factory
 
 
+async def get_redis() -> RedisPool:
+    global redit_pool
+
+    if redit_pool is not None:
+        return redit_pool
+
+    config = get_config()
+    redit_pool = RedisPool(config.REDIS_URI)
+    return redit_pool
+
+
 DbDependency = Annotated[sessionmaker[AsyncSession], Depends(get_db_connection_factory)]
+RedisDependency = Annotated[RedisPool, Depends(get_redis)]
+
+AUTH_STORE_SESSION_DB = 4

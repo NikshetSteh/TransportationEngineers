@@ -108,7 +108,7 @@ async def create_new_login_for_robot(
         await validate_engineer(
             login,
             password,
-            db_session,
+            db,
             engineer_privileges_translations[EngineerPrivileges.ROBOT_LOGIN]
         )
 
@@ -143,7 +143,7 @@ async def create_new_login_for_store(
         await validate_engineer(
             login,
             password,
-            db_session,
+            db,
             engineer_privileges_translations[EngineerPrivileges.STORE_LOGIN]
         )
 
@@ -181,7 +181,7 @@ async def create_login_code_for_client(
 
     async with db() as db_session:
         robots = (await db_session.execute(
-            db_select(RobotModel).where(ClientModelClass.id == client_id)
+            db_select(ClientModelClass).where(ClientModelClass.id == client_id)
         )).one_or_none()
         client: RobotModel | ActiveStore | None = None if robots is None else robots[0]
 
@@ -233,30 +233,31 @@ async def create_session(
     return session_id
 
 
-async def auth_request(
-        request: Request,
-        redis_pool: RedisDependency,
-        client_type: ClientType
-) -> str:
-    db_index = -1
-    if client_type == ClientType.ROBOT:
-        db_index = AUTH_ROBOT_SESSION_DB
-    elif client_type == ClientType.STORE:
-        db_index = AUTH_STORE_SESSION_DB
+def auth_request(client_type: ClientType):
+    async def func(
+            request: Request,
+            redis_pool: RedisDependency
+    ) -> str:
+        db_index = -1
+        if client_type == ClientType.ROBOT:
+            db_index = AUTH_ROBOT_SESSION_DB
+        elif client_type == ClientType.STORE:
+            db_index = AUTH_STORE_SESSION_DB
 
-    auth_header = request.headers.get("Authorization")
-    if auth_header is None or len(auth_header.split()) != 2:
-        raise HTTPException(status_code=401, detail="Invalid credentials")
-
-    session_id = auth_header.split()[1]
-
-    config = get_config()
-    async with redis_pool() as redis:
-        await redis.select(db_index)
-        robot_id = await redis.get(session_id)
-
-        if robot_id is not None:
-            redis.expire(session_id, config.AUTH_SESSION_TIMEOUT)
-            return robot_id
-        else:
+        auth_header = request.headers.get("Authorization")
+        if auth_header is None or len(auth_header.split()) != 2:
             raise HTTPException(status_code=401, detail="Invalid credentials")
+
+        session_id = auth_header.split()[1]
+
+        config = get_config()
+        async with redis_pool() as redis:
+            await redis.select(db_index)
+            robot_id = await redis.get(session_id)
+
+            if robot_id is not None:
+                redis.expire(session_id, config.AUTH_SESSION_TIMEOUT)
+                return robot_id
+            else:
+                raise HTTPException(status_code=401, detail="Invalid credentials")
+    return func

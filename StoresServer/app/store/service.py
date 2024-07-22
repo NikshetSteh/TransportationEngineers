@@ -12,7 +12,7 @@ async def get_item_of_store(
         store_id: str,
         item_id: str,
         db: sessionmaker[AsyncSession]
-) -> None | StoreItem:
+) -> None | StoreItemModel:
     async with db() as session:
         stores = (await session.execute(
             select(StoreModel).where(StoreModel.id == store_id).options(selectinload(StoreModel.items))
@@ -55,7 +55,7 @@ async def add_item(
         await session.commit()
 
     return StoreItem(
-        id=item_model.id,
+        id=str(item_model.id),
         store_id=item_model.store_id,
         name=item_model.name,
         description=item_model.description,
@@ -93,7 +93,7 @@ async def get_item(
         raise HTTPException(status_code=404, detail="Item not found")
 
     return StoreItem(
-        id=item.id,
+        id=str(item.id),
         store_id=item.store_id,
         name=item.name,
         description=item.description,
@@ -118,7 +118,7 @@ async def get_items(
 
         return list(map(
             lambda x: StoreItem(
-                id=x.id,
+                id=str(x.id),
                 store_id=x.store_id,
                 name=x.name,
                 description=x.description,
@@ -151,4 +151,13 @@ async def update_item(
         session.add(item)
         await session.commit()
 
-    return item
+    return StoreItem(
+        id=str(item.id),
+        store_id=item.store_id,
+        name=item.name,
+        description=item.description,
+        logo_url=item.logo_url,
+        balance=item.balance,
+        price_penny=item.price_penny,
+        category=item.category
+    )

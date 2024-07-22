@@ -1,13 +1,21 @@
 from pydantic import BaseModel, Field
 
 
-class NewLogin(BaseModel):
+class NewRobotLogin(BaseModel):
     login: str
     password: str
 
     public_key: str
     robot_model_id: str = Field(max_length=60)
     robot_model_name: str = Field(max_length=60)
+
+
+class NewStoreLogin(BaseModel):
+    login: str
+    password: str
+
+    public_key: str
+    store_id: str
 
 
 class LoginCode(BaseModel):

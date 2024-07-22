@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 
-from auth.dependecies import AuthRequired
+from auth.dependecies import RobotAuthRequired
 from db import DbDependency
 from robot.schemes import *
 from robot.service import (check_user_place_in_wagon, get_current_ticket,
@@ -14,7 +14,7 @@ router = APIRouter()
 async def identification(
         request: IdentificationRequest,
         db: DbDependency,
-        _: AuthRequired
+        _: RobotAuthRequired
 ) -> User:
     user = await identification_face(request.image, db)
     if user is None:
@@ -27,7 +27,7 @@ async def identification(
 async def ticket_validation(
         request: TicketValidationRequest,
         db: DbDependency,
-        _: AuthRequired
+        _: RobotAuthRequired
 ) -> Ticket:
     user = await identification_face(request.face, db)
     if user is None:
@@ -47,7 +47,7 @@ async def get_user_current_ticket(
         user_id: str,
         station_id: str,
         db: DbDependency,
-        _: AuthRequired
+        _: RobotAuthRequired
 ) -> Ticket:
     ticket = await get_current_ticket(user_id, station_id, db)
     if ticket is None:
