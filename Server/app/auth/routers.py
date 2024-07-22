@@ -1,10 +1,11 @@
 from fastapi import APIRouter
 
+from auth.client_type import ClientType
 from auth.schemes import *
-from auth.service import create_new_login_for_robot, create_session, create_login_code_for_client
+from auth.service import (create_login_code_for_client,
+                          create_new_login_for_robot, create_session)
 from db import DbDependency, RedisDependency
 from robot.schemes import Robot
-from auth.client_type import ClientType
 
 router = APIRouter()
 

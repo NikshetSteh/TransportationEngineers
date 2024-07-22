@@ -12,18 +12,19 @@ from sqlalchemy import select as db_select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import sessionmaker
 
+from auth.client_type import ClientType
+from auth.engineer_privileges import (EngineerPrivileges,
+                                      engineer_privileges_translations)
 from config import get_config
-from db import AUTH_ROBOT_REQUEST_DB, AUTH_ROBOT_SESSION_DB, RedisDependency, AUTH_STORE_REQUEST_DB, \
-    AUTH_STORE_SESSION_DB
+from db import (AUTH_ROBOT_REQUEST_DB, AUTH_ROBOT_SESSION_DB,
+                AUTH_STORE_REQUEST_DB, AUTH_STORE_SESSION_DB, RedisDependency)
 from model.active_store import ActiveStore
 from model.engineer import Engineer
 from model.robot import Robot as RobotModel
 from redis_async import RedisPool
 from robot.schemes import Robot
-from auth.engineer_privileges import EngineerPrivileges, engineer_privileges_translations
 from store_api.schemes import Store
 from store_api.service import get_store
-from auth.client_type import ClientType
 
 
 async def create_login_code(

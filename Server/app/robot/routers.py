@@ -3,7 +3,8 @@ from fastapi import APIRouter, HTTPException
 from auth.dependecies import AuthRequired
 from db import DbDependency
 from robot.schemes import *
-from robot.service import check_user_place_in_wagon, identification_face, get_current_ticket
+from robot.service import (check_user_place_in_wagon, get_current_ticket,
+                           identification_face)
 from users.schemes import Ticket, User
 
 router = APIRouter()
