@@ -1,10 +1,12 @@
 from fastapi import HTTPException
-from sqlalchemy import delete, select
+from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload, sessionmaker
 
 from model.item import StoreItem as StoreItemModel
 from model.store import Store as StoreModel
+from model.history import Purchase as PurchaseModel
+from model.task import Task as TaskModel
 from store.schemes import *
 
 
@@ -161,3 +163,115 @@ async def update_item(
         price_penny=item.price_penny,
         category=item.category
     )
+
+
+async def make_purchase(
+        store_id: str,
+        user_id: str,
+        purchase_items: list[PurchaseItem],
+        is_default_ready: bool,
+        db: sessionmaker[AsyncSession]
+) -> Purchase:
+    items_ids = list(map(lambda x: x.id, purchase_items))
+
+    async with db() as session:
+        stores = (await session.execute(
+            select(StoreModel).where(StoreModel.id == store_id).options(selectinload(StoreModel.items))
+        )).one_or_none()
+        if stores is None:
+            raise HTTPException(status_code=404, detail="Store not found")
+
+        items = (await session.execute(
+            select(StoreItemModel).where(
+                StoreItemModel.id.in_(items_ids),
+                StoreItemModel.balance > 0
+            )
+        )).scalars().all()
+        if len(items) != len(items_ids):
+            raise HTTPException(status_code=404, detail="Some items not found")
+
+        items = {str(item.id): item for item in items}
+        have_bad_items = False
+        for item in purchase_items:
+            if item[item.id].count > items[item.id].balance:
+                have_bad_items = True
+                break
+
+        if have_bad_items:
+            raise HTTPException(status_code=400, detail="Not enough items")
+
+        for item in purchase_items:
+            await session.execute(
+                update(StoreItemModel)
+                .where(StoreItemModel.id == item.id)
+                .values(balance=StoreItemModel.balance - item.count)
+            )
+
+        purchase = PurchaseModel(
+            store_id=store_id,
+            user_id=user_id,
+            items_ids=items_ids,
+            is_default_ready=is_default_ready
+        )
+
+        session.add(purchase)
+        await session.flush()
+
+        task = TaskModel(
+            purchase_id=purchase.id,
+            store_id=store_id,
+            user_id=user_id,
+            is_ready=is_default_ready
+        )
+        session.add(task)
+        await session.commit()
+
+        return Purchase(
+            id=str(purchase.id),
+            store_id=purchase.store_id,
+            user_id=purchase.user_id,
+            items_ids=items_ids,
+            date=purchase.created_at
+        )
+
+
+async def get_tasks(
+        store_id: str,
+        also_ready_tasks: bool,
+        db: sessionmaker[AsyncSession]
+) -> list[Task]:
+    async with db() as session:
+        if also_ready_tasks:
+            tasks = (await session.execute(
+                select(TaskModel).where(TaskModel.store_id == store_id)
+            )).scalars().all()
+        else:
+            tasks = (await session.execute(
+                select(TaskModel).where(TaskModel.store_id == store_id, TaskModel.is_ready is False)
+            )).scalars().all()
+
+        return list(map(
+            lambda x: Task(
+                id=str(x.id),
+                purchase=x.purchase,
+                store_id=x.store_id,
+                user_id=x.user_id,
+                is_ready=x.is_ready
+            ),
+            tasks
+        ))
+
+
+async def mark_as_ready(
+        task_id: str,
+        db: sessionmaker[AsyncSession]
+) -> None:
+    async with db() as session:
+        task = (await session.execute(
+            select(TaskModel).where(TaskModel.id == task_id)
+        )).scalars().first()
+        if task is None:
+            raise HTTPException(status_code=404, detail="Task not found")
+
+        task.is_ready = True
+        await session.commit()

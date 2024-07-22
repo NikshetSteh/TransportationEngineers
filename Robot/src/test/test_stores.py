@@ -10,12 +10,12 @@ from auth import keys_utility
 user_id = "735d71d4-6493-4839-9fbe-3ae8ffaa1ed7"
 engineer_id = "734dad0b-a261-4620-8ce5-e64744f3a2c5"
 store_id = "dcf5ff18-50b3-4b67-a18f-077b1e879ec8"
-robot_token = "823c206c-46ca-44b1-bc7a-f5825a6aafef"
-store_token = "388ebfb6-4cfd-4258-a719-5b5870291ecb"
+robot_token = None
+store_token = None
 
-item_1 = "9b183a5a-f851-495e-9d2e-ee0f0247f0c7"
-item_2 = "58797f3b-bc2f-4e52-8536-f70e1036eba2"
-item_3 = "56ebb170-1f0d-49dd-aa1a-6a3960cdf055"
+item_1 = None
+item_2 = None
+item_3 = None
 
 with open("face") as file:
     face = file.read()
