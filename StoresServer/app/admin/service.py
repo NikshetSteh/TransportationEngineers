@@ -3,10 +3,10 @@ from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload, sessionmaker
 
-from admin.schemes import *
 # noinspection PyUnresolvedReferences
 from model.item import StoreItem as StoreItemModel
 from model.store import Store as StoreModel
+from store.schemes import *
 
 
 async def create_store(

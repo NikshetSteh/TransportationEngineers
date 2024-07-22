@@ -1,10 +1,10 @@
 from fastapi import APIRouter
 from fastapi_pagination import Page, paginate
 
-from admin.schemes import *
 from admin.service import create_store, delete_store, get_store, get_stores
 from db import DbDependency
 from schemes import EmptyResponse
+from store.schemes import *
 
 router = APIRouter()
 
