@@ -7,22 +7,14 @@ from sqlalchemy.orm import Mapped
 from model.base import Base
 
 
-class Robot(Base):
-    __tablename__ = "robots"
+class ActiveStore(Base):
+    __tablename__ = "active_stores"
 
     id: Mapped[int] = Column(
         UUID,
         name="id",
         primary_key=True,
         default=uuid.uuid4
-    )
-
-    robot_model_id: Mapped[str] = Column(
-        String(60),
-        unique=True
-    )
-    robot_model_name: Mapped[str] = Column(
-        String(60)
     )
 
     public_key: Mapped[str] = Column(

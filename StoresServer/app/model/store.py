@@ -2,13 +2,13 @@ import datetime
 import uuid
 
 from sqlalchemy import UUID, Column, DateTime, String
-from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import Mapped, relationship
 
 from model.base import Base
 
 
-class Robot(Base):
-    __tablename__ = "robots"
+class Store(Base):
+    __tablename__ = "stores"
 
     id: Mapped[int] = Column(
         UUID,
@@ -17,17 +17,18 @@ class Robot(Base):
         default=uuid.uuid4
     )
 
-    robot_model_id: Mapped[str] = Column(
-        String(60),
-        unique=True
+    name: Mapped[str] = Column(
+        String(100),
     )
-    robot_model_name: Mapped[str] = Column(
-        String(60)
+    description: Mapped[str] = Column(
+        String(255),
+    )
+    logo_url: Mapped[str] = Column(
+        String(255),
     )
 
-    public_key: Mapped[str] = Column(
-        String(500)
-    )
+    # noinspection PyUnresolvedReferences
+    items: Mapped[list["StoreItem"]] = relationship(back_populates="store")
 
     created_at: Mapped[datetime.datetime] = Column(
         DateTime(timezone=True),

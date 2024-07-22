@@ -1,10 +1,9 @@
+import base64
 import json
 
+import requests
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
-
-import base64
-import requests
 
 from auth import keys_utility
 
