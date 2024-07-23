@@ -1,31 +1,47 @@
+from enum import Enum
 from typing import Annotated
 
 from fastapi import Depends, HTTPException, Request
 
 from config import get_config
-from db import AUTH_STORE_SESSION_DB, RedisDependency
+from db import AUTH_ROBOT_SESSION_DB, AUTH_STORE_SESSION_DB, RedisDependency
 
 
-async def auth_request(
-        request: Request,
-        redis_pool: RedisDependency,
-) -> str:
-    auth_header = request.headers.get("Authorization")
-    if auth_header is None or len(auth_header.split()) != 2:
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+class ClientType(Enum):
+    ROBOT = "ROBOT"
+    STORE = "STORE"
 
-    session_id = auth_header.split()[1]
 
-    config = get_config()
-    async with redis_pool() as redis:
-        await redis.select(AUTH_STORE_SESSION_DB)
-        object_id = await redis.get(session_id)
+def auth_request(client_type: ClientType):
+    async def func(
+            request: Request,
+            redis_pool: RedisDependency
+    ) -> str:
+        db_index = -1
+        if client_type == ClientType.ROBOT:
+            db_index = AUTH_ROBOT_SESSION_DB
+        elif client_type == ClientType.STORE:
+            db_index = AUTH_STORE_SESSION_DB
 
-        if object_id is not None:
-            redis.expire(session_id, config.AUTH_SESSION_TIMEOUT)
-            return object_id.decode("utf-8")
-        else:
+        auth_header = request.headers.get("Authorization")
+        if auth_header is None or len(auth_header.split()) != 2:
             raise HTTPException(status_code=401, detail="Invalid credentials")
 
+        session_id = auth_header.split()[1]
 
-AuthRequired = Annotated[str, Depends(auth_request)]
+        config = get_config()
+        async with redis_pool() as redis:
+            await redis.select(db_index)
+            robot_id = await redis.get(session_id)
+
+            if robot_id is not None:
+                redis.expire(session_id, config.AUTH_SESSION_TIMEOUT)
+                return robot_id
+            else:
+                raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    return func
+
+
+StoreAuthRequired = Annotated[str, Depends(auth_request(ClientType.STORE))]
+RobotAuthRequired = Annotated[str, Depends(auth_request(ClientType.ROBOT))]

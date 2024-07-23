@@ -3,9 +3,10 @@ from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload, sessionmaker
 
-from model.item import StoreItem as StoreItemModel, PurchaseItem as PurchaseItemModel
-from model.store import Store as StoreModel
 from model.history import Purchase as PurchaseModel
+from model.item import PurchaseItem as PurchaseItemModel
+from model.item import StoreItem as StoreItemModel
+from model.store import Store as StoreModel
 from model.task import Task as TaskModel
 from store.schemes import *
 

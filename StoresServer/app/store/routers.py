@@ -1,17 +1,17 @@
 from fastapi import APIRouter
 from fastapi_pagination import Page, paginate
 
-from auth import AuthRequired
+from auth import StoreAuthRequired
 from db import DbDependency
-from store.service import *
 from schemes import EmptyResponse
+from store.service import *
 
 router = APIRouter()
 
 
 @router.get("/items")
 async def get_items_handler(
-        store_id: AuthRequired,
+        store_id: StoreAuthRequired,
         db: DbDependency
 ) -> Page[StoreItem]:
     return paginate(await get_items(store_id, db))
@@ -19,7 +19,7 @@ async def get_items_handler(
 
 @router.get("/item/{item_id}")
 async def get_item_handler(
-        store_id: AuthRequired,
+        store_id: StoreAuthRequired,
         item_id: str,
         db: DbDependency
 ) -> StoreItem:
@@ -28,7 +28,7 @@ async def get_item_handler(
 
 @router.post("/item")
 async def add_item_handler(
-        store_id: AuthRequired,
+        store_id: StoreAuthRequired,
         item: StoreItemCreation,
         db: DbDependency
 ) -> StoreItem:
@@ -37,7 +37,7 @@ async def add_item_handler(
 
 @router.delete("/item/{item_id}")
 async def remove_item_handler(
-        store_id: AuthRequired,
+        store_id: StoreAuthRequired,
         item_id: str,
         db: DbDependency
 ) -> None:
@@ -46,7 +46,7 @@ async def remove_item_handler(
 
 @router.put("/item")
 async def update_item_handler(
-        store_id: AuthRequired,
+        store_id: StoreAuthRequired,
         item: StoreItem,
         db: DbDependency
 ) -> StoreItem:
@@ -55,7 +55,7 @@ async def update_item_handler(
 
 @router.post("/purchase")
 async def make_purchase_handler(
-        store_id: AuthRequired,
+        store_id: StoreAuthRequired,
         purchase_data: PurchaseCreation,
         db: DbDependency
 ) -> Purchase:
@@ -79,7 +79,7 @@ async def mark_as_ready_handler(
 
 @router.get("/tasks")
 async def get_tasks_handler(
-        store_id: AuthRequired,
+        store_id: StoreAuthRequired,
         also_ready_tasks: bool,
         db: DbDependency
 ) -> Page[Task]:
