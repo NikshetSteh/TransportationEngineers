@@ -5,18 +5,10 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
 from config import get_config
-from model.base import Base
 from redis_async import RedisPool
 
 db_session_factory: sessionmaker[AsyncSession] | None = None
 redit_pool: RedisPool | None = None
-
-
-# TODO: Remove!!!
-async def update_db_scheme(engine) -> None:
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
-        await conn.run_sync(Base.metadata.create_all)
 
 
 async def create_db_connection_factory() -> None:
@@ -24,8 +16,6 @@ async def create_db_connection_factory() -> None:
 
     config = get_config()
     engine = create_async_engine(config.DB_URI, echo=config.SHOW_DB_ECHO)
-
-    await update_db_scheme(engine)
 
     # noinspection PyTypeChecker
     factory = sessionmaker(

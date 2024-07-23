@@ -8,6 +8,7 @@ class Config(BaseSettings):
     STORE_API: str = "http://127.0.0.1:8040"
 
     DB_URI: str = "postgresql+asyncpg://postgres:root@localhost:5432/TransportEngineers"
+    DB_URI_ALEMBIC: str = "postgresql+psycopg2://postgres:root@localhost:5432/TransportEngineers"
 
     SHOW_DB_ECHO: bool = False
 

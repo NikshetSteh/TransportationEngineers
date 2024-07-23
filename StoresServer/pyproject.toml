@@ -13,6 +13,8 @@ fastapi-pagination = "^0.12.26"
 asyncpg = "^0.29.0"
 sqlalchemy = "^2.0.31"
 redis = "^5.0.7"
+alembic = "^1.13.2"
+psycopg2 = "^2.9.9"
 
 
 [tool.poetry.group.dev.dependencies]
