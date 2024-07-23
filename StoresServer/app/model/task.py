@@ -2,9 +2,10 @@ import datetime
 import uuid
 
 from sqlalchemy import UUID, Column, DateTime, ForeignKey, Boolean
-from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import Mapped, relationship
 
 from model.base import Base
+from model.history import Purchase
 
 
 class Task(Base):
@@ -30,6 +31,7 @@ class Task(Base):
         UUID,
         ForeignKey("purchases.id", ondelete="CASCADE")
     )
+    purchase: Mapped["Purchase"] = relationship("Purchase")
 
     is_ready: Mapped[bool] = Column(
         Boolean

@@ -30,14 +30,20 @@ class Store(StoreCreation):
 
 class PurchaseItem(BaseModel):
     item_id: str
-    count: str
+    count: int
+
+
+class PurchaseCreation(BaseModel):
+    user_id: str
+    items: list[PurchaseItem]
+    is_default_ready: bool
 
 
 class Purchase(BaseModel):
     id: str
     store_id: str
     user_id: str
-    items_ids: list[str]
+    items: list[PurchaseItem]
     date: datetime.datetime
 
 

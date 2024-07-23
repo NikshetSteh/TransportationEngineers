@@ -27,7 +27,11 @@ class Purchase(Base):
         UUID
     )
 
-    items: Mapped[list["PurchaseItem"]] = relationship(back_populates="purchase")
+    # noinspection PyUnresolvedReferences
+    items: Mapped[list["PurchaseItem"]] = relationship(
+        back_populates="purchase",
+        lazy="selectin"
+    )
 
     created_at: Mapped[datetime.datetime] = Column(
         DateTime(timezone=True),

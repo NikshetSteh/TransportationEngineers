@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker
 
 from config import get_config
 from model.base import Base
-from redis_async.redis import RedisClient, RedisPool
+from redis_async.redis import RedisPool
 
 db_session_factory: sessionmaker[AsyncSession] | None = None
 redit_pool: RedisPool | None = None

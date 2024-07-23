@@ -7,10 +7,10 @@ from cryptography.hazmat.primitives.asymmetric import padding
 
 from auth import keys_utility
 
-user_id = "735d71d4-6493-4839-9fbe-3ae8ffaa1ed7"
-engineer_id = "734dad0b-a261-4620-8ce5-e64744f3a2c5"
-store_id = "dcf5ff18-50b3-4b67-a18f-077b1e879ec8"
-robot_token = None
+user_id = "6558de9d-0be8-409a-b8f0-a8949a505201"
+engineer_id = "c6ce6bd5-3af3-4424-b805-9b54ded0f6be"
+store_id = None
+robot_token = "31d18af9-66af-4bd9-9b76-bec04f30f2ed"
 store_token = None
 
 item_1 = None
@@ -247,3 +247,33 @@ response = requests.get("http://localhost:8040/store/items", headers={
 })
 print(response)
 print(response.content.decode("utf-8"))
+
+response = requests.post("http://localhost:8040/store/purchase", json={
+    "user_id": user_id,
+    "items": [
+        {
+            "item_id": item_3,
+            "count": 1
+        }
+    ],
+    "is_default_ready": False
+}, headers={
+    "Authorization": f"Bearer {store_token}"
+})
+print(response)
+print(response.content.decode())
+
+response = requests.get("http://localhost:8040/store/tasks", headers={
+    "Authorization": f"Bearer {store_token}"
+}, params={
+    "also_ready_tasks": 1
+})
+print(response)
+print(response.content.decode())
+task_id = json.loads(response.content.decode())["items"][0]["id"]
+
+response = requests.put(f"http://localhost:8040/store/task/{task_id}/ready", headers={
+    "Authorization": f"Bearer {store_token}"
+})
+print(response)
+print(response.content.decode())

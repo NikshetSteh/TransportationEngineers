@@ -3,7 +3,7 @@ from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload, sessionmaker
 
-from model.item import StoreItem as StoreItemModel
+from model.item import StoreItem as StoreItemModel, PurchaseItem as PurchaseItemModel
 from model.store import Store as StoreModel
 from model.history import Purchase as PurchaseModel
 from model.task import Task as TaskModel
@@ -172,7 +172,7 @@ async def make_purchase(
         is_default_ready: bool,
         db: sessionmaker[AsyncSession]
 ) -> Purchase:
-    items_ids = list(map(lambda x: x.id, purchase_items))
+    items_ids = list(map(lambda x: x.item_id, purchase_items))
 
     async with db() as session:
         stores = (await session.execute(
@@ -193,7 +193,7 @@ async def make_purchase(
         items = {str(item.id): item for item in items}
         have_bad_items = False
         for item in purchase_items:
-            if item[item.id].count > items[item.id].balance:
+            if item.count > items[item.item_id].balance:
                 have_bad_items = True
                 break
 
@@ -203,19 +203,25 @@ async def make_purchase(
         for item in purchase_items:
             await session.execute(
                 update(StoreItemModel)
-                .where(StoreItemModel.id == item.id)
+                .where(StoreItemModel.id == item.item_id)
                 .values(balance=StoreItemModel.balance - item.count)
             )
 
         purchase = PurchaseModel(
             store_id=store_id,
-            user_id=user_id,
-            items_ids=items_ids,
-            is_default_ready=is_default_ready
+            user_id=user_id
         )
-
         session.add(purchase)
         await session.flush()
+
+        for item in purchase_items:
+            session.add(
+                PurchaseItemModel(
+                    purchase_id=purchase.id,
+                    store_item_id=item.item_id,
+                    count=item.count
+                )
+            )
 
         task = TaskModel(
             purchase_id=purchase.id,
@@ -230,7 +236,7 @@ async def make_purchase(
             id=str(purchase.id),
             store_id=purchase.store_id,
             user_id=purchase.user_id,
-            items_ids=items_ids,
+            items=purchase_items,
             date=purchase.created_at
         )
 
@@ -243,20 +249,33 @@ async def get_tasks(
     async with db() as session:
         if also_ready_tasks:
             tasks = (await session.execute(
-                select(TaskModel).where(TaskModel.store_id == store_id)
+                select(TaskModel)
+                .where(TaskModel.store_id == store_id).options(selectinload(TaskModel.purchase))
             )).scalars().all()
         else:
             tasks = (await session.execute(
-                select(TaskModel).where(TaskModel.store_id == store_id, TaskModel.is_ready is False)
+                select(TaskModel)
+                .where(TaskModel.store_id == store_id, TaskModel.is_ready is False)
+                .options(selectinload(TaskModel.purchase))
             )).scalars().all()
 
         return list(map(
             lambda x: Task(
                 id=str(x.id),
-                purchase=x.purchase,
-                store_id=x.store_id,
-                user_id=x.user_id,
-                is_ready=x.is_ready
+                purchase=Purchase(
+                    id=str(x.purchase.id),
+                    store_id=str(x.purchase.store_id),
+                    user_id=str(x.purchase.user_id),
+                    items=[PurchaseItem(
+                        item_id=str(y.store_item_id),
+                        count=y.count
+                    ) for y in x.purchase.items],
+                    date=x.purchase.created_at
+                ),
+                store_id=str(x.store_id),
+                user_id=str(x.user_id),
+                is_ready=x.is_ready,
+                date=x.created_at
             ),
             tasks
         ))
