@@ -2,6 +2,7 @@ import datetime
 import uuid
 
 from sqlalchemy import UUID, Boolean, Column, DateTime, ForeignKey
+from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.orm import Mapped, relationship
 
 from model.base import Base
@@ -35,6 +36,9 @@ class Task(Base):
 
     is_ready: Mapped[bool] = Column(
         Boolean
+    )
+    additional_data: Mapped[dict] = Column(
+        JSON
     )
 
     created_at: Mapped[datetime.datetime] = Column(

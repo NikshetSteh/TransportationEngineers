@@ -1,10 +1,11 @@
 import datetime
 import uuid
 
-from sqlalchemy import UUID, Column, DateTime, String
+from sqlalchemy import UUID, Column, DateTime, Enum, String
 from sqlalchemy.orm import Mapped, relationship
 
 from model.base import Base
+from store.store_types import StoreType
 
 
 class Store(Base):
@@ -25,6 +26,9 @@ class Store(Base):
     )
     logo_url: Mapped[str] = Column(
         String(255),
+    )
+    store_type: Mapped[StoreType] = Column(
+        Enum(StoreType, name="store_type_enum", create_type=False)
     )
 
     # noinspection PyUnresolvedReferences

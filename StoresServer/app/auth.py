@@ -32,11 +32,11 @@ def auth_request(client_type: ClientType):
         config = get_config()
         async with redis_pool() as redis:
             await redis.select(db_index)
-            robot_id = await redis.get(session_id)
+            object_id = await redis.get(session_id)
 
-            if robot_id is not None:
+            if object_id is not None:
                 redis.expire(session_id, config.AUTH_SESSION_TIMEOUT)
-                return robot_id
+                return object_id.decode("utf-8")
             else:
                 raise HTTPException(status_code=401, detail="Invalid credentials")
 

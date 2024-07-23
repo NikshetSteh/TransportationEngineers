@@ -171,6 +171,7 @@ async def make_purchase(
         user_id: str,
         purchase_items: list[PurchaseItem],
         is_default_ready: bool,
+        additional_data: dict,
         db: sessionmaker[AsyncSession]
 ) -> Purchase:
     items_ids = list(map(lambda x: x.item_id, purchase_items))
@@ -228,7 +229,8 @@ async def make_purchase(
             purchase_id=purchase.id,
             store_id=store_id,
             user_id=user_id,
-            is_ready=is_default_ready
+            is_ready=is_default_ready,
+            additional_data=additional_data
         )
         session.add(task)
         await session.commit()
@@ -276,7 +278,8 @@ async def get_tasks(
                 store_id=str(x.store_id),
                 user_id=str(x.user_id),
                 is_ready=x.is_ready,
-                date=x.created_at
+                date=x.created_at,
+                additional_data=x.additional_data
             ),
             tasks
         ))

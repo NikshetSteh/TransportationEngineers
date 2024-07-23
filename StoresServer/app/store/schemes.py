@@ -3,11 +3,14 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
+from store.store_types import StoreType
+
 
 class StoreCreation(BaseModel):
     name: str = Field(max_length=50)
     description: str = Field(max_length=255)
     logo_url: str = Field(max_length=255)
+    store_type: StoreType
 
 
 class StoreItemCreation(BaseModel):
@@ -37,6 +40,7 @@ class PurchaseCreation(BaseModel):
     user_id: str
     items: list[PurchaseItem]
     is_default_ready: bool
+    additional_data: dict = Field(default={})
 
 
 class Purchase(BaseModel):
@@ -54,3 +58,4 @@ class Task(BaseModel):
     user_id: str
     is_ready: bool
     date: datetime.datetime
+    additional_data: dict

@@ -2,14 +2,11 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
-
-class StoreCreation(BaseModel):
-    name: str = Field(max_length=50)
-    description: str = Field(max_length=255)
-    logo_url: str = Field(max_length=255)
+from store_api.store_types import StoreType
 
 
-class StoreItemCreation(BaseModel):
+class StoreItem(BaseModel):
+    id: str
     name: str = Field(max_length=50)
     description: str = Field(max_length=255)
     logo_url: str = Field(max_length=255)
@@ -18,10 +15,10 @@ class StoreItemCreation(BaseModel):
     category: str = Field(max_length=100)
 
 
-class StoreItem(StoreItemCreation):
+class Store(BaseModel):
     id: str
-
-
-class Store(StoreCreation):
-    id: str
+    name: str = Field(max_length=50)
+    description: str = Field(max_length=255)
+    logo_url: str = Field(max_length=255)
+    store_type: StoreType
     items: Optional[list[StoreItem]]

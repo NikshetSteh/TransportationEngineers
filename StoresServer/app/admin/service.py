@@ -31,6 +31,7 @@ async def create_store(
         name=store.name,
         description=store.description,
         logo_url=store.logo_url,
+        store_type=store.store_type,
         items=[]
     )
 
@@ -47,6 +48,7 @@ async def get_stores(
             name=x.name,
             description=x.description,
             logo_url=x.logo_url,
+            store_type=x.store_type,
             items=[]
         ),
         stores
@@ -67,13 +69,14 @@ async def get_store(
         if stores is None:
             raise HTTPException(status_code=404, detail="Store not found")
 
-        store = stores[0]
+        store: StoreModel = stores[0]
 
         return Store(
             id=str(store.id),
             name=store.name,
             description=store.description,
             logo_url=store.logo_url,
+            store_type=store.store_type,
             items=list(map(
                 lambda x: StoreItem(
                     id=str(x.id),

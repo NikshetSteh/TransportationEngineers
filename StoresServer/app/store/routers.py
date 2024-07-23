@@ -64,6 +64,7 @@ async def make_purchase_handler(
         purchase_data.user_id,
         purchase_data.items,
         purchase_data.is_default_ready,
+        purchase_data.additional_data,
         db
     )
 
@@ -80,7 +81,7 @@ async def mark_as_ready_handler(
 @router.get("/tasks")
 async def get_tasks_handler(
         store_id: StoreAuthRequired,
-        also_ready_tasks: bool,
-        db: DbDependency
+        db: DbDependency,
+        also_ready_tasks: bool = False
 ) -> Page[Task]:
     return paginate(await get_tasks(store_id, also_ready_tasks, db))

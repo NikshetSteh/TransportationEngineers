@@ -7,10 +7,10 @@ from cryptography.hazmat.primitives.asymmetric import padding
 
 from auth import keys_utility
 
-user_id = "6558de9d-0be8-409a-b8f0-a8949a505201"
-engineer_id = "c6ce6bd5-3af3-4424-b805-9b54ded0f6be"
+user_id = "76f90fa6-86e1-46ee-b84d-7f5022bd2b24"
+engineer_id = "989ad990-2c5f-42ac-b00f-10dc672b4750"
 store_id = None
-robot_token = "31d18af9-66af-4bd9-9b76-bec04f30f2ed"
+robot_token = "0daa1133-844a-40f1-a912-afaefb4882f0"
 store_token = None
 
 item_1 = None
@@ -53,7 +53,8 @@ if store_id is None:
     response = requests.post("http://localhost:8040/admin/store", json={
         "name": "TestStore",
         "description": "Desc",
-        "logo_url": "logo_url"
+        "logo_url": "logo_url",
+        "store_type": "SHOP"
     })
     print(response)
     store_id = json.loads(response.content.decode("utf-8"))["id"]
@@ -256,7 +257,10 @@ response = requests.post("http://localhost:8040/store/purchase", json={
             "count": 1
         }
     ],
-    "is_default_ready": False
+    "is_default_ready": False,
+    "additional_data": {
+        "place": 10
+    }
 }, headers={
     "Authorization": f"Bearer {store_token}"
 })

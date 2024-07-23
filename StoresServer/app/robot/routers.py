@@ -29,5 +29,6 @@ async def make_purchase_handler(
         purchase_data.user_id,
         purchase_data.items,
         purchase_data.is_default_ready,
+        purchase_data.additional_data,
         db
     )
