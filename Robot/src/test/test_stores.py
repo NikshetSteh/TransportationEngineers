@@ -7,10 +7,10 @@ from cryptography.hazmat.primitives.asymmetric import padding
 
 from auth import keys_utility
 
-user_id = "76f90fa6-86e1-46ee-b84d-7f5022bd2b24"
-engineer_id = "989ad990-2c5f-42ac-b00f-10dc672b4750"
-store_id = None
-robot_token = "0daa1133-844a-40f1-a912-afaefb4882f0"
+user_id = "341e6a5d-b08e-427e-98ef-dc3aeade5b0e"
+engineer_id = "ea5800bf-0c9f-484a-ab94-285d7a7fd8a4"
+store_id = "205c2527-4ebc-437e-a61f-95d3a5f428f4"
+robot_token = None
 store_token = None
 
 item_1 = None
@@ -114,6 +114,7 @@ if robot_token is None:
     robot_token = json.loads(response.content.decode("utf-8"))["token"]
 
 print("Robot token:", robot_token)
+exit()
 
 # Store
 if store_token is None:
@@ -281,3 +282,9 @@ response = requests.put(f"http://localhost:8040/store/task/{task_id}/ready", hea
 })
 print(response)
 print(response.content.decode())
+
+# response = requests.get("http://localhost:8040/robot/store/{store_id}/user/{user_id}/recommendations", headers={
+#     "Authorization": f"Bearer {robot_token}"
+# })
+# print(response)
+# print(response.content.decode())

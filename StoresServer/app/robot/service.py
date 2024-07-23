@@ -17,64 +17,75 @@ async def get_user_recommendations(
         recommendations = []
 
         last_purchases = (await session.execute(
-            select(PurchaseModel).where(
+            select(StoreItemModel)
+            .join(PurchaseItemModel, PurchaseItemModel.store_item_id == StoreItemModel.id)
+            .join(PurchaseModel, PurchaseModel.id == PurchaseItemModel.purchase_id)
+            .where(
                 PurchaseModel.user_id == user_id,
                 PurchaseModel.store_id == store_id
-            ).order_by(PurchaseModel.created_at.desc()).limit(1)
-        )).one_or_none()
-        if last_purchases is not None:
-            last_purchases_items = (await session.execute(
-                select(PurchaseItemModel).where(
-                    PurchaseItemModel.purchase_id == last_purchases.id
-                )
-            )).scalars().all()
-
-            recommendations.extend(last_purchases_items)
+            )
+            .order_by(PurchaseModel.created_at.desc())
+            .limit(2)
+        )).all()
+        last_purchases = list(map(lambda x: x[0], last_purchases))
+        recommendations.extend(last_purchases)
+        print("After first:", recommendations)
 
         user_popular_purchases = (await session.execute(
-            select([PurchaseItemModel.store_item, func.count(PurchaseItemModel.store_item_id).label('count')])
+            select(StoreItemModel)
+            .join(PurchaseItemModel, StoreItemModel.id == PurchaseItemModel.store_item_id)
+            .group_by(StoreItemModel.id)
             .where(
-                PurchaseItemModel.purchase_id == select([PurchaseModel.id]).where(PurchaseModel.user_id == user_id)
+                PurchaseItemModel.purchase_id.in_(
+                    select(PurchaseModel.id)
+                    .where(
+                        PurchaseModel.user_id == user_id,
+                        PurchaseModel.store_id == store_id
+                    )
+                )
             )
-            .group_by(PurchaseItemModel.store_item_id)
-            .order_by(func.count(PurchaseItemModel.store_item_id).desc())
+            .order_by(func.sum(PurchaseItemModel.count).desc())
             .limit(4)
         )).all()
         user_popular_purchases = list(map(lambda x: x[0], user_popular_purchases))
         recommendations.extend(user_popular_purchases)
+        print("After second:", recommendations)
 
         store_popular_purchases = (await session.execute(
-            select([PurchaseItemModel.store_item_id, func.count(PurchaseItemModel.store_item_id).label('count')])
+            select(StoreItemModel)
+            .join(PurchaseItemModel, StoreItemModel.id == PurchaseItemModel.store_item_id)
+            .group_by(StoreItemModel.id)
             .where(
-                PurchaseItemModel.purchase_id == select([PurchaseModel.id]).where(PurchaseModel.store_id == store_id)
+                PurchaseItemModel.purchase_id.in_(
+                    select(PurchaseModel.id)
+                    .where(
+                        PurchaseModel.store_id == store_id
+                    )
+                )
             )
-            .group_by(PurchaseItemModel.store_item_id)
-            .order_by(func.count(PurchaseItemModel.store_item_id).desc())
+            .order_by(func.sum(PurchaseItemModel.count).desc())
             .limit(2)
         )).all()
         store_popular_purchases = list(map(lambda x: x[0], store_popular_purchases))
         recommendations.extend(store_popular_purchases)
+        print("After third:", recommendations)
 
         items_for_recommendations = []
         items_ids = []
 
         for item in recommendations:
-            if item.store_item_id in items_ids:
+            if item.id in items_ids:
                 continue
             else:
-                buffer = (await session.execute(
-                    select(StoreItemModel).where(StoreItemModel.id == item.store_item_id)
-                )).one_or_none()
-                if buffer is not None:
-                    items_for_recommendations.append(StoreItem(
-                        id=str(buffer[0].id),
-                        name=buffer[0].name,
-                        description=buffer[0].description,
-                        logo_url=buffer[0].logo_url,
-                        category=buffer[0].category,
-                        price_penny=buffer[0].price_penny,
-                        store_id=str(buffer[0].store_id)
-                    ))
-                    items_ids.append(item.store_item_id)
+                items_for_recommendations.append(StoreItem(
+                    id=str(item.id),
+                    name=item.name,
+                    description=item.description,
+                    logo_url=item.logo_url,
+                    category=item.category,
+                    price_penny=item.price_penny,
+                    store_id=str(item.store_id)
+                ))
+                items_ids.append(item.id)
 
         return items_for_recommendations
