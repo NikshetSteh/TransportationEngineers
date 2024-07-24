@@ -18,7 +18,7 @@ async def validate_user_ticket(
         session: ClientSession
 ) -> Ticket:
     async with session.post(
-        f"{config.BASE_URL}/robot/ticket_validation",
+        f"{config.BASE_API_URL}/robot/ticket_validation",
         json={
             "station_id": station_id,
             "train_number": train_number,
@@ -48,7 +48,7 @@ async def get_user_ticket_for_station(
         session: ClientSession
 ) -> Ticket | None:
     async with session.get(
-        f"{config.BASE_URL}/robot/station/{station_id}/user/{user_id}/current_ticket"
+        f"{config.BASE_API_URL}/robot/station/{station_id}/user/{user_id}/current_ticket"
     ) as response:
         if response.status == 404:
             return None

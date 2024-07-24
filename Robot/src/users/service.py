@@ -11,7 +11,7 @@ async def indentify_face(
         session: ClientSession
 ) -> User | None:
     async with session.post(
-            f"{config.BASE_URL}/robot/identification",
+            f"{config.BASE_API_URL}/robot/identification",
             json={
                 "image": face
             }

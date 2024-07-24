@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Path
 from fastapi_pagination import Page, paginate
 
 from admin.service import get_store
@@ -13,18 +13,18 @@ router = APIRouter()
 
 @router.get("/store/{store_id}")
 async def get_store_handler(
-        store_id: str,
-        db: DbDependency
+        db: DbDependency,
+        store_id: str = Path(pattern="[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
 ) -> Store:
     return await get_store(store_id, db)
 
 
 @router.post("/store/{store_id}/make_purchase")
 async def make_purchase_handler(
-        store_id: str,
         purchase_data: PurchaseCreation,
         db: DbDependency,
         _: RobotAuthRequired,
+        store_id: str = Path(pattern="[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
 ) -> Purchase:
     return await make_purchase(
         store_id,
@@ -38,10 +38,10 @@ async def make_purchase_handler(
 
 @router.get("/store/{store_id}/user/{user_id}/recommendations")
 async def get_user_recommendations_handler(
-        store_id: str,
-        user_id: str,
         db: DbDependency,
-        _: RobotAuthRequired
+        _: RobotAuthRequired,
+        store_id: str = Path(pattern="[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"),
+        user_id: str = Path(pattern="[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"),
 ) -> Page[StoreItem]:
     return paginate(
         await get_user_recommendations(

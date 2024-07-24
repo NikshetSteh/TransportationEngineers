@@ -7,7 +7,8 @@ class Config(BaseSettings):
     KEY_PATH: str = "private"
     LOGIN_FILE_PATH: str = "private/login_data"
 
-    BASE_URL: str = "http://localhost:8000"
+    BASE_API_URL: str = "http://172.23.116.239:80/base_api/v1"
+    STORE_API_URL: str = "http://172.23.116.239:80/store_api/v1"
 
     ROBOT_MODEL_ID: str = "TestRobotID1"
     ROBOT_MODEL_NAME: str = "TestRobot:0.1.0:001"

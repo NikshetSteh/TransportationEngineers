@@ -83,7 +83,9 @@ async def get_store(
                     name=x.name,
                     description=x.description,
                     logo_url=x.logo_url,
-                    category=x.category
+                    category=x.category,
+                    balance=x.balance,
+                    price_penny=x.price_penny
                 ),
                 store.items
             ))

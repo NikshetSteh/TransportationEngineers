@@ -17,8 +17,8 @@ class StoreItemCreation(BaseModel):
     name: str = Field(max_length=50)
     description: str = Field(max_length=255)
     logo_url: str = Field(max_length=255)
-    balance: int = Field(default=0)
-    price_penny: int = Field(default=0)
+    balance: int
+    price_penny: int
     category: str = Field(max_length=100)
 
 

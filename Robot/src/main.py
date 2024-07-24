@@ -8,6 +8,7 @@ from auth.service import is_login, login, new_login
 from config import get_config
 from tickets.service import validate_user_ticket, get_user_ticket_for_station
 from users.service import indentify_face
+from store.service import get_store
 
 
 async def main() -> None:
@@ -41,8 +42,9 @@ async def main() -> None:
                 "1. Validate user ticket: image_path, station_id, train_number, wagon_number\n"
                 "2. Indentify face: image_path\n"
                 "3. Get ticket: user_id, station_id\n"
+                "4. Get store: store_id\n"
             )
-            action = input("Select action: ").split()
+            action = input(">").split()
             if len(action) < 1:
                 continue
             if action[0] == "1":
@@ -85,7 +87,7 @@ async def main() -> None:
                     print(e)
                     continue
 
-                print(result.model_dump_json(indent=4))
+                print(result.model_dump_json(indent=4) if result is not None else None)
             elif action[0] == "3":
                 if len(action) < 3:
                     print("Invalid count of arguments")
@@ -97,6 +99,17 @@ async def main() -> None:
                     session=session
                 )
                 print(result.model_dump_json(indent=4) if result is not None else None)
+            elif action[0] == "4":
+                if len(action) < 2:
+                    print("Invalid count of arguments")
+                    continue
+
+                try:
+                    result = await get_store(action[1], session)
+                except Exception as e:
+                    print(e)
+                    continue
+                print(result.model_dump_json(indent=True) if result is not None else None)
 
 
 asyncio.run(main())

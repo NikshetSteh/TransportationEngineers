@@ -33,7 +33,7 @@ async def login_by_key(
         session: ClientSession
 ) -> None:
     async with session.post(
-            f"{config.BASE_URL}/auth/robot/login",
+            f"{config.BASE_API_URL}/auth/robot/login",
             json={
                 "id": robot_id
             }
@@ -51,7 +51,7 @@ async def login_by_key(
         )
 
     async with session.post(
-            f"{config.BASE_URL}/auth/robot/login_code",
+            f"{config.BASE_API_URL}/auth/robot/login_code",
             json={
                 "request_id": login_request_id,
                 "data": decrypted_data.decode("utf-8"),
@@ -71,7 +71,7 @@ async def new_login(
 ) -> None:
     private_key, public_key = keys_utility.create_keys()
     async with session.post(
-        f"{config.BASE_URL}/auth/robot/new_login",
+        f"{config.BASE_API_URL}/auth/robot/new_login",
         json={
             "login": engineer_login,
             "password": engineer_password,
