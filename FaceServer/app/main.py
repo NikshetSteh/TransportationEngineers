@@ -1,6 +1,11 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, APIRouter
 
 from routers import router
 
 app = FastAPI()
-app.include_router(router)
+
+api = APIRouter()
+
+api.include_router(router)
+
+app.include_router(api, prefix="/face_api/v1")

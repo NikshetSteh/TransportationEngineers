@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, APIRouter
 from fastapi_pagination import add_pagination
 
 from admin.routers import router as admin_router
@@ -7,8 +7,12 @@ from robot.routers import router as robot_router
 
 app = FastAPI()
 
-app.include_router(admin_router, prefix="/admin")
-app.include_router(store_router, prefix="/store")
-app.include_router(robot_router, prefix="/robot")
+api = APIRouter()
+
+api.include_router(admin_router, prefix="/admin")
+api.include_router(store_router, prefix="/store")
+api.include_router(robot_router, prefix="/robot")
+
+app.include_router(api, prefix="/store_api/v1")
 
 add_pagination(app)

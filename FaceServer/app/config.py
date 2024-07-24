@@ -5,7 +5,7 @@ from pydantic_settings import BaseSettings
 
 class Config(BaseSettings):
     CHROMA_DB_HOST: str = "localhost"
-    CHROMA_DB_PORT: int = 8010
+    CHROMA_DB_PORT: int = 8040
 
     FACE_MODEL: str = "buffalo_l"
     FACE_MODEL_PROVIDER: str = "CPUExecutionProvider"
