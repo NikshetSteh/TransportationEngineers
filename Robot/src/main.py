@@ -54,14 +54,18 @@ async def main() -> None:
                 with open(image_path, "rb") as image_file:
                     face_data = image_file.read()
 
-                result = await validate_user_ticket(
-                    station_id=action[2],
-                    train_number=int(action[3]),
-                    wagon_number=int(action[4]),
-                    date=datetime.datetime.fromisoformat("2024-07-22T10:53:14.363248+00:00"),
-                    face=base64.b64encode(face_data).decode(),
-                    session=session
-                )
+                try:
+                    result = await validate_user_ticket(
+                        station_id=action[2],
+                        train_number=int(action[3]),
+                        wagon_number=int(action[4]),
+                        date=datetime.datetime.fromisoformat("2024-07-22T10:53:14.363248+00:00"),
+                        face=base64.b64encode(face_data).decode(),
+                        session=session
+                    )
+                except Exception as e:
+                    print(e)
+                    continue
                 print(result.model_dump())
             elif action[0] == "2":
                 if len(action) < 2:
@@ -72,11 +76,16 @@ async def main() -> None:
                 with open(image_path, "rb") as image_file:
                     face_data = image_file.read()
 
-                result = await indentify_face(
-                    face=base64.b64encode(face_data).decode(),
-                    session=session
-                )
-                print(result.model_dump())
+                try:
+                    result = await indentify_face(
+                        face=base64.b64encode(face_data).decode(),
+                        session=session
+                    )
+                except Exception as e:
+                    print(e)
+                    continue
+
+                print(result.model_dump_json(indent=4))
             elif action[0] == "3":
                 if len(action) < 3:
                     print("Invalid count of arguments")
@@ -87,7 +96,7 @@ async def main() -> None:
                     station_id=action[2],
                     session=session
                 )
-                print(result.model_dump() if result is not None else None)
+                print(result.model_dump_json(indent=4) if result is not None else None)
 
 
 asyncio.run(main())
