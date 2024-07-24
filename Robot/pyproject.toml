@@ -9,7 +9,7 @@ readme = "README.md"
 python = "^3.12"
 cryptography = "^42.0.8"
 pydantic-settings = "^2.3.4"
-requests-async = "^0.6.2"
+aiohttp = "^3.9.5"
 
 
 [tool.poetry.group.dev.dependencies]

@@ -1,3 +1,5 @@
+import datetime
+
 from pydantic import BaseModel
 
 
@@ -8,4 +10,4 @@ class Ticket(BaseModel):
     wagon_number: int
     place_number: int
     station_id: str
-    date: datetime
+    date: datetime.datetime

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Path
 
 from auth.dependecies import RobotAuthRequired
 from db import DbDependency
@@ -44,10 +44,10 @@ async def ticket_validation(
 
 @router.get("/station/{station_id}/user/{user_id}/current_ticket")
 async def get_user_current_ticket(
-        user_id: str,
-        station_id: str,
         db: DbDependency,
-        _: RobotAuthRequired
+        _: RobotAuthRequired,
+        station_id: str,
+        user_id: str = Path(pattern="^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
 ) -> Ticket:
     ticket = await get_current_ticket(user_id, station_id, db)
     if ticket is None:

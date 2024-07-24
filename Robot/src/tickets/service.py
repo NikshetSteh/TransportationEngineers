@@ -1,6 +1,7 @@
 import datetime
 
-import requests_async as requests
+from aiohttp.client import ClientSession
+
 from config import get_config
 from tickets.exceptions import InvalidTicket
 from tickets.schemes import Ticket
@@ -14,9 +15,9 @@ async def validate_user_ticket(
         wagon_number: int,
         date: datetime.datetime,
         face: str,
-        token: str
-) -> None:
-    response = await requests.post(
+        session: ClientSession
+) -> Ticket:
+    async with session.post(
         f"{config.BASE_URL}/robot/ticket_validation",
         json={
             "station_id": station_id,
@@ -24,42 +25,36 @@ async def validate_user_ticket(
             "wagon_number": wagon_number,
             "date": date.isoformat(),
             "face": face
-        },
-        headers={
-            "Authorization": f"Bearer {token}"
         }
-    )
+    ) as response:
+        if response.status == 404:
+            raise Exception("can`t find people face")
 
-    if response == 404:
-        raise Exception("can`t find people face")
+        if response.status == 400:
+            response_data = await response.json()
+            raise InvalidTicket(
+                response_data["detail"]["message"],
+                response_data["detail"].get("right_ticket", None)
+            )
+        if response.status != 200:
+            raise Exception(f"Unknown server error({response.status}): {await response.text()}")
 
-    if response == 400:
-        response_data = await response.json()
-        raise InvalidTicket(
-            response_data["detail"]["message"],
-            response_data["detail"].get("right_ticket", None)
-        )
-    if response != 200:
-        raise Exception(f"Unknown server error({response.status_code}): {response.text}")
+        return Ticket.parse_obj(await response.json())
 
 
 async def get_user_ticket_for_station(
         station_id: str,
         user_id: str,
-        token: str
+        session: ClientSession
 ) -> Ticket | None:
-    response = await requests.get(
-        f"{config.BASE_URL}/robot/station/{station_id}/user/{user_id}/current_ticket",
-        headers={
-            "Authorization": f"Bearer {token}"
-        }
-    )
+    async with session.get(
+        f"{config.BASE_URL}/robot/station/{station_id}/user/{user_id}/current_ticket"
+    ) as response:
+        if response.status == 404:
+            return None
 
-    if response == 404:
-        return None
+        if response.status != 200:
+            raise Exception(f"Unknown server error({response.status}): {await response.text()}")
 
-    if response != 200:
-        raise Exception(f"Unknown server error({response.status_code}): {response.text}")
-
-    response_data = await response.json()
-    return Ticket(**response_data)
+        response_data = await response.json()
+        return Ticket(**response_data)
