@@ -84,7 +84,8 @@ async def get_user_recommendations(
                     logo_url=item.logo_url,
                     category=item.category,
                     price_penny=item.price_penny,
-                    store_id=str(item.store_id)
+                    store_id=str(item.store_id),
+                    balance=item.balance
                 ))
                 items_ids.append(item.id)
 

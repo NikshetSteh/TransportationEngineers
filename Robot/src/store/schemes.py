@@ -1,3 +1,4 @@
+import datetime
 from typing import Optional
 
 from pydantic import BaseModel, Field
@@ -26,3 +27,23 @@ class Store(BaseModel):
     description: str = Field(max_length=255)
     logo_url: str = Field(max_length=255)
     store_type: StoreType
+
+
+class PurchaseItem(BaseModel):
+    item_id: str
+    count: int
+
+
+class PurchaseCreation(BaseModel):
+    user_id: str
+    items: list[PurchaseItem]
+    is_default_ready: bool
+    additional_data: dict = Field(default={})
+
+
+class Purchase(BaseModel):
+    id: str
+    store_id: str
+    user_id: str
+    items: list[PurchaseItem]
+    date: datetime.datetime

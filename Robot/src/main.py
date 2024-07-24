@@ -8,7 +8,8 @@ from auth.service import is_login, login, new_login
 from config import get_config
 from tickets.service import validate_user_ticket, get_user_ticket_for_station
 from users.service import indentify_face
-from store.service import get_store
+from store.service import get_store, get_user_recommendation_for_store, create_purchase
+from store.schemes import PurchaseCreation
 
 
 async def main() -> None:
@@ -43,6 +44,8 @@ async def main() -> None:
                 "2. Indentify face: image_path\n"
                 "3. Get ticket: user_id, station_id\n"
                 "4. Get store: store_id\n"
+                "5. Get user recommendations for store: user_id, store_id, page=1, size=50\n"
+                "6. Make purchase: store_id, data(json)\n"
             )
             action = input(">").split()
             if len(action) < 1:
@@ -110,6 +113,56 @@ async def main() -> None:
                     print(e)
                     continue
                 print(result.model_dump_json(indent=True) if result is not None else None)
+            elif action[0] == "5":
+                if len(action) < 3:
+                    print("Invalid count of arguments")
+                    continue
+
+                try:
+                    if len(action) == 3:
+                        result = await get_user_recommendation_for_store(
+                            user_id=action[1],
+                            store_id=action[2],
+                            session=session
+                        )
+                    elif len(action) == 4:
+                        result = await get_user_recommendation_for_store(
+                            user_id=action[1],
+                            store_id=action[2],
+                            session=session,
+                            page=int(action[3])
+                        )
+                    elif len(action) == 5:
+                        result = await get_user_recommendation_for_store(
+                            user_id=action[1],
+                            store_id=action[2],
+                            session=session,
+                            page=int(action[3]),
+                            size=int(action[4])
+                        )
+                except Exception as e:
+                    print(e)
+                    continue
+                print(result.model_dump_json(indent=True))
+            elif action[0] == "6":
+                if len(action) < 3:
+                    print("Invalid count of arguments")
+                    continue
+
+                purchase_creation = PurchaseCreation.parse_raw(action[2])
+                try:
+                    result = await create_purchase(
+                        store_id=action[1],
+                        user_id=purchase_creation.user_id,
+                        items=purchase_creation.items,
+                        is_default_ready=purchase_creation.is_default_ready,
+                        session=session,
+                        additional_data=purchase_creation.additional_data
+                    )
+                except Exception as e:
+                    print(e)
+                    continue
+                print(result.model_dump_json(indent=True))
 
 
 asyncio.run(main())
