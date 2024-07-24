@@ -33,7 +33,7 @@ async def login_by_key(
         robot_id: str
 ) -> str:
     response: Response = await requests.post(
-        f"ht{config['BASE_URL']}/auth/robot/login",
+        f"ht{config.BASE_URL}/auth/robot/login",
         json={
             "id": robot_id
         }
@@ -52,7 +52,7 @@ async def login_by_key(
     )
 
     response: Response = await requests.post(
-        f"{config['BASE_URL']}/auth/robot/login_code",
+        f"{config.BASE_URL}/auth/robot/login_code",
         json={
             "request_id": login_request_id,
             "data": decrypted_data.decode("utf-8"),
@@ -70,7 +70,7 @@ async def new_login(
 ) -> None:
     private_key, public_key = keys_utility.create_keys()
     response: Response = await requests.post(
-        f"{config['BASE_URL']}/auth/robot/new_login",
+        f"{config.BASE_URL}/auth/robot/new_login",
         json={
             "login": engineer_login,
             "password": engineer_password,
