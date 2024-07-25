@@ -2,9 +2,14 @@ import datetime
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import selectinload, sessionmaker
 
+from admin.schemes import Engineer
+from auth.engineer_privileges import (EngineerPrivileges,
+                                      engineer_privileges_translations)
 from face_api.service import search_face
+from model.auth_cards import AuthCard
+from model.engineer import Engineer as EngineerModel
 from model.ticket import Ticket as TicketModel
 from model.user import User as UserModel
 from robot.exceptions import *
@@ -147,3 +152,30 @@ async def get_current_ticket(
             station_id=tickets[0].station_id,
             date=tickets[0].date
         )
+
+
+async def validate_robot_admin_access(
+        key: str,
+        db: sessionmaker[AsyncSession]
+) -> Engineer:
+    async with db() as session:
+        auth_cards = (await session.execute(
+            select(AuthCard).where(
+                AuthCard.key == key
+            ).options(selectinload(AuthCard.engineer))
+        )).one_or_none()
+
+        if auth_cards is None:
+            raise HTTPException(status_code=403, detail="Access denied")
+
+        engineer_model: EngineerModel = auth_cards[0].engineer
+
+        if engineer_model.privileges & engineer_privileges_translations[EngineerPrivileges.ROBOT_ADMIN] == 0:
+            raise HTTPException(status_code=403, detail="Access denied")
+
+        engineer = Engineer(
+            id=str(engineer_model.id),
+            login=engineer_model.login
+        )
+
+        return engineer

@@ -1,10 +1,11 @@
 from fastapi import APIRouter, HTTPException, Path
 
+from admin.schemes import Engineer
 from auth.dependecies import RobotAuthRequired
 from db import DbDependency
 from robot.schemes import *
 from robot.service import (check_user_place_in_wagon, get_current_ticket,
-                           identification_face)
+                           identification_face, validate_robot_admin_access)
 from users.schemes import Ticket, User
 
 router = APIRouter()
@@ -54,3 +55,15 @@ async def get_user_current_ticket(
         raise HTTPException(status_code=404, detail="Ticket not found")
 
     return ticket
+
+
+@router.post("/engineer/admin_access")
+async def admin_access(
+        access_request: EngineerRobotAccessRequest,
+        db: DbDependency,
+        _: RobotAuthRequired
+) -> Engineer:
+    return await validate_robot_admin_access(
+        access_request.key,
+        db
+    )
