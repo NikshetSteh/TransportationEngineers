@@ -27,3 +27,7 @@ class EngineerPrivilegesUpdate(BaseModel):
 
 class UserFaceUpdate(BaseModel):
     face: str = Field(max_length=10_485_760)
+
+
+class AuthCardCreation(BaseModel):
+    key: str | None = Field(max_length=256, default=None)

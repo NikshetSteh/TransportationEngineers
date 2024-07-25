@@ -1,21 +1,22 @@
 from logging.config import fileConfig
 
-from alembic import context
-from sqlalchemy import create_engine
-from sqlalchemy import pool
+from sqlalchemy import create_engine, pool
 
+from alembic import context
 from config import get_config as get_app_config
+# noinspection PyUnresolvedReferences
+from model.active_store import ActiveStore
+# noinspection PyUnresolvedReferences
+from model.auth_cards import AuthCard
+from model.base import Base
+# noinspection PyUnresolvedReferences
+from model.engineer import Engineer
 # noinspection PyUnresolvedReferences
 from model.robot import Robot
 # noinspection PyUnresolvedReferences
 from model.ticket import Ticket
 # noinspection PyUnresolvedReferences
 from model.user import User
-# noinspection PyUnresolvedReferences
-from model.engineer import Engineer
-# noinspection PyUnresolvedReferences
-from model.active_store import ActiveStore
-from model.base import Base
 
 config = context.config
 

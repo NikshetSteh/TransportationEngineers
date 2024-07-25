@@ -19,3 +19,7 @@ class TicketValidationRequest(BaseModel):
     wagon_number: int
     date: datetime.datetime
     face: str = Field(max_length=10_485_760)
+
+
+class EngineerRobotAccessRequest(BaseModel):
+    key: str = Field(max_length=256)
