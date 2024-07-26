@@ -6,6 +6,8 @@ from aiohttp.client import ClientSession
 
 from auth.service import auth_admin, is_login, login, new_login
 from config import get_config
+from info_service.service import (get_destination_attractions,
+                                  get_destination_hotels)
 from store.schemes import PurchaseCreation
 from store.service import (create_purchase, get_store,
                            get_user_recommendation_for_store)
@@ -46,6 +48,8 @@ async def main() -> None:
                 "5. Get user recommendations for store: user_id, store_id, page=1, size=50\n"
                 "6. Make purchase: store_id, data(json)\n"
                 "7. Auth admin: admin_card_id\n"
+                "8. Get destination attractions: destination_id\n"
+                "9. Get destination hotels: destination_id\n"
             )
             action = input(">").split()
             if len(action) < 1:
@@ -176,6 +180,26 @@ async def main() -> None:
                 except Exception as e:
                     print(e)
                     continue
+                print(result.model_dump_json(indent=True))
+            elif action[0] == "8":
+                if len(action) < 2:
+                    print("Invalid count of arguments")
+                    continue
+
+                result = await get_destination_attractions(
+                    destination_id=action[1],
+                    session=session
+                )
+                print(result.model_dump_json(indent=True))
+            elif action[0] == "9":
+                if len(action) < 2:
+                    print("Invalid count of arguments")
+                    continue
+
+                result = await get_destination_hotels(
+                    destination_id=action[1],
+                    session=session
+                )
                 print(result.model_dump_json(indent=True))
             else:
                 print("Invalid action")

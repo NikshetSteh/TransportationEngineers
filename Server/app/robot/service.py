@@ -1,4 +1,4 @@
-import datetime
+from typing import TypeVar
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -9,10 +9,13 @@ from auth.engineer_privileges import (EngineerPrivileges,
                                       engineer_privileges_translations)
 from face_api.service import search_face
 from model.auth_cards import AuthCard
+from model.destinations_info import Attraction as AttractionModel
+from model.destinations_info import Hotel as HotelModel
 from model.engineer import Engineer as EngineerModel
 from model.ticket import Ticket as TicketModel
 from model.user import User as UserModel
 from robot.exceptions import *
+from robot.schemes import *
 from users.schemes import Ticket, User
 
 
@@ -152,6 +155,50 @@ async def get_current_ticket(
             station_id=tickets[0].station_id,
             date=tickets[0].date
         )
+
+
+T = TypeVar('T')
+
+
+async def get_destination_info(
+        model_type: T,
+        destination_id: str,
+        db: sessionmaker[AsyncSession]
+) -> list[T]:
+    async with db() as session:
+        return (await session.execute(
+            select(model_type).where(model_type.destination_id == destination_id)
+        )).scalars().all()
+
+
+async def get_attractions(
+        destination_id: str,
+        db: sessionmaker[AsyncSession]
+) -> list[Attraction]:
+    return list(map(
+        lambda attraction: Attraction(
+            id=str(attraction.id),
+            name=attraction.name,
+            description=attraction.description,
+            logo_url=attraction.logo_url
+        ),
+        await get_destination_info(AttractionModel, destination_id, db)
+    ))
+
+
+async def get_hotels(
+        destination_id: str,
+        db: sessionmaker[AsyncSession]
+) -> list[Hotel]:
+    return list(map(
+        lambda hotel: Hotel(
+            id=str(hotel.id),
+            name=hotel.name,
+            description=hotel.description,
+            logo_url=hotel.logo_url
+        ),
+        await get_destination_info(HotelModel, destination_id, db)
+    ))
 
 
 async def validate_robot_admin_access(

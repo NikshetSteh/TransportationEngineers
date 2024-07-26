@@ -21,5 +21,19 @@ class TicketValidationRequest(BaseModel):
     face: str = Field(max_length=10_485_760)
 
 
+class Attraction(BaseModel):
+    id: str
+    name: str
+    description: str
+    logo_url: str
+
+
+class Hotel(BaseModel):
+    id: str
+    name: str
+    description: str
+    logo_url: str
+
+
 class EngineerRobotAccessRequest(BaseModel):
     key: str = Field(max_length=256)

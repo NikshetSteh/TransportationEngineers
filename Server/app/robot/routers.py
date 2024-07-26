@@ -1,11 +1,13 @@
 from fastapi import APIRouter, HTTPException, Path
+from fastapi_pagination import Page, paginate
 
 from admin.schemes import Engineer
 from auth.dependecies import RobotAuthRequired
 from db import DbDependency
 from robot.schemes import *
-from robot.service import (check_user_place_in_wagon, get_current_ticket,
-                           identification_face, validate_robot_admin_access)
+from robot.service import (check_user_place_in_wagon, get_attractions,
+                           get_current_ticket, get_hotels, identification_face,
+                           validate_robot_admin_access)
 from users.schemes import Ticket, User
 
 router = APIRouter()
@@ -55,6 +57,24 @@ async def get_user_current_ticket(
         raise HTTPException(status_code=404, detail="Ticket not found")
 
     return ticket
+
+
+@router.get("/destination/{destination_id}/hotels")
+async def get_destination_hotels(
+        db: DbDependency,
+        _: RobotAuthRequired,
+        destination_id: str
+) -> Page[Hotel]:
+    return paginate(await get_hotels(destination_id, db))
+
+
+@router.get("/destination/{destination_id}/attractions")
+async def get_destination_attractions(
+        destination_id: str,
+        db: DbDependency,
+        _: RobotAuthRequired
+) -> Page[Attraction]:
+    return paginate(await get_attractions(destination_id, db))
 
 
 @router.post("/engineer/admin_access")

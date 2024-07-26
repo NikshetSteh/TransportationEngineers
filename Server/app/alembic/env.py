@@ -10,6 +10,8 @@ from model.active_store import ActiveStore
 from model.auth_cards import AuthCard
 from model.base import Base
 # noinspection PyUnresolvedReferences
+from model.destinations_info import Attraction, Hotel
+# noinspection PyUnresolvedReferences
 from model.engineer import Engineer
 # noinspection PyUnresolvedReferences
 from model.robot import Robot
