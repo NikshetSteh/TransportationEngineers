@@ -11,9 +11,11 @@ from model.engineer import Engineer as EngineerModel
 from model.robot import Robot as RobotModel
 from model.ticket import Ticket as TicketModel
 from model.user import User as UserModel
-from robot.schemes import Robot
+from robot.schemes import Robot, Hotel, Attraction
 from schemes import EmptyResponse
 from users.schemes import Ticket, TicketCreation, User
+from robot.service import get_hotels, get_attractions
+from model.destinations_info import Hotel as HotelModel, Attraction as AttractionModel
 
 router = APIRouter()
 
@@ -336,3 +338,94 @@ async def get_tickets(
         )
     )
     return paginate(data)
+
+
+@router.get("/destination/{destination_id}/hotels")
+async def get_destination_hotels(
+        db: DbDependency,
+        destination_id: str
+) -> list[Hotel]:
+    return paginate(await get_hotels(destination_id, db))
+
+
+@router.get("/destination/{destination_id}/attractions")
+async def get_destination_attractions(
+        destination_id: str,
+        db: DbDependency,
+) -> Page[Attraction]:
+    return paginate(await get_attractions(destination_id, db))
+
+
+@router.post("/destination/{destination_id}/hotel")
+async def create_destination_hotel(
+        destination_id: str,
+        data: HotelCreation,
+        db: DbDependency
+) -> Hotel:
+    async with db() as session:
+        hotel = HotelModel(
+            destination_id=destination_id,
+            name=data.name,
+            description=data.description,
+        )
+        session.add(hotel)
+        await session.commit()
+
+    return Hotel(
+        id=str(hotel.id),
+        destination_id=hotel.destination_id,
+        name=hotel.name,
+        description=hotel.description
+    )
+
+
+@router.post("/destination/{destination_id}/attraction")
+async def create_destination_attraction(
+        destination_id: str,
+        data: AttractionCreation,
+        db: DbDependency
+) -> Attraction:
+    async with db() as session:
+        attraction = AttractionModel(
+            destination_id=destination_id,
+            name=data.name,
+            description=data.description,
+        )
+        session.add(attraction)
+        await session.commit()
+
+    return Attraction(
+        id=str(attraction.id),
+        destination_id=attraction.destination_id,
+        name=attraction.name,
+        description=attraction.description
+    )
+
+
+@router.delete("/destination_info/hotel/{hotel_id}")
+async def delete_destination_hotel(
+        hotel_id: str,
+        db: DbDependency
+) -> EmptyResponse:
+    async with db() as session:
+        await session.execute(
+            delete(HotelModel).where(HotelModel.id == hotel_id)
+        )
+        await session.commit()
+
+    return EmptyResponse()
+
+
+@router.delete("/destination_info/attraction/{attraction_id}")
+async def delete_destination_attraction(
+        attraction_id: str,
+        db: DbDependency
+) -> EmptyResponse:
+    async with db() as session:
+        await session.execute(
+            delete(AttractionModel).where(AttractionModel.id == attraction_id)
+        )
+
+        await session.commit()
+
+    return EmptyResponse()

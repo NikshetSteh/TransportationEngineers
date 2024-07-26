@@ -19,3 +19,17 @@ class TicketValidationRequest(BaseModel):
     wagon_number: int
     date: datetime.datetime
     face: str = Field(max_length=10_485_760)
+
+
+class Attraction(BaseModel):
+    id: str
+    name: str
+    description: str
+    logo_url: str
+
+
+class Hotel(BaseModel):
+    id: str
+    name: str
+    description: str
+    logo_url: str

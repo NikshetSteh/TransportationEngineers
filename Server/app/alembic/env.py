@@ -15,6 +15,8 @@ from model.user import User
 from model.engineer import Engineer
 # noinspection PyUnresolvedReferences
 from model.active_store import ActiveStore
+# noinspection PyUnresolvedReferences
+from model.destinations_info import Hotel, Attraction
 from model.base import Base
 
 config = context.config

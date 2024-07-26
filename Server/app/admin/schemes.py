@@ -27,3 +27,15 @@ class EngineerPrivilegesUpdate(BaseModel):
 
 class UserFaceUpdate(BaseModel):
     face: str = Field(max_length=10_485_760)
+
+
+class AttractionCreation(BaseModel):
+    name: str
+    description: str
+    logo_url: str
+
+
+class HotelCreation(BaseModel):
+    name: str
+    description: str
+    logo_url: str
