@@ -8,6 +8,7 @@ from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
 
 from auth import keys_utility
+from auth.schemes import *
 from config import get_config
 
 config = get_config()
@@ -71,14 +72,14 @@ async def new_login(
 ) -> None:
     private_key, public_key = keys_utility.create_keys()
     async with session.post(
-        f"{config.BASE_API_URL}/auth/robot/new_login",
-        json={
-            "login": engineer_login,
-            "password": engineer_password,
-            "public_key": keys_utility.public_key_to_string(public_key),
-            "robot_model_id": robot_model_id,
-            "robot_model_name": robot_model_name
-        }
+            f"{config.BASE_API_URL}/auth/robot/new_login",
+            json={
+                "login": engineer_login,
+                "password": engineer_password,
+                "public_key": keys_utility.public_key_to_string(public_key),
+                "robot_model_id": robot_model_id,
+                "robot_model_name": robot_model_name
+            }
     ) as response:
         if response.status == 401:
             raise Exception("Invalid credentials")
@@ -102,3 +103,20 @@ async def login(
 ) -> None:
     private_key, public_key = keys_utility.try_load_keys(password)
     await login_by_key(private_key, load_login_data()["robot_id"], session)
+
+
+async def auth_admin(
+        key: str,
+        session: ClientSession
+) -> Admin:
+    async with session.post(
+            f"{config.BASE_API_URL}/robot/engineer/admin_access",
+            json={
+                "key": key
+            }) as response:
+        if response.status == 403:
+            raise Exception("Access denied")
+        if response.status != 200:
+            raise Exception(f"Something went wrong({response.status}): {await response.text()}")
+
+        return Admin(**(await response.json()))

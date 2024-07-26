@@ -4,12 +4,13 @@ import datetime
 
 from aiohttp.client import ClientSession
 
-from auth.service import is_login, login, new_login
+from auth.service import auth_admin, is_login, login, new_login
 from config import get_config
-from tickets.service import validate_user_ticket, get_user_ticket_for_station
-from users.service import indentify_face
-from store.service import get_store, get_user_recommendation_for_store, create_purchase
 from store.schemes import PurchaseCreation
+from store.service import (create_purchase, get_store,
+                           get_user_recommendation_for_store)
+from tickets.service import get_user_ticket_for_station, validate_user_ticket
+from users.service import indentify_face
 
 
 async def main() -> None:
@@ -17,23 +18,21 @@ async def main() -> None:
         config = get_config()
 
         if is_login():
-            password = input("Enter password: ")
-            await login(password, session)
+            await login("", session)
         else:
             engineer_login = input("Enter engineer login: ")
             engineer_password = input("Enter engineer password: ")
-            new_password = input("Enter new password: ")
 
             await new_login(
                 engineer_login,
                 engineer_password,
-                new_password,
+                "",
                 config.ROBOT_MODEL_ID,
                 config.ROBOT_MODEL_NAME,
                 session
             )
 
-            await login(new_password, session)
+            await login("", session)
 
         print(f"Authed successfully with token: {session.headers['Authorization']}")
 
@@ -46,6 +45,7 @@ async def main() -> None:
                 "4. Get store: store_id\n"
                 "5. Get user recommendations for store: user_id, store_id, page=1, size=50\n"
                 "6. Make purchase: store_id, data(json)\n"
+                "7. Auth admin: admin_card_id\n"
             )
             action = input(">").split()
             if len(action) < 1:
@@ -163,6 +163,23 @@ async def main() -> None:
                     print(e)
                     continue
                 print(result.model_dump_json(indent=True))
+            elif action[0] == "7":
+                if len(action) < 2:
+                    print("Invalid count of arguments")
+                    continue
+
+                try:
+                    result = await auth_admin(
+                        action[1],
+                        session
+                    )
+                except Exception as e:
+                    print(e)
+                    continue
+                print(result.model_dump_json(indent=True))
+            else:
+                print("Invalid action")
+                continue
 
 
 asyncio.run(main())

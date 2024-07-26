@@ -1,11 +1,13 @@
 from fastapi import APIRouter, HTTPException, Path
 from fastapi_pagination import Page, paginate
 
+from admin.schemes import Engineer
 from auth.dependecies import RobotAuthRequired
 from db import DbDependency
 from robot.schemes import *
 from robot.service import (check_user_place_in_wagon, get_current_ticket,
-                           identification_face, get_hotels, get_attractions)
+                           get_hotels, get_attractions, identification_face,
+                           validate_robot_admin_access)
 from users.schemes import Ticket, User
 
 router = APIRouter()
@@ -73,3 +75,15 @@ async def get_destination_attractions(
         _: RobotAuthRequired
 ) -> Page[Attraction]:
     return paginate(await get_attractions(destination_id, db))
+
+
+@router.post("/engineer/admin_access")
+async def admin_access(
+        access_request: EngineerRobotAccessRequest,
+        db: DbDependency,
+        _: RobotAuthRequired
+) -> Engineer:
+    return await validate_robot_admin_access(
+        access_request.key,
+        db
+    )

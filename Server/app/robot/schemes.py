@@ -33,3 +33,7 @@ class Hotel(BaseModel):
     name: str
     description: str
     logo_url: str
+
+
+class EngineerRobotAccessRequest(BaseModel):
+    key: str = Field(max_length=256)

@@ -1,7 +1,8 @@
 from aiohttp import ClientSession
-from store.schemes import *
+
 from config import get_config
 from schemes import Page
+from store.schemes import *
 
 config = get_config()
 

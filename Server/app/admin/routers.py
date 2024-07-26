@@ -1,5 +1,5 @@
 import bcrypt
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Path
 from fastapi_pagination import Page, paginate
 from sqlalchemy import delete, select
 
@@ -7,6 +7,7 @@ from admin.schemes import *
 from auth.engineer_privileges import engineer_privileges_translations
 from db import DbDependency
 from face_api.service import delete_face, save_face
+from model.auth_cards import AuthCard as AuthCardModel
 from model.engineer import Engineer as EngineerModel
 from model.robot import Robot as RobotModel
 from model.ticket import Ticket as TicketModel
@@ -425,7 +426,44 @@ async def delete_destination_attraction(
         await session.execute(
             delete(AttractionModel).where(AttractionModel.id == attraction_id)
         )
+    return EmptyResponse()
 
+
+@router.put("/engineer/{engineer_id}/auth_card")
+async def update_auth_card(
+        data: AuthCardCreation,
+        db: DbDependency,
+        engineer_id: str = Path(pattern="[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}")
+) -> EmptyResponse:
+    async with db() as session:
+        engineers = (await session.execute(
+            select(EngineerModel).where(EngineerModel.id == engineer_id)
+        )).one_or_none()
+        if engineers is None:
+            raise HTTPException(status_code=404, detail="Engineer not found")
+
+        if data.key is None or data.key == "":
+            await session.execute(
+                delete(AuthCardModel).where(AuthCardModel.engineer_id == engineer_id)
+            )
+            await session.commit()
+            return EmptyResponse()
+
+        auth_cards = (await session.execute(
+            select(AuthCardModel).where(AuthCardModel.engineer_id == engineer_id)
+        )).one_or_none()
+        if auth_cards is not None:
+            auth_card = auth_cards[0]
+            auth_card.key = data.key
+            session.add(auth_card)
+            await session.commit()
+            return EmptyResponse()
+
+        auth_card = AuthCardModel(
+            engineer_id=engineer_id,
+            key=data.key
+        )
+        session.add(auth_card)
         await session.commit()
 
     return EmptyResponse()

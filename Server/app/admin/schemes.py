@@ -39,3 +39,7 @@ class HotelCreation(BaseModel):
     name: str
     description: str
     logo_url: str
+
+
+class AuthCardCreation(BaseModel):
+    key: str | None = Field(max_length=256, default=None)

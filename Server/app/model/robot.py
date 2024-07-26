@@ -10,7 +10,7 @@ from model.base import Base
 class Robot(Base):
     __tablename__ = "robots"
 
-    id: Mapped[int] = Column(
+    id: Mapped[str] = Column(
         UUID,
         name="id",
         primary_key=True,
