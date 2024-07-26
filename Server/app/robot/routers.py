@@ -5,8 +5,8 @@ from admin.schemes import Engineer
 from auth.dependecies import RobotAuthRequired
 from db import DbDependency
 from robot.schemes import *
-from robot.service import (check_user_place_in_wagon, get_current_ticket,
-                           get_hotels, get_attractions, identification_face,
+from robot.service import (check_user_place_in_wagon, get_attractions,
+                           get_current_ticket, get_hotels, identification_face,
                            validate_robot_admin_access)
 from users.schemes import Ticket, User
 
@@ -64,7 +64,7 @@ async def get_destination_hotels(
         db: DbDependency,
         _: RobotAuthRequired,
         destination_id: str
-) -> list[Hotel]:
+) -> Page[Hotel]:
     return paginate(await get_hotels(destination_id, db))
 
 

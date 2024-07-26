@@ -8,15 +8,16 @@ from auth.engineer_privileges import engineer_privileges_translations
 from db import DbDependency
 from face_api.service import delete_face, save_face
 from model.auth_cards import AuthCard as AuthCardModel
+from model.destinations_info import Attraction as AttractionModel
+from model.destinations_info import Hotel as HotelModel
 from model.engineer import Engineer as EngineerModel
 from model.robot import Robot as RobotModel
 from model.ticket import Ticket as TicketModel
 from model.user import User as UserModel
-from robot.schemes import Robot, Hotel, Attraction
+from robot.schemes import Attraction, Hotel, Robot
+from robot.service import get_attractions, get_hotels
 from schemes import EmptyResponse
 from users.schemes import Ticket, TicketCreation, User
-from robot.service import get_hotels, get_attractions
-from model.destinations_info import Hotel as HotelModel, Attraction as AttractionModel
 
 router = APIRouter()
 
@@ -368,15 +369,16 @@ async def create_destination_hotel(
             destination_id=destination_id,
             name=data.name,
             description=data.description,
+            logo_url=data.logo_url
         )
         session.add(hotel)
         await session.commit()
 
     return Hotel(
         id=str(hotel.id),
-        destination_id=hotel.destination_id,
         name=hotel.name,
-        description=hotel.description
+        description=hotel.description,
+        logo_url=hotel.logo_url
     )
 
 
@@ -391,15 +393,16 @@ async def create_destination_attraction(
             destination_id=destination_id,
             name=data.name,
             description=data.description,
+            logo_url=data.logo_url
         )
         session.add(attraction)
         await session.commit()
 
     return Attraction(
         id=str(attraction.id),
-        destination_id=attraction.destination_id,
         name=attraction.name,
-        description=attraction.description
+        description=attraction.description,
+        logo_url=attraction.logo_url
     )
 
 
@@ -426,6 +429,7 @@ async def delete_destination_attraction(
         await session.execute(
             delete(AttractionModel).where(AttractionModel.id == attraction_id)
         )
+        await session.commit()
     return EmptyResponse()
 
 

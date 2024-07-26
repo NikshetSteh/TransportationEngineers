@@ -8,8 +8,9 @@ from admin.schemes import Engineer
 from auth.engineer_privileges import (EngineerPrivileges,
                                       engineer_privileges_translations)
 from face_api.service import search_face
-from model.destinations_info import Hotel as HotelModel, Attraction as AttractionModel
 from model.auth_cards import AuthCard
+from model.destinations_info import Attraction as AttractionModel
+from model.destinations_info import Hotel as HotelModel
 from model.engineer import Engineer as EngineerModel
 from model.ticket import Ticket as TicketModel
 from model.user import User as UserModel

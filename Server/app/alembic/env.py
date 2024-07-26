@@ -8,6 +8,9 @@ from config import get_config as get_app_config
 from model.active_store import ActiveStore
 # noinspection PyUnresolvedReferences
 from model.auth_cards import AuthCard
+from model.base import Base
+# noinspection PyUnresolvedReferences
+from model.destinations_info import Attraction, Hotel
 # noinspection PyUnresolvedReferences
 from model.engineer import Engineer
 # noinspection PyUnresolvedReferences
@@ -16,13 +19,6 @@ from model.robot import Robot
 from model.ticket import Ticket
 # noinspection PyUnresolvedReferences
 from model.user import User
-# noinspection PyUnresolvedReferences
-from model.engineer import Engineer
-# noinspection PyUnresolvedReferences
-from model.active_store import ActiveStore
-# noinspection PyUnresolvedReferences
-from model.destinations_info import Hotel, Attraction
-from model.base import Base
 
 config = context.config
 
