@@ -1,5 +1,5 @@
 <RCC>
   <qresource prefix="icons">
-    <file>Media/ticket.png</file>
+    <file>media/ticket.png</file>
   </qresource>
 </RCC>

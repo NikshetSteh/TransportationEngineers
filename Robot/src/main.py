@@ -1,8 +1,11 @@
 import asyncio
 import base64
 import datetime
+import sys
 
 from aiohttp.client import ClientSession
+from PySide6.QtWidgets import QApplication
+from qasync import QEventLoop
 
 from auth.service import auth_admin, is_login, login, new_login
 from config import get_config
@@ -12,6 +15,7 @@ from store.schemes import PurchaseCreation
 from store.service import (create_purchase, get_store,
                            get_user_recommendation_for_store)
 from tickets.service import get_user_ticket_for_station, validate_user_ticket
+from ui.ticket.checking.window import TicketCheckingWindow
 from users.service import indentify_face
 
 
@@ -50,6 +54,7 @@ async def main() -> None:
                 "7. Auth admin: admin_card_id\n"
                 "8. Get destination attractions: destination_id\n"
                 "9. Get destination hotels: destination_id\n"
+                "10. Run check ticket window\n"
             )
             action = input(">").split()
             if len(action) < 1:
@@ -201,9 +206,30 @@ async def main() -> None:
                     session=session
                 )
                 print(result.model_dump_json(indent=True))
+            elif action[0] == "10":
+                if len(action) < 1:
+                    print("Invalid count of arguments")
+                    continue
+
+                window = TicketCheckingWindow(
+                    session=session
+                )
+                window.show()
+                while window.isEnabled():
+                    await asyncio.sleep(1)
             else:
                 print("Invalid action")
                 continue
 
+while True:
+    app = QApplication(sys.argv)
+    try:
 
-asyncio.run(main())
+        loop = QEventLoop(app)
+        asyncio.set_event_loop(loop)
+
+        loop.run_until_complete(main())
+    except Exception as e:
+        print("Error: " + str(e))
+        app.shutdown()
+        continue

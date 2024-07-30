@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'Ticket.ui'
+## Form generated from reading UI file 'ticket.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.6.0
+## Created by: Qt User Interface Compiler version 6.7.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -17,7 +17,7 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QLabel, QMainWindow, QSizePolicy,
     QWidget)
-import Ticket_rc
+import ui.ticket.checking.ticket_rc
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -28,7 +28,7 @@ class Ui_MainWindow(object):
         MainWindow.setMaximumSize(QSize(1024, 600))
         MainWindow.setBaseSize(QSize(1024, 600))
         icon = QIcon()
-        icon.addFile(u":/icons/Media/ticket.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon.addFile(u":/icons/Media/ticket.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         MainWindow.setWindowIcon(icon)
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")

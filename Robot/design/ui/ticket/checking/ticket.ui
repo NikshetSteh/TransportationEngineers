@@ -71,7 +71,7 @@
   </widget>
  </widget>
  <resources>
-  <include location="Ticket.qrc"/>
+  <include location="ticket.qrc"/>
  </resources>
  <connections/>
 </ui>

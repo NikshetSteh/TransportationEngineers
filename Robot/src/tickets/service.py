@@ -32,6 +32,11 @@ async def validate_user_ticket(
 
         if response.status == 400:
             response_data = await response.json()
+            if isinstance(response_data["detail"], str):
+                raise InvalidTicket(
+                    response_data["detail"],
+                    None
+                )
             raise InvalidTicket(
                 response_data["detail"]["message"],
                 response_data["detail"].get("right_ticket", None)
