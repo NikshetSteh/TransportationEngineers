@@ -30,8 +30,8 @@ async def search_face(
     x1, y1, x2, y2 = face["bbox"]
     square = (x2 - x1) * (y2 - y1)
 
-    if square / image.shape[0] / image.shape[1] < 0.1:
-        raise HTTPException(status_code=400, detail="Too small square")
+    # if square / image.shape[0] / image.shape[1] < 0.05:
+    #     raise HTTPException(status_code=400, detail="Too small square")
 
     collection = await chroma_db.get_or_create_collection("faces")
     users = await collection.query(
