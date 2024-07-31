@@ -2,6 +2,8 @@ from users import *
 from tickets import *
 from cities import *
 from engineers import *
+from stores import *
+from store_items import *
 
 while True:
     print(
@@ -83,36 +85,51 @@ while True:
     def store():
         print(
             "1. Создать магазин",
-            "2. Редактировать магазин",
+            "2. Показать магазины",
             "3. Удалить магазин",
+            "4. Показать магазин",
+            "5. Редактировать магазин",
             sep="\n"
         )
         mode_s = int(input("> "))
         match mode_s:
             case 1:
-                pass
+                create_store()
             case 2:
-                items()
+                get_stores()
             case 3:
-                pass
+                delete_store()
+            case 4:
+                get_store()
+            case 5:
+                items()
 
 
     def items():
         print(
             "1. Добавить товар",
-            "2. Редактировать товар",
+            "2. Показать товары",
             "3. Удалить товар",
+            "4. Обновить товар",
+            "5. Показать задачи",
+            "6. Отметить задачу выполненной",
             sep="\n"
         )
 
         mode_i = int(input("> "))
         match mode_i:
             case 1:
-                pass
+                create_store_item()
             case 2:
-                pass
+                get_store_items()
             case 3:
-                pass
+                delete_store_item()
+            case 4:
+                update_store_item()
+            case 5:
+                get_store_tasks()
+            case 6:
+                mark_task_as_done()
 
 
     def engineers():

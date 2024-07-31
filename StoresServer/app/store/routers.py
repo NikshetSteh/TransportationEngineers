@@ -40,8 +40,10 @@ async def remove_item_handler(
         store_id: StoreAuthRequired,
         item_id: str,
         db: DbDependency
-) -> None:
-    return await remove_item(store_id, item_id, db)
+) -> EmptyResponse:
+    await remove_item(store_id, item_id, db)
+
+    return EmptyResponse()
 
 
 @router.put("/item")

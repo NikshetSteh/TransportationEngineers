@@ -4,3 +4,5 @@
 *.pyc
 
 /src/t/
+
+/src/private/
