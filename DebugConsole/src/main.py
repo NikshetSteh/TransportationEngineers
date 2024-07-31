@@ -1,4 +1,5 @@
 from users import *
+from tickets import *
 
 while True:
     print(
@@ -44,11 +45,11 @@ while True:
         mode_t = int(input("> "))
         match mode_t:
             case 1:
-                pass
+                create_ticket()
             case 2:
-                pass
+                get_tickets()
             case 3:
-                pass
+                delete_ticket()
 
 
     def cities():
