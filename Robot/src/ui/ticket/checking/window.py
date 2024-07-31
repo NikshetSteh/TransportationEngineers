@@ -54,20 +54,14 @@ class TicketCheckingWindow(QMainWindow):
 
     @asyncSlot()
     async def check(self):
-        print("CHECK1")
         if self.is_working:
             return
 
-        print("CHECK2")
-
-        # _, frame = self.video_capture.read()
-        frame = cv2.imread("t/a.jpg")
+        _, frame = self.video_capture.read()
+        # frame = cv2.imread("t/a.jpg")
         _, frame = cv2.imencode('.jpg', frame)
         im_bytes = frame.tobytes()
         im_b64 = base64.b64encode(im_bytes).decode("utf-8")
-        print(len(im_b64))
-
-        print("CHECK 3")
 
         try:
             self.is_working = True
