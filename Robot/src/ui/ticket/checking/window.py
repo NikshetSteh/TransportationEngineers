@@ -58,7 +58,6 @@ class TicketCheckingWindow(QMainWindow):
             return
 
         _, frame = self.video_capture.read()
-        # frame = cv2.imread("t/a.jpg")
         _, frame = cv2.imencode('.jpg', frame)
         im_bytes = frame.tobytes()
         im_b64 = base64.b64encode(im_bytes).decode("utf-8")
