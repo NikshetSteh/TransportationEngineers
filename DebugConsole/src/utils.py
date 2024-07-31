@@ -1,4 +1,5 @@
 from json import JSONDecodeError, dumps
+from typing import TypeVar
 
 from requests import Response
 
@@ -25,3 +26,10 @@ def default_print_pagination(response: Response) -> None:
         print(dumps(buffer, indent=2))
     except JSONDecodeError:
         print(response.text)
+
+
+T = TypeVar('T')
+
+
+def input_with_default(title: str, default: T) -> T | str:
+    return input(f"{title} [{default}]: ") or default

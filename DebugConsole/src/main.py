@@ -1,6 +1,7 @@
 from users import *
 from tickets import *
 from cities import *
+from engineers import *
 
 while True:
     print(
@@ -117,18 +118,24 @@ while True:
     def engineers():
         print(
             "1. Добавить инженера",
-            "2. Редактировать инженера",
-            "3. Удалить инженера",
+            "2. Показать инженеров",
+            "3. Настройка прав",
+            "4. Удалить инженера",
+            "5. Редактировать карту доступа",
             sep="\n"
         )
         mode_e = int(input("> "))
         match mode_e:
             case 1:
-                pass
+                create_engineer()
             case 2:
-                pass
+                get_engineers()
             case 3:
-                pass
+                set_engineer_privileges()
+            case 4:
+                delete_engineer()
+            case 5:
+                set_engineer_cart_id()
 
 
     match mode:
