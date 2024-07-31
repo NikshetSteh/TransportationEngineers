@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Path
 from fastapi_pagination import Page, paginate
 
 from admin.service import create_store, delete_store, get_store, get_stores
@@ -33,9 +33,9 @@ async def get_store_handler(
 
 
 @router.delete("/store/{store_id}")
-async def delete_store(
-        store_id: str,
-        db: DbDependency
+async def delete_store_handler(
+        db: DbDependency,
+        store_id: str = Path(pattern="^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
 ) -> EmptyResponse:
     await delete_store(store_id, db)
     return EmptyResponse()
