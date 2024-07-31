@@ -35,4 +35,3 @@ def delete_ticket() -> None:
     ticket_id = input("Ticket ID: ")
     response = requests.delete(f"{BASE_API_URL}/admin/ticket/{ticket_id}")
     default_print_response(response)
-

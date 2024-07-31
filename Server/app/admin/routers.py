@@ -349,7 +349,7 @@ async def get_tickets(
 async def get_destination_hotels(
         db: DbDependency,
         destination_id: str
-) -> list[Hotel]:
+) -> Page[Hotel]:
     return paginate(await get_hotels(destination_id, db))
 
 

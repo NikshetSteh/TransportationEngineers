@@ -1,5 +1,6 @@
 from users import *
 from tickets import *
+from cities import *
 
 while True:
     print(
@@ -56,20 +57,26 @@ while True:
         print(
             "1. Добавить достопримечательность",
             "2. Добавить отель",
-            "3. Удалить достопримечательность",
-            "4. Удалить отель",
+            "3. Показать достопримечательности",
+            "4. Показать отели",
+            "5. Удалить достопримечательность",
+            "6. Удалить отель",
             sep="\n"
         )
         mode_c = int(input("> "))
         match mode_c:
             case 1:
-                pass
+                create_attraction()
             case 2:
-                pass
+                create_hotel()
             case 3:
-                pass
+                get_attractions()
             case 4:
-                pass
+                get_hotels()
+            case 5:
+                delete_attraction()
+            case 6:
+                delete_hotel()
 
 
     def store():
