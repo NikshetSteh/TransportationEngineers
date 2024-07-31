@@ -81,8 +81,8 @@ async def save_face(
     x1, y1, x2, y2 = face["bbox"]
     square = (x2 - x1) * (y2 - y1)
 
-    if square / image.shape[0] / image.shape[1] < 0.4:
-        raise HTTPException(status_code=400, detail="Face too small")
+    # if square / image.shape[0] / image.shape[1] < 0.4:
+    #     raise HTTPException(status_code=400, detail="Face too small")
 
     embedding = face["embedding"]
 
