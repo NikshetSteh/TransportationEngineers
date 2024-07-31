@@ -1,0 +1,42 @@
+services:
+  base_server:
+    build: Server
+    environment:
+      - FACE_API=http://face_server:8000/face_api/v1
+      - STORE_API=http://nginx/store_api/v1
+      - DB_URI=postgresql+asyncpg://postgres:root@base_db:5432/TransportEngineers
+      - DB_URI_ALEMBIC=postgresql+psycopg2://postgres:root@base_db:5432/TransportEngineers
+      - REDIS_URI=redis://redis:6379
+  store_server:
+    build: StoresServer
+    environment:
+      - DB_URI=postgresql+asyncpg://postgres:root@store_db:5432/TransportEngineersStores
+      - DB_URI_ALEMBIC=postgresql+psycopg2://postgres:root@store_db:5432/TransportEngineersStores
+      - REDIS_URI=redis://redis:6379
+  face_server:
+    build: FaceServer
+    environment:
+      - CHROMA_DB_PORT=8000
+      - CHROMA_DB_HOST=chromadb
+  nginx:
+    image: nginx:1.27-alpine
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "8080:80"
+  redis:
+    image: "redis:alpine"
+  chromadb:
+    image: chromadb/chroma
+  base_db:
+    image: postgres:14-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=TransportEngineers
+  store_db:
+    image: postgres:14-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=TransportEngineersStores

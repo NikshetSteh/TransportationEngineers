@@ -129,6 +129,9 @@ async def delete_user(
             raise HTTPException(status_code=404, detail="User not found")
 
         await session.execute(
+            delete(TicketModel).where(TicketModel.user_id == user_id)
+        )
+        await session.execute(
             delete(UserModel).where(UserModel.id == user_id)
         )
         await session.commit()

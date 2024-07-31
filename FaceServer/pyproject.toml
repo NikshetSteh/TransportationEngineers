@@ -12,11 +12,11 @@ pydantic-settings = "^2.3.4"
 insightface = "^0.7.3"
 chromadb = "^0.5.4"
 cryptography = "^43.0.0"
+uvicorn = "^0.30.3"
 
 
 [tool.poetry.group.dev.dependencies]
 isort = "^5.13.2"
-uvicorn = "^0.30.2"
 
 [build-system]
 requires = ["poetry-core"]
