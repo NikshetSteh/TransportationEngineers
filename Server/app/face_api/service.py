@@ -1,5 +1,3 @@
-import json
-
 import aiohttp
 from fastapi import HTTPException
 
@@ -41,7 +39,7 @@ async def search_face(
             elif response.status == 404:
                 return None
             else:
-                raise Exception(f"Error: {response.status}, {await response.json()}")
+                raise HTTPException(status_code=response.status, detail=(await response.json())["detail"])
 
 
 async def delete_face(

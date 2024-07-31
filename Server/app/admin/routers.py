@@ -129,6 +129,9 @@ async def delete_user(
             raise HTTPException(status_code=404, detail="User not found")
 
         await session.execute(
+            delete(TicketModel).where(TicketModel.user_id == user_id)
+        )
+        await session.execute(
             delete(UserModel).where(UserModel.id == user_id)
         )
         await session.commit()
@@ -346,7 +349,7 @@ async def get_tickets(
 async def get_destination_hotels(
         db: DbDependency,
         destination_id: str
-) -> list[Hotel]:
+) -> Page[Hotel]:
     return paginate(await get_hotels(destination_id, db))
 
 
