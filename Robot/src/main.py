@@ -212,6 +212,10 @@ async def main() -> None:
                     continue
 
                 window = TicketCheckingWindow(
+                    train_number=1,
+                    wagon_number=1,
+                    date=datetime.datetime.fromisoformat("2024-07-22T10:53:14.363248+00:00"),
+                    station_id="1",
                     session=session
                 )
                 window.show()
@@ -229,7 +233,7 @@ while True:
         asyncio.set_event_loop(loop)
 
         loop.run_until_complete(main())
-    except Exception as e:
-        print("Error: " + str(e))
+    except Exception as application_error:
+        print("Error: " + str(application_error))
         app.shutdown()
         continue
