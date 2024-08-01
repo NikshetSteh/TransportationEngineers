@@ -4,7 +4,7 @@ import sys
 
 import cv2
 from aiohttp import ClientSession
-from PySide6.QtCore import QTimer
+from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QImage, QPixmap
 from PySide6.QtWidgets import QMainWindow
 from qasync import asyncSlot
@@ -16,9 +16,19 @@ from tickets.service import validate_user_ticket
 class TicketCheckingWindow(QMainWindow):
     def __init__(
             self,
+            station_id: str,
+            train_number: int,
+            wagon_number: int,
+            date: datetime.datetime,
             session: ClientSession
     ):
         super(TicketCheckingWindow, self).__init__()
+
+        self.station_id = station_id
+        self.train_number = train_number
+        self.wagon_number = wagon_number
+        self.date = date
+
         self.ui = design.Ui_MainWindow()
         self.ui.setupUi(self)
 
@@ -38,6 +48,8 @@ class TicketCheckingWindow(QMainWindow):
 
         self.session = session
         self.is_working = False
+
+        self.setWindowFlag(Qt.WindowType.FramelessWindowHint, True)
 
     def update_frame(self):
         ret, frame = self.video_capture.read()
@@ -66,10 +78,10 @@ class TicketCheckingWindow(QMainWindow):
             self.is_working = True
 
             result = await validate_user_ticket(
-                station_id="4",
-                train_number=1,
-                wagon_number=2,
-                date=datetime.datetime.fromisoformat("2024-07-25T10:53:14.363248+00:00"),
+                station_id=self.station_id,
+                train_number=self.train_number,
+                wagon_number=self.wagon_number,
+                date=self.date,
                 face=im_b64,
                 session=self.session
             )
