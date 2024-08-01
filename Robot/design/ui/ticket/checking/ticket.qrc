@@ -1,5 +1,7 @@
 <RCC>
   <qresource prefix="icons">
+    <file>media/cancel.png</file>
+    <file>media/check.png</file>
     <file>media/ticket.png</file>
   </qresource>
 </RCC>

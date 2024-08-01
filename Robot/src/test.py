@@ -11,12 +11,14 @@ from auth.service import is_login, login, new_login
 from config import get_config
 from fms.fms import FMS
 from states.ticket_cheking_state import TicketCheckingState
+from ui.basic_window import BasicWindow
 from utils import async_input
 
 
 async def process(
         fms: FMS,
-        session: ClientSession
+        session: ClientSession,
+        main_window: BasicWindow
 ) -> NoReturn:
     print(
         "States:",
@@ -26,6 +28,8 @@ async def process(
     select_new_state = await async_input(
         "Select new state: "
     )
+
+    main_window.show()
 
     match select_new_state:
         case "1":
@@ -40,7 +44,9 @@ async def process(
                 train_id,
                 wagon_id,
                 date,
-                session
+                session,
+                main_window,
+                fms
             ))
 
 
@@ -48,11 +54,13 @@ async def run_loop(
         session: ClientSession
 ) -> NoReturn:
     state_machine = FMS()
+    main_window = BasicWindow()
 
     while True:
         await process(
             state_machine,
-            session
+            session,
+            main_window
         )
 
 
