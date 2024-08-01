@@ -91,9 +91,6 @@ class TicketChecking:
         im_bytes = frame.tobytes()
         im_b64 = base64.b64encode(im_bytes).decode("utf-8")
 
-        with open("t/t", "w") as file:
-            file.write(im_b64)
-
         status = False
         ticket = None
         ready = False
@@ -131,6 +128,3 @@ class TicketChecking:
                     ticket=ticket
                 )
             )
-
-    def restart(self) -> None:
-        self.is_waiting = False

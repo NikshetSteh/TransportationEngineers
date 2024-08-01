@@ -11,10 +11,11 @@ from auth.service import is_login, login, new_login
 from config import get_config
 from fsm.context import Context
 from fsm.fsm import FSM
+from states.auth_state import AuthState
 from states.ticket_cheking_state import TicketCheckingState
+from states.user_menu_state import UserMenuState
 from ui.basic_window import BasicWindow
 from utils import async_input
-from states.auth_state import AuthState
 
 
 async def process(
@@ -52,7 +53,7 @@ async def process(
         case "2":
             fsm.change_state(
                 AuthState(
-                    None
+                    UserMenuState
                 )
             )
 

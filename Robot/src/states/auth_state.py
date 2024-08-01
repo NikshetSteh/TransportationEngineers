@@ -3,7 +3,7 @@ from ui.auth.auth import Auth
 
 
 class AuthState(State):
-    def __init__(self, next_state: State):
+    def __init__(self, next_state: type(State)):
         super().__init__()
         self.next_state = next_state
         self.service: Auth | None = None

@@ -17,7 +17,7 @@ class Auth:
             self,
             fsm: FSM,
             state: State,
-            next_state: State
+            next_state: type(State)
     ):
         super(Auth, self).__init__()
 
@@ -33,7 +33,6 @@ class Auth:
 
         self.fms = fsm
         self.state = state
-        self.window = None
 
         self.next_state = next_state
 
@@ -56,8 +55,6 @@ class Auth:
         self.face_check_timer = QTimer()
         self.face_check_timer.timeout.connect(self.check)
         self.face_check_timer.start(2000)
-
-        self.window = window
 
         self.video_capture = cv2.VideoCapture(0)
 
@@ -87,7 +84,4 @@ class Auth:
         )
 
         if result is not None:
-            print(result)
-
-    def restart(self) -> None:
-        self.is_waiting = False
+            self.fms.change_state(self.next_state(result))
