@@ -9,15 +9,15 @@ from qasync import QEventLoop
 
 from auth.service import is_login, login, new_login
 from config import get_config
-from fms.fms import FMS
+from fsm.context import Context
+from fsm.fsm import FSM
 from states.ticket_cheking_state import TicketCheckingState
 from ui.basic_window import BasicWindow
 from utils import async_input
 
 
 async def process(
-        fms: FMS,
-        session: ClientSession,
+        fsm: FSM,
         main_window: BasicWindow
 ) -> NoReturn:
     print(
@@ -31,6 +31,8 @@ async def process(
 
     main_window.show()
 
+    fsm.context["fsm"] = fsm
+
     match select_new_state:
         case "1":
             train_id: int = int(await async_input("Enter train id: "))
@@ -39,27 +41,28 @@ async def process(
                 await async_input("Enter date: ")
             )
             station_id: str = await async_input("Enter station id: ")
-            fms.change_state(TicketCheckingState(
+            fsm.change_state(TicketCheckingState(
                 station_id,
                 train_id,
                 wagon_id,
-                date,
-                session,
-                main_window,
-                fms
+                date
             ))
 
 
 async def run_loop(
         session: ClientSession
 ) -> NoReturn:
-    state_machine = FMS()
+    context = Context()
+    state_machine = FSM(context)
     main_window = BasicWindow()
+
+    context["session"] = session
+    context["state_machine"] = state_machine
+    context["window"] = main_window
 
     while True:
         await process(
             state_machine,
-            session,
             main_window
         )
 

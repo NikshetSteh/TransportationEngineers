@@ -9,25 +9,31 @@ from qasync import QEventLoop
 
 from auth.service import auth_admin, is_login, login, new_login
 from config import get_config
+from fsm.fsm import FSM
 from info_service.service import (get_destination_attractions,
                                   get_destination_hotels)
+from states.ticket_cheking_state import TicketCheckingState
 from store.schemes import PurchaseCreation
 from store.service import (create_purchase, get_store,
                            get_user_recommendation_for_store)
 from tickets.service import get_user_ticket_for_station, validate_user_ticket
-from ui.ticket.checking.window import TicketCheckingWindow
+from ui.basic_window import BasicWindow
 from users.service import indentify_face
+from utils import async_input
 
 
 async def main() -> None:
+    window = BasicWindow()
+    fsm = FSM()
+    
     async with ClientSession() as session:
         config = get_config()
 
         if is_login():
             await login("", session)
         else:
-            engineer_login = input("Enter engineer login: ")
-            engineer_password = input("Enter engineer password: ")
+            engineer_login = await async_input("Enter engineer login: ")
+            engineer_password = await async_input("Enter engineer password: ")
 
             await new_login(
                 engineer_login,
@@ -56,7 +62,7 @@ async def main() -> None:
                 "9. Get destination hotels: destination_id\n"
                 "10. Run check ticket window\n"
             )
-            action = input(">").split()
+            action = (await async_input(">")).split()
             if len(action) < 1:
                 continue
             if action[0] == "1":
@@ -211,16 +217,19 @@ async def main() -> None:
                     print("Invalid count of arguments")
                     continue
 
-                window = TicketCheckingWindow(
-                    train_number=1,
-                    wagon_number=1,
-                    date=datetime.datetime.fromisoformat("2024-07-22T10:53:14.363248+00:00"),
-                    station_id="1",
-                    session=session
+                fsm.change_state(
+                    TicketCheckingState(
+                        station_id=await async_input("Station id: "),
+                        train_number=int(await async_input("Train number: ")),
+                        wagon_number=int(await async_input("Wagon number: ")),
+                        date=datetime.datetime.fromisoformat(await async_input("Date: ")),
+                        session=session,
+                        window=window,
+                        fsm=fsm
+                    )
                 )
+
                 window.show()
-                while window.isEnabled():
-                    await asyncio.sleep(1)
             else:
                 print("Invalid action")
                 continue

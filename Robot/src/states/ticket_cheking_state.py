@@ -1,11 +1,8 @@
 import datetime
 
-from aiohttp import ClientSession
-
-from fms.fms import FMS
-from fms.state import State
+from fsm.fsm import FSM
+from fsm.state import State
 from ui.ticket.checking.ticket_checking import TicketChecking
-from ui.basic_window import BasicWindow
 
 
 class TicketCheckingState(State):
@@ -14,25 +11,26 @@ class TicketCheckingState(State):
             station_id: str,
             train_number: int,
             wagon_number: int,
-            date: datetime.datetime,
-            session: ClientSession,
-            window: BasicWindow,
-            fms: FMS
+            date: datetime.datetime
     ) -> None:
         super().__init__()
-        self.window = window
-        self.service = TicketChecking(
-            station_id,
-            train_number,
-            wagon_number,
-            date,
-            session,
-            fms,
-            self
-        )
+        self.service = None
+        self.station_id = station_id
+        self.train_number = train_number
+        self.wagon_number = wagon_number
+        self.date = date
 
-    def start(self) -> None:
-        self.service.start(self.window)
+    def start(self, fsm: FSM) -> None:
+        if self.service is None:
+            self.service = TicketChecking(
+                self.station_id,
+                self.train_number,
+                self.wagon_number,
+                self.date,
+                fsm,
+                self
+            )
+        self.service.start(fsm.context["window"])
 
     def stop(self) -> None:
         self.service.stop()

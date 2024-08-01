@@ -4,12 +4,11 @@ import datetime
 import cv2
 from PySide6.QtCore import QTimer
 from PySide6.QtGui import QImage, QPixmap
-from aiohttp import ClientSession
 from qasync import asyncSlot
 
 import ui.ticket.checking.ticket_ui as main_design
-from fms.fms import FMS
-from fms.state import State
+from fsm.fsm import FSM
+from fsm.state import State
 from states.ticket_checking_result_state import TicketCheckingResultState
 from tickets.exceptions import InvalidTicket
 from tickets.service import validate_user_ticket
@@ -23,8 +22,7 @@ class TicketChecking:
             train_number: int,
             wagon_number: int,
             date: datetime.datetime,
-            session: ClientSession,
-            fms: FMS,
+            fsm: FSM,
             state: State
     ):
         super(TicketChecking, self).__init__()
@@ -38,13 +36,13 @@ class TicketChecking:
 
         self.video_capture = None
 
-        self.session = session
+        self.session = fsm.context["session"]
         self.is_waiting = False
 
         self.frame_update_timer = None
         self.face_check_timer = None
 
-        self.fms = fms
+        self.fms = fsm
         self.state = state
         self.window = None
 
@@ -128,10 +126,7 @@ class TicketChecking:
                     train_number=self.train_number,
                     wagon_number=self.wagon_number,
                     date=self.date,
-                    session=self.session,
-                    window=self.window,
-                    last_state=self.state,
-                    fms=self.fms,
+                    handle_state=self.state,
                     status=status,
                     ticket=ticket
                 )

@@ -1,27 +1,27 @@
 import datetime
 
+from aiohttp import ClientSession
 from PySide6.QtCore import QTimer
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QMainWindow
-from aiohttp import ClientSession
 
 import ui.ticket.checking.ticket_result_ui as design
-from fms.state import State
+from fsm.context import Context
+from fsm.fsm import FSM
+from fsm.state import State
 from tickets.schemes import Ticket
-from fms.fms import FMS
 
 
 class TicketCheckingResults:
     def __init__(
             self,
+            context: Context,
             station_id: str,
             train_number: int,
             wagon_number: int,
             date: datetime.datetime,
-            session: ClientSession,
             status: bool,
-            fms: FMS,
-            last_state: State,
+            handle_state: State,
             ticket: Ticket | None = None,
     ):
         self.station_id = station_id
@@ -33,13 +33,13 @@ class TicketCheckingResults:
 
         self.auto_close_timer = QTimer()
 
-        self.session = session
+        self.session: ClientSession = context["session"]
 
         self.status = status
         self.ticket = ticket
 
-        self.fms = fms
-        self.last_state = last_state
+        self.fsm: FSM = context["fsm"]
+        self.handle_state = handle_state
 
     def start(self, window: QMainWindow):
         self.ui.setupUi(window)
@@ -69,4 +69,4 @@ class TicketCheckingResults:
         self.auto_close_timer.stop()
 
     def go_back(self):
-        self.fms.change_state(self.last_state)
+        self.fsm.change_state(self.handle_state)
