@@ -39,3 +39,7 @@ class Ticket(Base):
     station_id: Mapped[str] = Column(
         String(60)
     )
+
+    destination_id: Mapped[str] = Column(
+        String(60)
+    )

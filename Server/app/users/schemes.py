@@ -14,6 +14,7 @@ class TicketCreation(BaseModel):
     wagon_number: int
     place_number: int
     station_id: str
+    destination: str
     date: datetime
 
 

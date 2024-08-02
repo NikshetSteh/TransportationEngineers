@@ -289,7 +289,8 @@ async def create_ticket(
             wagon_number=data.wagon_number,
             place_number=data.place_number,
             station_id=data.station_id,
-            date=data.date
+            date=data.date,
+            destination_id=data.destination
         )
         session.add(ticket)
         await session.commit()
@@ -301,7 +302,8 @@ async def create_ticket(
         wagon_number=ticket.wagon_number,
         place_number=ticket.place_number,
         station_id=ticket.station_id,
-        date=ticket.date
+        date=ticket.date,
+        destination=ticket.destination_id
     )
 
 
@@ -337,7 +339,8 @@ async def get_tickets(
                 wagon_number=x[0].wagon_number,
                 place_number=x[0].place_number,
                 station_id=x[0].station_id,
-                date=x[0].date
+                date=x[0].date,
+                destination=x[0].destination_id
             ),
             tickets
         )
