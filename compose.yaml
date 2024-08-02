@@ -18,6 +18,8 @@ services:
     environment:
       - CHROMA_DB_PORT=8000
       - CHROMA_DB_HOST=chromadb
+    volumes:
+      - face_model:/root/.insightface/models
   nginx:
     image: nginx:1.27-alpine
     volumes:
@@ -55,3 +57,4 @@ volumes:
   base_data:
   stores_data:
   chroma_data:
+  face_model:
