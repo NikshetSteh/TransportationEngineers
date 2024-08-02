@@ -28,15 +28,30 @@ services:
     image: "redis:alpine"
   chromadb:
     image: chromadb/chroma
+    environment:
+      - PERSIST_DIRECTORY=/chroma/chroma
+    volumes:
+      - chroma_data:/chroma/chroma
   base_db:
     image: postgres:14-alpine
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=root
       - POSTGRES_DB=TransportEngineers
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - base_data:/var/lib/postgresql/data
   store_db:
     image: postgres:14-alpine
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=root
       - POSTGRES_DB=TransportEngineersStores
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - stores_data:/var/lib/postgresql/data
+
+volumes:
+  base_data:
+  stores_data:
+  chroma_data:

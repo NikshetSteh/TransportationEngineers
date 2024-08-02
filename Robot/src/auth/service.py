@@ -39,6 +39,7 @@ async def login_by_key(
                 "id": robot_id
             }
     ) as response:
+        print(await response.text())
         login_code_data = await response.json()
         data, login_request_id = login_code_data["data"], login_code_data["request_id"]
 
