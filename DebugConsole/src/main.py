@@ -4,6 +4,7 @@ from cities import *
 from engineers import *
 from stores import *
 from store_items import *
+from debug_data import *
 
 while True:
     print(
@@ -12,6 +13,7 @@ while True:
         "3. Информация о городах",
         "4. Магазины",
         "5. Инженеры",
+        "6. Загрузка данных для тестирования",
         sep="\n"
     )
     mode = int(input("Введите номер режима: "))
@@ -166,5 +168,7 @@ while True:
             store()
         case 5:
             engineers()
+        case 6:
+            load_debug_data()
         case _:
             print("Такого режима нет")

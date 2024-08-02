@@ -1,0 +1,50 @@
+[
+  {
+    "name": "The Grand Hotel1",
+    "description": "Пятизвездочный отель, распложающийся в центре Москвы",
+    "logo_url": "/static/logos/hotels/1.png",
+    "destination_id": "Moscow"
+  },
+  {
+    "name": "The Grand Hotel2",
+    "description": "Пятизвездочный отель, распложающийся в центре Москвы",
+    "logo_url": "/static/logos/hotels/2.png",
+    "destination_id": "Moscow"
+  },
+  {
+    "name": "The Grand Hotel3",
+    "description": "Пятизвездочный отель, распложающийся в центре Москвы",
+    "logo_url": "/static/logos/hotels/3.png",
+    "destination_id": "Moscow"
+  },
+  {
+    "name": "The Grand Hotel4",
+    "description": "Пятизвездочный отель, распложающийся в центре Москвы",
+    "logo_url": "/static/logos/hotels/4.png",
+    "destination_id": "Moscow"
+  },
+  {
+    "name": "The Grand Hotel5",
+    "description": "Пятизвездочный отель, распложающийся в центре Москвы",
+    "logo_url": "/static/logos/hotels/5.png",
+    "destination_id": "SaintPetersburg"
+  },
+  {
+    "name": "The Grand Hotel6",
+    "description": "Пятизвездочный отель, распложающийся в центре Москвы",
+    "logo_url": "/static/logos/hotels/6.png",
+    "destination_id": "SaintPetersburg"
+  },
+  {
+    "name": "The Grand Hotel7",
+    "description": "Пятизвездочный отель, распложающийся в центре Москвы",
+    "logo_url": "/static/logos/hotels/7.png",
+    "destination_id": "SaintPetersburg"
+  },
+  {
+    "name": "The Grand Hotel8",
+    "description": "Пятизвездочный отель, распложающийся в центре Москвы",
+    "logo_url": "/static/logos/hotels/8.png",
+    "destination_id": "SaintPetersburg"
+  }
+]

@@ -23,7 +23,7 @@ def default_print_pagination(response: Response) -> None:
         buffer.pop("size")
         buffer.pop("pages")
 
-        print(dumps(buffer, indent=2))
+        print(dumps(buffer, indent=2, ensure_ascii=False))
     except JSONDecodeError:
         print(response.text)
 
