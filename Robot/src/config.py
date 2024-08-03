@@ -10,6 +10,8 @@ class Config(BaseSettings):
     BASE_API_URL: str = "http://localhost:8080/base_api/v1"
     STORE_API_URL: str = "http://localhost:8080/store_api/v1"
 
+    RESOURCE_URL: str = "http://localhost:8080"
+
     ROBOT_MODEL_ID: str = "TestRobotID1"
     ROBOT_MODEL_NAME: str = "TestRobot:0.1.0:001"
 

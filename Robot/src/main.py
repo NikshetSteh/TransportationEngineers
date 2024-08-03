@@ -12,6 +12,7 @@ from config import get_config
 from fsm.context import Context
 from fsm.fsm import FSM
 from states.auth_state import AuthState
+from states.destination_info_state import DestinationInfoState
 from states.ticket_cheking_state import TicketCheckingState
 from states.user_menu_state import UserMenuState
 from ui.basic_window import BasicWindow
@@ -26,6 +27,7 @@ async def process(
         "States:",
         "1. Check tickets",
         "2. User auth",
+        "3. Destination info",
         sep="\n"
     )
     select_new_state = await async_input(
@@ -54,6 +56,13 @@ async def process(
             fsm.change_state(
                 AuthState(
                     UserMenuState
+                )
+            )
+        case "3":
+            destination = await async_input("Enter destination: ")
+            fsm.change_state(
+                DestinationInfoState(
+                    destination
                 )
             )
 

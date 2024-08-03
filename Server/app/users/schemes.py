@@ -16,6 +16,7 @@ class TicketCreation(BaseModel):
     station_id: str
     destination: str
     date: datetime
+    start_date: datetime
 
 
 class Ticket(TicketCreation):

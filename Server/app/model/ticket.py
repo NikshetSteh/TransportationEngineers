@@ -43,3 +43,6 @@ class Ticket(Base):
     destination_id: Mapped[str] = Column(
         String(60)
     )
+    start_date: Mapped[datetime.datetime] = Column(
+        DateTime(timezone=True)
+    )

@@ -8,3 +8,6 @@ pyside6-uic --absolute-imports --python-paths design design/ui/user/main_menu.ui
 
 # Auth screen
 pyside6-uic --absolute-imports --python-paths design design/ui/auth/auth.ui -o src/ui/auth/auth_ui.py
+
+# Destinations info list
+pyside6-uic --absolute-imports --python-paths design design/ui/user/destination_info/destinations_info_list.ui -o src/ui/user/destination_info/destinations_info_list_ui.py
