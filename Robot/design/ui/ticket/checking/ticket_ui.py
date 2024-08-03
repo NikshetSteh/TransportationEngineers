@@ -17,7 +17,7 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QLabel, QMainWindow, QSizePolicy,
     QWidget)
-import ui.ticket.checking.ticket_rc
+import ticket_rc
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
