@@ -4,4 +4,10 @@
     <file>media/check.png</file>
     <file>media/ticket.png</file>
   </qresource>
+  <qresource prefix="images">
+    <file>media/Background_TC.png</file>
+    <file>media/RZD.png</file>
+    <file>media/provodnik.png</file>
+    <file>media/VideoZaglushka.png</file>
+  </qresource>
 </RCC>
