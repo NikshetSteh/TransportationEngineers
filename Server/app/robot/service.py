@@ -236,3 +236,26 @@ async def validate_robot_admin_access(
         )
 
         return engineer
+
+
+async def get_user_destination_by_train(
+        user_id: str,
+        train_number: int,
+        date: datetime.datetime,
+        db: sessionmaker[AsyncSession]
+) -> Destination:
+    async with db() as session:
+        tickets = (await session.execute(
+            select(TicketModel).where(
+                TicketModel.start_date == date,
+                TicketModel.user_id == user_id,
+                TicketModel.train_number == train_number
+            )
+        )).scalars().all()
+
+        if len(tickets) == 0:
+            raise InvalidWithoutTickets()
+
+        return Destination(
+            id=str(tickets[0].destination_id)
+        )

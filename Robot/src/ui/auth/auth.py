@@ -31,7 +31,7 @@ class Auth:
         self.frame_update_timer = None
         self.face_check_timer = None
 
-        self.fms = fsm
+        self.fsm = fsm
         self.state = state
 
         self.next_state = next_state
@@ -84,4 +84,5 @@ class Auth:
         )
 
         if result is not None:
-            self.fms.change_state(self.next_state(result))
+            self.fsm.context["user"] = result
+            self.fsm.change_state(self.next_state())

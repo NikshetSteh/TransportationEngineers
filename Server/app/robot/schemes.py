@@ -37,3 +37,13 @@ class Hotel(BaseModel):
 
 class EngineerRobotAccessRequest(BaseModel):
     key: str = Field(max_length=256)
+
+
+class DestinationDeterminationRequest(BaseModel):
+    user_id: str = Field(pattern="^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
+    train_number: int
+    start_date: datetime.datetime
+
+
+class Destination(BaseModel):
+    id: str

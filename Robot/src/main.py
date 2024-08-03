@@ -28,6 +28,9 @@ async def process(
         "1. Check tickets",
         "2. User auth",
         "3. Destination info",
+        "4. Set context var",
+        "5. Delete context var",
+        "6. Bind train",
         sep="\n"
     )
     select_new_state = await async_input(
@@ -65,6 +68,22 @@ async def process(
                     destination
                 )
             )
+        case "4":
+            var_name = await async_input("Enter var name: ")
+            var_value = await async_input("Enter var value: ")
+            fsm.context[var_name] = var_value
+        case "5":
+            var_name = await async_input("Enter var name: ")
+            fsm.context.data.pop(var_name)
+        case "6":
+            train_id: int = int(await async_input("Enter train id: "))
+            start_date: datetime.datetime = datetime.datetime.fromisoformat(
+                await async_input("Enter date: ")
+            )
+            fsm.context["train_number"] = train_id
+            fsm.context["train_start_date"] = start_date
+        case _:
+            raise Exception("Invalid state")
 
 
 async def run_loop(
