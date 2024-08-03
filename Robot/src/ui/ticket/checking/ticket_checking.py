@@ -2,6 +2,7 @@ import base64
 import datetime
 
 import cv2
+import numpy as np
 from PySide6.QtCore import QTimer
 from PySide6.QtGui import QImage, QPixmap
 from qasync import asyncSlot
@@ -50,6 +51,7 @@ class TicketChecking:
         ret, frame = self.video_capture.read()
         if ret:
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            frame = np.ascontiguousarray(frame[:, 84:84+476])
             height, width, channel = frame.shape
             bytes_per_line = 3 * width
             q_img = QImage(frame.data, width, height, bytes_per_line, QImage.Format.Format_RGB888)
@@ -87,6 +89,7 @@ class TicketChecking:
 
         _, frame = self.video_capture.read()
         # frame = cv2.imread("t/a.jpg")
+        frame = np.ascontiguousarray(frame[:, 84:84 + 476])
         _, frame = cv2.imencode('.jpg', frame)
         im_bytes = frame.tobytes()
         im_b64 = base64.b64encode(im_bytes).decode("utf-8")
