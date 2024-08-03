@@ -54,12 +54,12 @@ class TicketCheckingResults:
             else:
                 self.ui.TextLabel.setText(
                     f"Wrong Ticket\n\n"
-                    f"Perhaps you meant:\n\n"
-                    f"- Station: {self.ticket.station_id}\n"
-                    f"- Train: {self.ticket.train_number}\n"
-                    f"- Wagon: {self.ticket.wagon_number}\n"
-                    f"- Place : {self.ticket.place_number}\n"
-                    f"- Date  : {self.ticket.date}"
+                    # f"Perhaps you meant:\n\n"
+                    # f"- Station: {self.ticket.station_id}\n"
+                    # f"- Train: {self.ticket.train_number}\n"
+                    # f"- Wagon: {self.ticket.wagon_number}\n"
+                    # f"- Place : {self.ticket.place_number}\n"
+                    # f"- Date  : {self.ticket.date}"
                 )
 
         self.auto_close_timer.timeout.connect(self.go_back)
