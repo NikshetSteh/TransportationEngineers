@@ -66,7 +66,9 @@ async def check_user_place_in_wagon(
                 wagon_number=tickets[0].wagon_number,
                 place_number=tickets[0].place_number,
                 station_id=tickets[0].station_id,
-                date=tickets[0].date
+                date=tickets[0].date,
+                destination=tickets[0].destination_id,
+                start_date=tickets[0].start_date
             )
 
         tickets = (await session.execute(
@@ -86,7 +88,9 @@ async def check_user_place_in_wagon(
                 wagon_number=tickets[0].wagon_number,
                 place_number=tickets[0].place_number,
                 station_id=tickets[0].station_id,
-                date=tickets[0].date
+                date=tickets[0].date,
+                destination=tickets[0].destination_id,
+                start_date=tickets[0].start_date
             ))
 
         tickets = (await session.execute(
@@ -105,7 +109,9 @@ async def check_user_place_in_wagon(
                 wagon_number=tickets[0].wagon_number,
                 place_number=tickets[0].place_number,
                 station_id=tickets[0].station_id,
-                date=tickets[0].date
+                date=tickets[0].date,
+                destination=tickets[0].destination_id,
+                start_date=tickets[0].start_date
             ))
 
         tickets = (await session.execute(
@@ -122,7 +128,9 @@ async def check_user_place_in_wagon(
                 wagon_number=tickets[0].wagon_number,
                 place_number=tickets[0].place_number,
                 station_id=tickets[0].station_id,
-                date=tickets[0].date
+                date=tickets[0].date,
+                destination=tickets[0].destination_id,
+                start_date=tickets[0].start_date
             ))
 
         raise InvalidWithoutTickets()
@@ -153,7 +161,9 @@ async def get_current_ticket(
             wagon_number=tickets[0].wagon_number,
             place_number=tickets[0].place_number,
             station_id=tickets[0].station_id,
-            date=tickets[0].date
+            date=tickets[0].date,
+            destination=tickets[0].destination_id,
+            start_date=tickets[0].start_date
         )
 
 
