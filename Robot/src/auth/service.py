@@ -19,6 +19,9 @@ def save_login_data(
 ) -> None:
     save_data = json.dumps(login_data)
 
+    if not os.path.exists(config.LOGIN_FILE_PATH):
+        os.mkdir(os.path.dirname(config.LOGIN_FILE_PATH))
+
     with open(config.LOGIN_FILE_PATH, "w") as login_file:
         login_file.write(save_data)
 
@@ -42,14 +45,17 @@ async def login_by_key(
         login_code_data = await response.json()
         data, login_request_id = login_code_data["data"], login_code_data["request_id"]
 
-        decrypted_data = private_key.decrypt(
-            base64.b64decode(data),
-            padding.OAEP(
-                mgf=padding.MGF1(algorithm=hashes.SHA256()),
-                algorithm=hashes.SHA256(),
-                label=None
+        try:
+            decrypted_data = private_key.decrypt(
+                base64.b64decode(data),
+                padding.OAEP(
+                    mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                    algorithm=hashes.SHA256(),
+                    label=None
+                )
             )
-        )
+        except ValueError:
+            raise Exception("Invalid auth")
 
     async with session.post(
             f"{config.BASE_API_URL}/auth/robot/login_code",
