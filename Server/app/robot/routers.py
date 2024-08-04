@@ -6,7 +6,8 @@ from auth.dependecies import RobotAuthRequired
 from db import DbDependency
 from robot.schemes import *
 from robot.service import (check_user_place_in_wagon, get_attractions,
-                           get_current_ticket, get_hotels, identification_face,
+                           get_current_ticket, get_hotels,
+                           get_user_destination_by_train, identification_face,
                            validate_robot_admin_access)
 from users.schemes import Ticket, User
 
@@ -85,5 +86,19 @@ async def admin_access(
 ) -> Engineer:
     return await validate_robot_admin_access(
         access_request.key,
+        db
+    )
+
+
+@router.post("/determine_destination")
+async def get_user_destination(
+        determination_request: DestinationDeterminationRequest,
+        db: DbDependency,
+        _: RobotAuthRequired
+) -> Destination:
+    return await get_user_destination_by_train(
+        determination_request.user_id,
+        determination_request.train_number,
+        determination_request.start_date,
         db
     )

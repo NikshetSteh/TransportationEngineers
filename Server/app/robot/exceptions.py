@@ -27,6 +27,7 @@ class InvalidTicketTrain(HTTPException):
     def __init__(self, ticket: Ticket):
         buffer = ticket.model_dump()
         buffer["date"] = buffer["date"].isoformat()
+        buffer["start_date"] = buffer["start_date"].isoformat()
         super().__init__(status_code=400, detail={
             "message": "Invalid train number",
             "right_ticket": buffer

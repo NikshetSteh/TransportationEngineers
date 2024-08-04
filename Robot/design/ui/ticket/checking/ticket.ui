@@ -32,42 +32,83 @@
    <string>Проверка билета</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="Ticket.qrc">
+   <iconset>
     <normaloff>:/icons/Media/ticket.png</normaloff>:/icons/Media/ticket.png</iconset>
   </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(255, 255, 255)</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QLabel" name="label_t">
-    <property name="geometry">
-     <rect>
-      <x>110</x>
-      <y>110</y>
-      <width>261</width>
-      <height>221</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>31</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Пожалуйста,
- улыбочку!</string>
-    </property>
-   </widget>
    <widget class="QLabel" name="video_label">
     <property name="geometry">
      <rect>
-      <x>460</x>
-      <y>40</y>
-      <width>511</width>
-      <height>351</height>
+      <x>523</x>
+      <y>57</y>
+      <width>476</width>
+      <height>486</height>
      </rect>
     </property>
+    <property name="minimumSize">
+     <size>
+      <width>476</width>
+      <height>486</height>
+     </size>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>476</width>
+      <height>486</height>
+     </size>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border-radius: 50px;</string>
+    </property>
     <property name="text">
-     <string>Это видео виджет, не текст. </string>
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="ticket.qrc">:/images/media/VideoZaglushka.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
     </property>
    </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>1024</width>
+      <height>600</height>
+     </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>1024</width>
+      <height>600</height>
+     </size>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>1024</width>
+      <height>600</height>
+     </size>
+    </property>
+    <property name="baseSize">
+     <size>
+      <width>1024</width>
+      <height>600</height>
+     </size>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="ticket.qrc">:/images/media/Background_TC.png</pixmap>
+    </property>
+   </widget>
+   <zorder>label</zorder>
+   <zorder>video_label</zorder>
   </widget>
  </widget>
  <resources>

@@ -45,6 +45,7 @@ async def create_login_code(
         encrypted_data = ""
         for i in encrypted_data_buffer:
             encrypted_data += i
+        encrypted_data = encrypted_data.encode("utf-8")
     else:
         public_key_text = public_key
         public_key = serialization.load_pem_public_key(

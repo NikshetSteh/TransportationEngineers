@@ -38,6 +38,8 @@ async def search_face(
                 return (await response.json())["user_id"]
             elif response.status == 404:
                 return None
+            elif response.status == 400:
+                raise HTTPException(status_code=422, detail="Can`t recognize face")
             else:
                 raise HTTPException(status_code=response.status, detail=(await response.json())["detail"])
 

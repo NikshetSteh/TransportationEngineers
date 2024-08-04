@@ -11,6 +11,8 @@ def create_ticket() -> None:
     place_number = int(input("Place number: "))
     station_id = input("Station ID: ")
     date = input("Date: ")
+    start_date = input("Start date: ")
+    destination_id = input("Destination ID: ")
 
     response = requests.post(
         f"{BASE_API_URL}/admin/ticket",
@@ -20,7 +22,9 @@ def create_ticket() -> None:
             "wagon_number": wagon_number,
             "place_number": place_number,
             "station_id": station_id,
-            "date": date
+            "date": date,
+            "destination": destination_id,
+            "start_date": start_date
         }
     )
     default_print_response(response)
