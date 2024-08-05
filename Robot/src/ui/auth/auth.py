@@ -23,7 +23,7 @@ class Auth:
 
         self.ui = main_design.Ui_MainWindow()
 
-        self.video_capture = None
+        self.camera = None
 
         self.session = fsm.context["session"]
         self.is_waiting = False
@@ -37,7 +37,7 @@ class Auth:
         self.next_state = next_state
 
     def update_frame(self):
-        ret, frame = self.video_capture.read()
+        ret, frame = self.camera.get_frame()
         if ret:
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             height, width, channel = frame.shape
@@ -56,15 +56,11 @@ class Auth:
         self.face_check_timer.timeout.connect(self.check)
         self.face_check_timer.start(2000)
 
-        self.video_capture = cv2.VideoCapture(0)
-
-        if not self.video_capture.isOpened():
-            print("Error: Could not open webcam.")
+        self.camera = self.fsm.context["camera"]
 
         self.is_waiting = False
 
     def stop(self):
-        self.video_capture.release()
         self.frame_update_timer.stop()
         self.face_check_timer.stop()
 
@@ -73,7 +69,7 @@ class Auth:
         if self.is_waiting:
             return
 
-        _, frame = self.video_capture.read()
+        _, frame = self.camera.get_frame()
         _, frame = cv2.imencode('.jpg', frame)
         im_bytes = frame.tobytes()
         im_b64 = base64.b64encode(im_bytes).decode("utf-8")

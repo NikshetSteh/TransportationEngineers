@@ -28,6 +28,7 @@ class TicketChecking:
     ):
         super(TicketChecking, self).__init__()
 
+        self.camera = None
         self.station_id = station_id
         self.train_number = train_number
         self.wagon_number = wagon_number
@@ -35,20 +36,18 @@ class TicketChecking:
 
         self.ui = main_design.Ui_MainWindow()
 
-        self.video_capture = None
-
         self.session = fsm.context["session"]
         self.is_waiting = False
 
         self.frame_update_timer = None
         self.face_check_timer = None
 
-        self.fms = fsm
+        self.fsm = fsm
         self.state = state
         self.window = None
 
     def update_frame(self):
-        ret, frame = self.video_capture.read()
+        ret, frame = self.camera.get_frame()
         if ret:
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             frame = np.ascontiguousarray(frame[:, 84:84+476])
@@ -70,15 +69,11 @@ class TicketChecking:
 
         self.window = window
 
-        self.video_capture = cv2.VideoCapture(0)
-
-        if not self.video_capture.isOpened():
-            print("Error: Could not open webcam.")
+        self.camera = self.fsm.context["camera"]
 
         self.is_waiting = False
 
     def stop(self):
-        self.video_capture.release()
         self.frame_update_timer.stop()
         self.face_check_timer.stop()
 
@@ -87,7 +82,7 @@ class TicketChecking:
         if self.is_waiting:
             return
 
-        _, frame = self.video_capture.read()
+        _, frame = self.camera.get_frame()
         # frame = cv2.imread("t/a.jpg")
         frame = np.ascontiguousarray(frame[:, 84:84 + 476])
         _, frame = cv2.imencode('.jpg', frame)
@@ -120,7 +115,7 @@ class TicketChecking:
             self.is_waiting = False
 
         if ready:
-            self.fms.change_state(
+            self.fsm.change_state(
                 TicketCheckingResultState(
                     station_id=self.station_id,
                     train_number=self.train_number,
