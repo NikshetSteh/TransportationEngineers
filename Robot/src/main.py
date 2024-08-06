@@ -3,12 +3,13 @@ import datetime
 import sys
 from typing import NoReturn
 
-from aiohttp import ClientSession
 from PySide6.QtWidgets import QApplication
+from aiohttp import ClientSession
 from qasync import QEventLoop
 
 from auth.service import is_login, login, new_login
 from config import get_config
+from deviant.service import run_deviant_check_loop
 from fsm.context import Context
 from fsm.fsm import FSM
 from states.auth_state import AuthState
@@ -17,17 +18,22 @@ from states.ticket_cheking_state import TicketCheckingState
 from states.user_menu_state import UserMenuState
 from ui.basic_window import BasicWindow
 from utils import async_input
+from video.camera import Camera
 
 
 async def process(
         fsm: FSM,
-        main_window: BasicWindow
+        main_window: BasicWindow,
 ) -> NoReturn:
     print(
         "States:",
         "1. Check tickets",
         "2. User auth",
         "3. Destination info",
+        "4. Set context var",
+        "5. Delete context var",
+        "6. Bind train",
+        "7. Run deviant loop",
         sep="\n"
     )
     select_new_state = await async_input(
@@ -65,10 +71,30 @@ async def process(
                     destination
                 )
             )
+        case "4":
+            var_name = await async_input("Enter var name: ")
+            var_value = await async_input("Enter var value: ")
+            fsm.context[var_name] = var_value
+        case "5":
+            var_name = await async_input("Enter var name: ")
+            fsm.context.data.pop(var_name)
+        case "6":
+            train_id: int = int(await async_input("Enter train id: "))
+            start_date: datetime.datetime = datetime.datetime.fromisoformat(
+                await async_input("Enter date: ")
+            )
+            fsm.context["train_number"] = train_id
+            fsm.context["train_start_date"] = start_date
+        case "7":
+            # noinspection PyAsyncCall
+            asyncio.create_task(run_deviant_check_loop(camera=fsm.context["camera"]))
+        case _:
+            print("Invalid state")
 
 
 async def run_loop(
-        session: ClientSession
+        session: ClientSession,
+        camera: Camera
 ) -> NoReturn:
     context = Context()
     state_machine = FSM(context)
@@ -77,6 +103,7 @@ async def run_loop(
     context["session"] = session
     context["state_machine"] = state_machine
     context["window"] = main_window
+    context["camera"] = camera
 
     while True:
         await process(
@@ -106,10 +133,12 @@ async def main() -> NoReturn:
 
             await login("", session)
 
-        await run_loop(session)
+        with Camera() as camera:
+            await run_loop(session, camera)
 
 
-application = QApplication(sys.argv)
-loop = QEventLoop(application)
-asyncio.set_event_loop(loop)
-loop.run_until_complete(main())
+if __name__ == "__main__":
+    application = QApplication(sys.argv)
+    loop = QEventLoop(application)
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(main())

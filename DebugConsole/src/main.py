@@ -5,6 +5,7 @@ from engineers import *
 from stores import *
 from store_items import *
 from debug_data import *
+from train_stores import *
 
 while True:
     print(
@@ -14,6 +15,7 @@ while True:
         "4. Магазины",
         "5. Инженеры",
         "6. Загрузка данных для тестирования",
+        "7. Магазины поездов",
         sep="\n"
     )
     mode = int(input("Введите номер режима: "))
@@ -157,6 +159,24 @@ while True:
                 set_engineer_cart_id()
 
 
+    def trains_stores():
+        print(
+            "1. Добавить магазин к поезду",
+            "2. Показать магазины поезда",
+            "3. Удалить привязку магазина к поезду",
+            sep="\n"
+        )
+
+        mode_t = int(input("> "))
+        match mode_t:
+            case 1:
+                add_train_store()
+            case 2:
+                get_train_stores()
+            case 3:
+                delete_train_store()
+
+
     match mode:
         case 1:
             users()
@@ -170,5 +190,7 @@ while True:
             engineers()
         case 6:
             load_debug_data()
+        case 7:
+            trains_stores()
         case _:
             print("Такого режима нет")

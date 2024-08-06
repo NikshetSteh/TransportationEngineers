@@ -64,3 +64,27 @@ async def create_purchase(
             raise Exception(f"Unknown server error({response.status}): {await response.text()}")
 
         return Purchase.parse_obj(await response.json())
+
+
+async def get_train_stores(
+        train_number: int,
+        session: ClientSession
+) -> list[Store]:
+    async with session.get(
+        f"{config.BASE_API_URL}/robot/train/{train_number}/stores"
+    ) as response:
+        if response.status != 200:
+            raise Exception(f"Unknown server error({response.status}): {await response.text()}")
+
+        data = (await response.json())["items"]
+
+    async with session.post(
+            f"{config.STORE_API_URL}/robot/stores/list",
+            json={
+                "ids": data
+            }
+    ) as response:
+        if response.status != 200:
+            raise Exception(f"Unknown server error({response.status}): {await response.text()}")
+
+        return [Store.parse_obj(item) for item in (await response.json())]

@@ -19,7 +19,7 @@ def save_login_data(
 ) -> None:
     save_data = json.dumps(login_data)
 
-    if not os.path.exists(config.LOGIN_FILE_PATH):
+    if not os.path.exists(os.path.dirname(config.LOGIN_FILE_PATH)):
         os.mkdir(os.path.dirname(config.LOGIN_FILE_PATH))
 
     with open(config.LOGIN_FILE_PATH, "w") as login_file:

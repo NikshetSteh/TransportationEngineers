@@ -13,6 +13,7 @@ from model.destinations_info import Attraction as AttractionModel
 from model.destinations_info import Hotel as HotelModel
 from model.engineer import Engineer as EngineerModel
 from model.ticket import Ticket as TicketModel
+from model.train_stores import TrainStore
 from model.user import User as UserModel
 from robot.exceptions import *
 from robot.schemes import *
@@ -236,3 +237,38 @@ async def validate_robot_admin_access(
         )
 
         return engineer
+
+
+async def get_user_destination_by_train(
+        user_id: str,
+        train_number: int,
+        date: datetime.datetime,
+        db: sessionmaker[AsyncSession]
+) -> Destination:
+    async with db() as session:
+        tickets = (await session.execute(
+            select(TicketModel).where(
+                TicketModel.start_date == date,
+                TicketModel.user_id == user_id,
+                TicketModel.train_number == train_number
+            )
+        )).scalars().all()
+
+        if len(tickets) == 0:
+            raise InvalidWithoutTickets()
+
+        return Destination(
+            id=str(tickets[0].destination_id)
+        )
+
+
+async def get_train_stores(
+        train_number: int,
+        db: sessionmaker[AsyncSession]
+) -> list[str]:
+    async with db() as session:
+        stores = (await session.execute(
+            select(TrainStore.store_id).where(TrainStore.train_number == train_number)
+        )).fetchall()
+
+    return list(map(lambda x: str(x[0]), stores))
