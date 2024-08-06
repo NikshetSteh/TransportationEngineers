@@ -21,10 +21,6 @@ from utils import async_input
 from video.camera import Camera
 
 
-async def loop():
-    pass
-
-
 async def process(
         fsm: FSM,
         main_window: BasicWindow,

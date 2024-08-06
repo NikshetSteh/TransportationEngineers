@@ -18,6 +18,8 @@ from model.robot import Robot
 # noinspection PyUnresolvedReferences
 from model.ticket import Ticket
 # noinspection PyUnresolvedReferences
+from model.train_stores import TrainStore
+# noinspection PyUnresolvedReferences
 from model.user import User
 
 config = context.config
