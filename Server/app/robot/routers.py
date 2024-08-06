@@ -8,7 +8,7 @@ from robot.schemes import *
 from robot.service import (check_user_place_in_wagon, get_attractions,
                            get_current_ticket, get_hotels,
                            get_user_destination_by_train, identification_face,
-                           validate_robot_admin_access)
+                           validate_robot_admin_access, get_train_stores)
 from users.schemes import Ticket, User
 
 router = APIRouter()
@@ -102,3 +102,12 @@ async def get_user_destination(
         determination_request.start_date,
         db
     )
+
+
+@router.get("/train/{train_number}/stores")
+async def get_train_stores_ids(
+        train_number: int,
+        db: DbDependency,
+        _: RobotAuthRequired
+) -> Page[str]:
+    return paginate(await get_train_stores(train_number, db))

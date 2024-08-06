@@ -5,7 +5,8 @@ from sqlalchemy.orm import sessionmaker
 from model.history import Purchase as PurchaseModel
 from model.item import PurchaseItem as PurchaseItemModel
 from model.item import StoreItem as StoreItemModel
-from store.schemes import StoreItem
+from store.schemes import StoreItem, Store
+from model.store import Store as StoreModel
 
 
 async def get_user_recommendations(
@@ -29,7 +30,6 @@ async def get_user_recommendations(
         )).all()
         last_purchases = list(map(lambda x: x[0], last_purchases))
         recommendations.extend(last_purchases)
-        print("After first:", recommendations)
 
         user_popular_purchases = (await session.execute(
             select(StoreItemModel)
@@ -49,7 +49,6 @@ async def get_user_recommendations(
         )).all()
         user_popular_purchases = list(map(lambda x: x[0], user_popular_purchases))
         recommendations.extend(user_popular_purchases)
-        print("After second:", recommendations)
 
         store_popular_purchases = (await session.execute(
             select(StoreItemModel)
@@ -68,7 +67,6 @@ async def get_user_recommendations(
         )).all()
         store_popular_purchases = list(map(lambda x: x[0], store_popular_purchases))
         recommendations.extend(store_popular_purchases)
-        print("After third:", recommendations)
 
         items_for_recommendations = []
         items_ids = []
@@ -90,3 +88,27 @@ async def get_user_recommendations(
                 items_ids.append(item.id)
 
         return items_for_recommendations
+
+
+async def get_store_list(
+        ids: list[str],
+        db: sessionmaker[AsyncSession]
+) -> list[Store]:
+    async with db() as session:
+        stores = (await session.execute(
+            select(StoreModel).where(StoreModel.id.in_(ids))
+        )).scalars().all()
+
+        print(stores)
+
+        return list(map(
+            lambda x: Store(
+                id=str(x.id),
+                name=x.name,
+                description=x.description,
+                logo_url=x.logo_url,
+                store_type=x.store_type,
+                items=[]
+            ),
+            stores
+        ))

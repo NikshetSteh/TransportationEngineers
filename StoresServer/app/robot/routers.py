@@ -4,9 +4,10 @@ from fastapi_pagination import Page, paginate
 from admin.service import get_store
 from auth import RobotAuthRequired
 from db import DbDependency
+from robot.schemes import StoreListRequest
 from store.schemes import Purchase, PurchaseCreation, Store, StoreItem
 from store.service import make_purchase
-from robot.service import get_user_recommendations
+from robot.service import get_user_recommendations, get_store_list
 
 router = APIRouter()
 
@@ -50,3 +51,12 @@ async def get_user_recommendations_handler(
             db
         )
     )
+
+
+@router.post("/stores/list")
+async def get_store_list_handler(
+        data: StoreListRequest,
+        db: DbDependency,
+        _: RobotAuthRequired
+) -> list[Store]:
+    return await get_store_list(data.ids, db)
