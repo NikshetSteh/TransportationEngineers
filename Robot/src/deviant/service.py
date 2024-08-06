@@ -1,13 +1,13 @@
 import asyncio
+import multiprocessing
 from typing import NoReturn
 
 import cv2
 import numpy as np
 import torch
+from menovideo.menovideo import DeVTr
 
 from video.camera import Camera
-from menovideo.menovideo import DeVTr
-import multiprocessing
 
 
 def check_deviant(

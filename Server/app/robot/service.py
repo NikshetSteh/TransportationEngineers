@@ -272,3 +272,19 @@ async def get_train_stores(
         )).fetchall()
 
     return list(map(lambda x: str(x[0]), stores))
+
+
+async def get_user_by_id(
+        user_id: str,
+        db: sessionmaker[AsyncSession]
+) -> User:
+    async with db() as session:
+        users = (await session.execute(
+            select(UserModel).where(UserModel.id == user_id)
+        )).one_or_none()
+        if users is None:
+            raise HTTPException(status_code=404, detail="User not found")
+        return User(
+            id=str(users[0].id),
+            name=users[0].name
+        )

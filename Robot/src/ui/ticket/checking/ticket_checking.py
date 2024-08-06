@@ -14,6 +14,7 @@ from states.ticket_checking_result_state import TicketCheckingResultState
 from tickets.exceptions import InvalidTicket
 from tickets.service import validate_user_ticket
 from ui.basic_window import BasicWindow
+from users.service import get_user_by_id
 
 
 class TicketChecking:
@@ -91,6 +92,7 @@ class TicketChecking:
 
         status = False
         ticket = None
+        user = None
         ready = False
 
         try:
@@ -114,6 +116,11 @@ class TicketChecking:
             print("Ticket Check Error:", e)
             self.is_waiting = False
 
+        print(ticket)
+
+        if ticket is not None:
+            user = await get_user_by_id(ticket.user_id, self.session)
+
         if ready:
             self.fsm.change_state(
                 TicketCheckingResultState(
@@ -123,6 +130,7 @@ class TicketChecking:
                     date=self.date,
                     handle_state=self.state,
                     status=status,
-                    ticket=ticket
+                    ticket=ticket,
+                    user=user
                 )
             )

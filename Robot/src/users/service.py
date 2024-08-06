@@ -48,3 +48,16 @@ async def get_user_destination(
             raise Exception(f"Unknown server error({response.status}): {await response.text()}")
 
         return (await response.json())["id"]
+
+
+async def get_user_by_id(
+        user_id: str,
+        session: ClientSession
+) -> User:
+    async with session.get(
+        f"{config.BASE_API_URL}/robot/user/{user_id}"
+    ) as response:
+        if response.status != 200:
+            raise Exception(f"Unknown server error({response.status}): {await response.text()}")
+
+        return User(**await response.json())

@@ -3,8 +3,8 @@ import datetime
 import sys
 from typing import NoReturn
 
-from PySide6.QtWidgets import QApplication
 from aiohttp import ClientSession
+from PySide6.QtWidgets import QApplication
 from qasync import QEventLoop
 
 from auth.service import is_login, login, new_login

@@ -62,7 +62,7 @@
     </property>
     <property name="text">
      <string>Хорошего пути,
-Фёдоров Ф. Ф!</string>
+{0}!</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_3">
@@ -83,7 +83,7 @@
      <string notr="true">color: rgb(231, 36, 16);</string>
     </property>
     <property name="text">
-     <string>Ваше место: </string>
+     <string>Ваше место: {0}</string>
     </property>
    </widget>
   </widget>
