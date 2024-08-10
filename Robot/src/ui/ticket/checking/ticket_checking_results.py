@@ -2,11 +2,10 @@ import datetime
 
 from aiohttp import ClientSession
 from PySide6.QtCore import QTimer
-from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QMainWindow
 
+import ui.ticket.checking.ticket_result_f_ui as design_f
 import ui.ticket.checking.ticket_result_s_ui as design_s
-import ui.ticket.checking.ticket_result_ui as design_f
 from fsm.context import Context
 from fsm.fsm import FSM
 from fsm.state import State
@@ -57,13 +56,7 @@ class TicketCheckingResults:
                 self.ui.label_3.text().format(self.ticket.place_number)
             )
         else:
-            self.ui.IconLabel.setPixmap(QPixmap(u":/icons/media/cancel.png"))
-            if self.ticket is None:
-                self.ui.TextLabel.setText("Wrong Ticket\n\n")
-            else:
-                self.ui.TextLabel.setText(
-                    f"Wrong Ticket\n\n"
-                )
+            pass
 
         self.auto_close_timer.timeout.connect(self.go_back)
         self.auto_close_timer.start(1000)

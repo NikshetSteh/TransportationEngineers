@@ -116,8 +116,6 @@ class TicketChecking:
             print("Ticket Check Error:", e)
             self.is_waiting = False
 
-        print(ticket)
-
         if ticket is not None:
             user = await get_user_by_id(ticket.user_id, self.session)
 
