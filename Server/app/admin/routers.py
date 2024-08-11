@@ -3,6 +3,7 @@ from fastapi import APIRouter, HTTPException, Path
 from fastapi_pagination import Page, paginate
 from sqlalchemy import delete, select
 
+import store_api.service
 from admin.schemes import *
 from auth.engineer_privileges import engineer_privileges_translations
 from db import DbDependency
@@ -13,6 +14,7 @@ from model.destinations_info import Hotel as HotelModel
 from model.engineer import Engineer as EngineerModel
 from model.robot import Robot as RobotModel
 from model.ticket import Ticket as TicketModel
+from model.train_stores import TrainStore
 from model.user import User as UserModel
 from robot.schemes import Attraction, Hotel, Robot
 from robot.service import get_attractions, get_hotels
@@ -477,6 +479,55 @@ async def update_auth_card(
             key=data.key
         )
         session.add(auth_card)
+        await session.commit()
+
+    return EmptyResponse()
+
+
+@router.post("/train/{train_number}/store/{store_id}")
+async def add_store_to_train(
+        train_number: int,
+        db: DbDependency,
+        store_id: str = Path(pattern="[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}"),
+) -> EmptyResponse:
+    store = await store_api.service.get_store(store_id)
+    if store is None:
+        raise HTTPException(status_code=404, detail="Store id not found")
+
+    async with db() as session:
+        train_store = TrainStore(
+            store_id=store_id,
+            train_number=train_number
+        )
+        session.add(train_store)
+        await session.commit()
+
+    return EmptyResponse()
+
+
+@router.get("/train/{train_number}/stores")
+async def get_train_stores_ids(
+        train_number: int,
+        db: DbDependency
+) -> Page[str]:
+    async with db() as session:
+        stores = (await session.execute(
+            select(TrainStore.store_id).where(TrainStore.train_number == train_number)
+        )).fetchall()
+
+    return paginate(list(map(lambda x: str(x[0]), stores)))
+
+
+@router.delete("/train/{train_number}/store/{store_id}")
+async def remove_store_from_train(
+        train_number: int,
+        db: DbDependency,
+        store_id: str = Path(pattern="[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}"),
+) -> EmptyResponse:
+    async with db() as session:
+        await session.execute(
+            delete(TrainStore).where(TrainStore.train_number == train_number, TrainStore.store_id == store_id)
+        )
         await session.commit()
 
     return EmptyResponse()

@@ -4,6 +4,7 @@ from fsm.fsm import FSM
 from fsm.state import State
 from tickets.schemes import Ticket
 from ui.ticket.checking.ticket_checking_results import TicketCheckingResults
+from users.schemes import User
 
 
 class TicketCheckingResultState(State):
@@ -15,7 +16,8 @@ class TicketCheckingResultState(State):
             date: datetime.datetime,
             handle_state: State,
             status: bool,
-            ticket: Ticket = None
+            ticket: Ticket = None,
+            user: User = None
     ) -> None:
         super().__init__()
         self.service = None
@@ -26,6 +28,7 @@ class TicketCheckingResultState(State):
         self.handle_state = handle_state
         self.status = status
         self.ticket = ticket
+        self.user = user
 
     def start(self, fsm: FSM) -> None:
         if self.service is None:
@@ -37,7 +40,8 @@ class TicketCheckingResultState(State):
                 self.date,
                 self.status,
                 self.handle_state,
-                self.ticket
+                self.ticket,
+                self.user
             )
         self.service.start(fsm.context["window"])
 

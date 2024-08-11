@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="images">
+    <file>media/Background_TS.png</file>
+  </qresource>
+</RCC>

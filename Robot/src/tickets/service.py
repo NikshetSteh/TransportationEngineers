@@ -39,7 +39,8 @@ async def validate_user_ticket(
                 )
             raise InvalidTicket(
                 response_data["detail"]["message"],
-                response_data["detail"].get("right_ticket", None)
+                Ticket.parse_obj(response_data["detail"]["right_ticket"])
+                if "right_ticket" in response_data["detail"] else None
             )
         if response.status != 200:
             raise Exception(f"Unknown server error({response.status}): {await response.text()}")
