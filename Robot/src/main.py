@@ -14,6 +14,7 @@ from fsm.context import Context
 from fsm.fsm import FSM
 from states.auth_state import AuthState
 from states.destination_info_state import DestinationInfoState
+from states.store_category_selection_state import StoreCategorySelectionState
 from states.ticket_cheking_state import TicketCheckingState
 from states.user_menu_state import UserMenuState
 from ui.basic_window import BasicWindow
@@ -34,6 +35,7 @@ async def process(
         "5. Delete context var",
         "6. Bind train",
         "7. Run deviant loop",
+        "8. Store category selection",
         sep="\n"
     )
     select_new_state = await async_input(
@@ -88,6 +90,13 @@ async def process(
         case "7":
             # noinspection PyAsyncCall
             asyncio.create_task(run_deviant_check_loop(camera=fsm.context["camera"]))
+        case "8":
+            store_id = await async_input("Enter store id: ")
+            fsm.change_state(
+                StoreCategorySelectionState(
+                    store_id
+                )
+            )
         case _:
             print("Invalid state")
 

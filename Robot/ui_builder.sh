@@ -14,3 +14,7 @@ pyside6-uic --absolute-imports --python-paths design design/ui/auth/auth.ui -o s
 
 # Destinations info list
 pyside6-uic --absolute-imports --python-paths design design/ui/user/destination_info/destinations_info_list.ui -o src/ui/user/destination_info/destinations_info_list_ui.py
+
+# Store
+pyside6-uic --absolute-imports --python-paths design design/ui/store/category_selection/category_select.ui -o src/ui/store/category_selection/category_select_ui.py
+pyside6-rcc design/ui/store/category_selection/category_select.qrc -o src/ui/store/category_selection/category_select_rc.py
