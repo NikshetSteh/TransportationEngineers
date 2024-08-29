@@ -15,8 +15,10 @@ from fsm.fsm import FSM
 from states.auth_state import AuthState
 from states.destination_info_state import DestinationInfoState
 from states.store_category_selection_state import StoreCategorySelectionState
+from states.store_item_state import StoreItemState
 from states.ticket_cheking_state import TicketCheckingState
 from states.user_menu_state import UserMenuState
+from store.schemes import StoreItem
 from ui.basic_window import BasicWindow
 from utils import async_input
 from video.camera import Camera
@@ -36,6 +38,7 @@ async def process(
         "6. Bind train",
         "7. Run deviant loop",
         "8. Store category selection",
+        "9. Store item view",
         sep="\n"
     )
     select_new_state = await async_input(
@@ -95,6 +98,29 @@ async def process(
             fsm.change_state(
                 StoreCategorySelectionState(
                     store_id
+                )
+            )
+        case "9":
+            item_id = await async_input("Enter item id: ")
+            item_name = await async_input("Enter item name: ")
+            item_description = await async_input("Enter item description: ")
+            item_price_penny = int(await async_input("Enter item price: "))
+            item_balance = int(await async_input("Enter item balance: "))
+            item_category = await async_input("Enter item category: ")
+            item_logo_url = await async_input("Enter item logo url: ")
+            fsm.change_state(
+                (
+                    StoreItemState(
+                        StoreItem(
+                            id=item_id,
+                            name=item_name,
+                            description=item_description,
+                            price_penny=item_price_penny,
+                            balance=item_balance,
+                            category=item_category,
+                            logo_url=item_logo_url
+                        )
+                    )
                 )
             )
         case _:

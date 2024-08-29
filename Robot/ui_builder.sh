@@ -18,3 +18,6 @@ pyside6-uic --absolute-imports --python-paths design design/ui/user/destination_
 # Store
 pyside6-uic --absolute-imports --python-paths design design/ui/store/category_selection/category_select.ui -o src/ui/store/category_selection/category_select_ui.py
 pyside6-rcc design/ui/store/category_selection/category_select.qrc -o src/ui/store/category_selection/category_select_rc.py
+
+pyside6-uic --absolute-imports --python-paths design design/ui/store/item/item.ui -o src/ui/store/item/item_ui.py
+pyside6-rcc design/ui/store/item/item.qrc -o src/ui/store/item/item_rc.py

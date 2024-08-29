@@ -49,7 +49,7 @@
      <string/>
     </property>
     <property name="pixmap">
-     <pixmap resource="category_select.qrc">:/media/window.png</pixmap>
+     <pixmap resource="category_select.qrc">:/media/window_category_selection.png</pixmap>
     </property>
    </widget>
    <widget class="QPushButton" name="recommendations">

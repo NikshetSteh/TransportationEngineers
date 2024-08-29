@@ -37,7 +37,7 @@ class Ui_MainWindow(object):
         self.label = QLabel(self.centralwidget)
         self.label.setObjectName(u"label")
         self.label.setGeometry(QRect(0, 0, 1024, 600))
-        self.label.setPixmap(QPixmap(u":/media/window.png"))
+        self.label.setPixmap(QPixmap(u":/media/window_category_selection.png"))
         self.recommendations = QPushButton(self.centralwidget)
         self.recommendations.setObjectName(u"recommendations")
         self.recommendations.setGeometry(QRect(132, 268, 150, 150))

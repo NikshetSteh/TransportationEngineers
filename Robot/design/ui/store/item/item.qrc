@@ -1,5 +1,5 @@
 <RCC>
   <qresource prefix="/">
-    <file>media/window_category_selection.png</file>
+    <file>media/window_item.png</file>
   </qresource>
 </RCC>
