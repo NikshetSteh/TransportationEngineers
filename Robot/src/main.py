@@ -13,6 +13,7 @@ from deviant.service import run_deviant_check_loop
 from fsm.context import Context
 from fsm.fsm import FSM
 from states.auth_state import AuthState
+from states.catalog_state import CatalogState
 from states.destination_info_state import DestinationInfoState
 from states.store_category_selection_state import StoreCategorySelectionState
 from states.store_item_state import StoreItemState
@@ -39,6 +40,7 @@ async def process(
         "7. Run deviant loop",
         "8. Store category selection",
         "9. Store item view",
+        "10. Store catalog",
         sep="\n"
     )
     select_new_state = await async_input(
@@ -120,6 +122,14 @@ async def process(
                             category=item_category,
                             logo_url=item_logo_url
                         )
+                    )
+                )
+            )
+        case "10":
+            fsm.change_state(
+                (
+                    CatalogState(
+
                     )
                 )
             )

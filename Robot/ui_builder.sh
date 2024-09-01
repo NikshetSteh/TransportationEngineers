@@ -21,3 +21,7 @@ pyside6-rcc design/ui/store/category_selection/category_select.qrc -o src/ui/sto
 
 pyside6-uic --absolute-imports --python-paths design design/ui/store/item/item.ui -o src/ui/store/item/item_ui.py
 pyside6-rcc design/ui/store/item/item.qrc -o src/ui/store/item/item_rc.py
+
+pyside6-uic --absolute-imports --python-paths design design/ui/store/catalog/catalog.ui -o src/ui/store/catalog/catalog_ui.py
+pyside6-rcc design/ui/store/catalog/catalog.qrc -o src/ui/store/catalog/catalog_rc.py
+pyside6-uic --absolute-imports --python-paths design design/ui/store/catalog/item.ui -o src/ui/store/catalog/item_ui.py
