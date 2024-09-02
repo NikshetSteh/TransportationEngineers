@@ -1,8 +1,12 @@
 from qasync import asyncSlot
 
 import ui.user.main_menu_ui as main_design
+from config import get_config
 from fsm.fsm import FSM
+from fsm.state import State
 from states.destination_info_state import DestinationInfoState
+from states.store_category_selection_state import StoreCategorySelectionState
+from store.service import get_store
 from ui.basic_window import BasicWindow
 from users.schemes import User
 from users.service import get_user_destination
@@ -13,6 +17,7 @@ class UserMenu:
             self,
             fsm: FSM,
             user: User,
+            state: State
     ):
         super(UserMenu, self).__init__()
 
@@ -23,6 +28,7 @@ class UserMenu:
         self.fsm = fsm
         self.context = fsm.context
         self.user = user
+        self.state = state
 
     def start(self, window: BasicWindow):
         self.ui.setupUi(window)
@@ -37,6 +43,7 @@ class UserMenu:
 
         # self.ui.pushButton.clicked.connect(self.train)
         self.ui.pushButton_2.clicked.connect(self.destination_info)
+        self.ui.pushButton.clicked.connect(self.open_store)
 
     def stop(self):
         pass
@@ -54,3 +61,26 @@ class UserMenu:
                 destination
             )
         )
+
+    @asyncSlot()
+    async def open_store(self):
+        # noinspection PyBroadException
+        try:
+            self.ui.pushButton.setEnabled(False)
+            self.ui.pushButton_2.setEnabled(False)
+
+            config = get_config()
+            store = await get_store(
+                config.DEFAULT_STORE,
+                self.session
+            )
+            self.fsm.change_state(
+                StoreCategorySelectionState(
+                    store,
+                    self.state
+                )
+            )
+        except Exception as e:
+            print("Error when try load store: " + str(e))
+            self.ui.pushButton.setEnabled(True)
+            self.ui.pushButton_2.setEnabled(True)

@@ -15,6 +15,8 @@ class Config(BaseSettings):
     ROBOT_MODEL_ID: str = "TestRobotID1"
     ROBOT_MODEL_NAME: str = "TestRobot:0.1.0:001"
 
+    DEFAULT_STORE: str = "0ebdbfc3-0e2c-4ce2-ac69-a414437c0482"
+
 
 @lru_cache()
 def get_config() -> Config:

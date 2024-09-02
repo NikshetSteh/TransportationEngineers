@@ -15,7 +15,8 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor, QFont,
                            QFontDatabase, QGradient, QIcon, QImage,
                            QKeySequence, QLinearGradient, QPainter, QPalette,
                            QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import QApplication, QLabel, QSizePolicy, QWidget
+from PySide6.QtWidgets import (QApplication, QLabel, QPushButton, QSizePolicy,
+                               QWidget)
 
 
 class Ui_ItemUI(object):
@@ -42,6 +43,11 @@ class Ui_ItemUI(object):
         font1.setPointSize(20)
         font1.setBold(True)
         self.price.setFont(font1)
+        self.button = QPushButton(ItemUI)
+        self.button.setObjectName(u"button")
+        self.button.setGeometry(QRect(0, 0, 450, 155))
+        self.button.setStyleSheet(u"background: rgbs(255, 255, 255, 1);\n"
+"border: none;")
 
         self.retranslateUi(ItemUI)
 
@@ -53,5 +59,6 @@ class Ui_ItemUI(object):
         self.label.setText("")
         self.name.setText(QCoreApplication.translate("ItemUI", u"name", None))
         self.price.setText(QCoreApplication.translate("ItemUI", u"\u0426\u0435\u043d\u0430: 100 \u0440\u0443\u0431.", None))
+        self.button.setText("")
     # retranslateUi
 

@@ -68,6 +68,23 @@
     <string>Цена: 100 руб.</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="button">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>450</width>
+     <height>155</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background: rgbs(255, 255, 255, 1);
+border: none;</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>

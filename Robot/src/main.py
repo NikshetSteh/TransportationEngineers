@@ -13,9 +13,9 @@ from deviant.service import run_deviant_check_loop
 from fsm.context import Context
 from fsm.fsm import FSM
 from states.auth_state import AuthState
-from states.catalog_state import CatalogState
+# from states.catalog_state import CatalogState
 from states.destination_info_state import DestinationInfoState
-from states.store_category_selection_state import StoreCategorySelectionState
+# from states.store_category_selection_state import StoreCategorySelectionState
 from states.store_item_state import StoreItemState
 from states.ticket_cheking_state import TicketCheckingState
 from states.user_menu_state import UserMenuState
@@ -96,12 +96,13 @@ async def process(
             # noinspection PyAsyncCall
             asyncio.create_task(run_deviant_check_loop(camera=fsm.context["camera"]))
         case "8":
-            store_id = await async_input("Enter store id: ")
-            fsm.change_state(
-                StoreCategorySelectionState(
-                    store_id
-                )
-            )
+            pass
+            # store_id = await async_input("Enter store id: ")
+            # fsm.change_state(
+            #     StoreCategorySelectionState(
+            #         store_id
+            #     )
+            # )
         case "9":
             item_id = await async_input("Enter item id: ")
             item_name = await async_input("Enter item name: ")
@@ -125,14 +126,14 @@ async def process(
                     )
                 )
             )
-        case "10":
-            fsm.change_state(
-                (
-                    CatalogState(
-
-                    )
-                )
-            )
+        # case "10":
+        #     fsm.change_state(
+        #         (
+        #             CatalogState(
+        #
+        #             )
+        #         )
+        #     )
         case _:
             print("Invalid state")
 

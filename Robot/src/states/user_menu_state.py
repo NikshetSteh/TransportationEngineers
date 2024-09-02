@@ -11,7 +11,8 @@ class UserMenuState(State):
         if self.service is None:
             self.service = UserMenu(
                 fsm,
-                fsm.context["user"]
+                fsm.context["user"],
+                self
             )
 
         self.service.start(fsm.context["window"])
