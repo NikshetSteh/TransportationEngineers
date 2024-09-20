@@ -45,7 +45,8 @@ class UserMenu:
     def __init__(
             self,
             fsm: FSM,
-            destination_id: str
+            destination_id: str,
+            last_state
     ):
         super(UserMenu, self).__init__()
 
@@ -60,6 +61,7 @@ class UserMenu:
 
         self.destination_id = destination_id
         self.buffer = []
+        self.last_state = last_state
 
     def start(self, window: BasicWindow) -> None:
         self.ui.setupUi(window)
@@ -69,6 +71,10 @@ class UserMenu:
         self.timer = QTimer()
         self.timer.timeout.connect(self.load_data)
         self.timer.start(1000)
+
+        self.ui.pushButton.clicked.connect(
+            lambda: self.fsm.change_state(self.last_state)
+        )
 
     @asyncSlot()
     async def load_data(self):

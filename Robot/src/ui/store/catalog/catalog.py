@@ -1,16 +1,16 @@
+from aiohttp import ClientSession
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWidgets import QGridLayout, QWidget
+from qasync import asyncSlot
 
 from fsm.fsm import FSM
 from fsm.state import State
 from states.store_item_state import StoreItemState
 from store.schemes import Store, StoreItem
+from store.service import get_user_recommendation_for_store
 from ui.basic_window import BasicWindow
 from ui.store.catalog.catalog_ui import Ui_MainWindow
 from ui.store.catalog.item import Item
-from qasync import asyncSlot
-from aiohttp import ClientSession
-from store.service import get_user_recommendation_for_store
 
 
 def process_scroll_area(scroll_area) -> QGridLayout:

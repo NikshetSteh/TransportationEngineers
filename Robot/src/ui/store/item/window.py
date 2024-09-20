@@ -6,10 +6,9 @@ import ui.store.item.item_ui as main_design
 from config import get_config
 from fsm.fsm import FSM
 from fsm.state import State
-from store.schemes import StoreItem
-from ui.basic_window import BasicWindow
+from store.schemes import PurchaseItem, StoreItem
 from store.service import create_purchase
-from store.schemes import PurchaseItem
+from ui.basic_window import BasicWindow
 
 
 class StoreItemWindow:

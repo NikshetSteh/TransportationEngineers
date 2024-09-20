@@ -58,7 +58,8 @@ class UserMenu:
         )
         self.fsm.change_state(
             DestinationInfoState(
-                destination
+                destination,
+                self.state
             )
         )
 
