@@ -58,7 +58,8 @@ class UserMenu:
         )
         self.fsm.change_state(
             DestinationInfoState(
-                destination
+                destination,
+                self.state
             )
         )
 
@@ -74,6 +75,7 @@ class UserMenu:
                 config.DEFAULT_STORE,
                 self.session
             )
+            self.fsm.context["store"] = store
             self.fsm.change_state(
                 StoreCategorySelectionState(
                     store,

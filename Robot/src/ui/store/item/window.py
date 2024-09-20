@@ -6,7 +6,8 @@ import ui.store.item.item_ui as main_design
 from config import get_config
 from fsm.fsm import FSM
 from fsm.state import State
-from store.schemes import StoreItem
+from store.schemes import PurchaseItem, StoreItem
+from store.service import create_purchase
 from ui.basic_window import BasicWindow
 
 
@@ -39,6 +40,9 @@ class StoreItemWindow:
         self.ui.name.setText(self.item.name)
         self.ui.description.setText(self.item.description)
         self.ui.count.setText(f"{self.item.balance} шт.")
+        self.ui.pushButton_2.clicked.connect(
+            self.buy
+        )
 
         if self.item.price_penny % 100 == 0:
             self.ui.price.setText(f"{self.item.price_penny // 100} руб.")
@@ -55,13 +59,29 @@ class StoreItemWindow:
     async def load_logo(self):
         config = get_config()
 
-        async with self.session.get(config.RESOURCE_URL + "/static/logos/" + self.item.logo_url) as response:
+        async with self.session.get(config.RESOURCE_URL + "/static/logos/items/" + self.item.logo_url) as response:
             if response.status == 200:
                 image_data = await response.read()
                 pixmap = QPixmap()
                 pixmap.loadFromData(image_data)
+                self.ui.icon.setScaledContents(True)
                 self.ui.icon.setPixmap(pixmap)
                 self.timer.stop()
             else:
                 print(f"Failed to fetch image: {response.status}")
                 self.timer.stop()
+
+    @asyncSlot()
+    async def buy(self):
+        await create_purchase(
+            self.fsm.context["store"].id,
+            self.fsm.context["user"].id,
+            [
+                PurchaseItem(
+                    item_id=self.item.id,
+                    count=1
+                )
+            ],
+            True,
+            self.session
+        )

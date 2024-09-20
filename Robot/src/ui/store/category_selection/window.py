@@ -27,10 +27,10 @@ class StoreCategorySelection:
     def start(self, window: BasicWindow):
         self.ui.setupUi(window)
         self.ui.pushButton.clicked.connect(self.return_to_last_state)
-        # TODO: Add recommendations
         self.ui.train_souvenirs.clicked.connect(self.make_go_to_category_handler("train_souvenirs"))
         self.ui.city_souvenirs.clicked.connect(self.make_go_to_category_handler("city_souvenirs"))
         self.ui.food.clicked.connect(self.make_go_to_category_handler("food"))
+        self.ui.recommendations.clicked.connect(self.make_go_to_category_handler("recommendations"))
         self.is_waiting = False
 
     def stop(self):

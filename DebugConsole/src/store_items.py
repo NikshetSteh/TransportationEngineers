@@ -1,3 +1,4 @@
+import json
 from functools import wraps
 
 import requests
@@ -153,3 +154,29 @@ def mark_task_as_done(
         }
     )
     default_print_response(response)
+
+
+@login_required
+def load_items(
+        session_token: str
+) -> None:
+    file_path = input_with_default("File path", "data/items.json")
+    with open(file_path, encoding="utf-8") as file:
+        items = json.loads("".join(file.readlines()))
+
+    for item in items:
+        response = requests.post(
+            f"{STORE_API_URL}/store/item",
+            json={
+                "name": item["name"],
+                "description": item["name"],
+                "logo_url": item["logo_url"],
+                "balance": item["balance"],
+                "price_penny": item["price"],
+                "category": item["category"]
+            },
+            headers={
+                "Authorization": session_token
+            }
+        )
+        default_print_response(response)
