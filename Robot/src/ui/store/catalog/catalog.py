@@ -1,4 +1,4 @@
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWidgets import QGridLayout, QWidget
 
 from fsm.fsm import FSM
@@ -8,6 +8,9 @@ from store.schemes import Store, StoreItem
 from ui.basic_window import BasicWindow
 from ui.store.catalog.catalog_ui import Ui_MainWindow
 from ui.store.catalog.item import Item
+from qasync import asyncSlot
+from aiohttp import ClientSession
+from store.service import get_user_recommendation_for_store
 
 
 def process_scroll_area(scroll_area) -> QGridLayout:
@@ -40,15 +43,39 @@ class Catalog:
         self.category = category
         self.state = state
 
-        self.items = [
-            i for i in store.items if i.category == category
-        ]
+        self.items = []
+
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.load_items)
 
     def start(self, window: BasicWindow):
         self.ui.setupUi(window)
 
         self.ui.pushButton.clicked.connect(self.return_to_last_state)
 
+        if self.category == "recommendations":
+            self.timer.start(1)
+        else:
+            self.items = [
+                i for i in self.store.items if i.category == self.category
+            ]
+            self.show_items()
+
+    def stop(self):
+        self.timer.stop()
+
+    @asyncSlot()
+    async def load_items(self):
+        self.timer.stop()
+        session: ClientSession = self.fsm.context["session"]
+        self.items = (await get_user_recommendation_for_store(
+            self.fsm.context["user"].id,
+            self.store.id,
+            session
+        )).items
+        self.show_items()
+
+    def show_items(self):
         scroll_area = self.ui.scrollArea
 
         scroll_layout = process_scroll_area(scroll_area)
@@ -65,11 +92,8 @@ class Catalog:
                 i % 2
             )
             item.button.clicked.connect(
-                lambda: self.open_item(self.items[i])
+                self.create_button_handler(self.items[i])
             )
-
-    def stop(self):
-        pass
 
     def return_to_last_state(self):
         self.fsm.change_state(self.last_state)
@@ -81,3 +105,9 @@ class Catalog:
                 self.state
             )
         )
+
+    def create_button_handler(self, item: StoreItem):
+        def handler():
+            self.open_item(item)
+
+        return handler

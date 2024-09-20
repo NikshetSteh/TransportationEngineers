@@ -35,11 +35,12 @@ class Item(QWidget):
         config = get_config()
 
         async with aiohttp.ClientSession() as session:
-            async with session.get(config.RESOURCE_URL + "/static/logos/" + self.image_url) as response:
+            async with session.get(config.RESOURCE_URL + "/static/logos/items/" + self.image_url) as response:
                 if response.status == 200:
                     image_data = await response.read()
                     pixmap = QPixmap()
                     pixmap.loadFromData(image_data)
+                    self.ui.label.setScaledContents(True)
                     self.ui.label.setPixmap(pixmap)
                 else:
                     print(f"Failed to fetch image: {response.status}")

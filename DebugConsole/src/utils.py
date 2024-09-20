@@ -1,3 +1,4 @@
+import json
 from json import JSONDecodeError, dumps
 from typing import TypeVar
 
@@ -7,9 +8,9 @@ from requests import Response
 def default_print_response(response: Response) -> None:
     print(response.status_code)
     try:
-        buffer = response.json()
+        buffer = json.loads(response.content.decode("utf-8"))
 
-        print(dumps(buffer, indent=2))
+        print(dumps(buffer, indent=2, ensure_ascii=False))
     except JSONDecodeError:
         print(response.text)
 

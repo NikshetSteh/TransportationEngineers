@@ -257,7 +257,7 @@ def auth_request(client_type: ClientType):
             robot_id = await redis.get(session_id)
 
             if robot_id is not None:
-                redis.expire(session_id, config.AUTH_SESSION_TIMEOUT)
+                await redis.expire(session_id, config.AUTH_SESSION_TIMEOUT)
                 return robot_id
             else:
                 raise HTTPException(status_code=401, detail="Invalid credentials")

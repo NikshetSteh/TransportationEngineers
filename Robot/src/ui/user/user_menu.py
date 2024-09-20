@@ -74,6 +74,7 @@ class UserMenu:
                 config.DEFAULT_STORE,
                 self.session
             )
+            self.fsm.context["store"] = store
             self.fsm.change_state(
                 StoreCategorySelectionState(
                     store,

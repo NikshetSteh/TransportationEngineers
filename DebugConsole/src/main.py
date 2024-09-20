@@ -117,6 +117,7 @@ while True:
             "4. Обновить товар",
             "5. Показать задачи",
             "6. Отметить задачу выполненной",
+            "7. Загрузить товары",
             sep="\n"
         )
 
@@ -134,6 +135,8 @@ while True:
                 get_store_tasks()
             case 6:
                 mark_task_as_done()
+            case 7:
+                load_items()
 
 
     def engineers():
