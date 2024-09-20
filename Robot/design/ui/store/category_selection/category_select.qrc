@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="/">
+    <file>media/window_category_selection.png</file>
+  </qresource>
+</RCC>
