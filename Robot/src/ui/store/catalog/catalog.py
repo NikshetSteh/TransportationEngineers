@@ -56,7 +56,8 @@ class Catalog:
         for i in range(len(self.items)):
             item = Item(
                 name=self.items[i].name,
-                price_penny=self.items[i].price_penny
+                price_penny=self.items[i].price_penny,
+                logo=self.items[i].logo_url
             )
             scroll_layout.addWidget(
                 item,
