@@ -4,8 +4,8 @@ from pydantic_settings import BaseSettings
 
 
 class Config(BaseSettings):
-    FACE_API: str = "http://127.0.0.1:8030/face_api/v1"
-    STORE_API: str = "http://172.23.116.239:80/store_api/v1"
+    FACE_API: str = "http://127.0.0.1:8100/face_api/v1"
+    STORE_API: str = "http://127.0.0.1:8090/store_api/v1"
 
     DB_URI: str = "postgresql+asyncpg://postgres:root@localhost:5432/TransportEngineers"
     DB_URI_ALEMBIC: str = "postgresql+psycopg2://postgres:root@localhost:5432/TransportEngineers"

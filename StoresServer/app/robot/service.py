@@ -5,8 +5,8 @@ from sqlalchemy.orm import sessionmaker
 from model.history import Purchase as PurchaseModel
 from model.item import PurchaseItem as PurchaseItemModel
 from model.item import StoreItem as StoreItemModel
-from store.schemes import StoreItem, Store
 from model.store import Store as StoreModel
+from store.schemes import Store, StoreItem
 
 
 async def get_user_recommendations(
@@ -98,8 +98,6 @@ async def get_store_list(
         stores = (await session.execute(
             select(StoreModel).where(StoreModel.id.in_(ids))
         )).scalars().all()
-
-        print(stores)
 
         return list(map(
             lambda x: Store(

@@ -17,6 +17,8 @@ from model.train_stores import TrainStore
 from model.user import User as UserModel
 from robot.exceptions import *
 from robot.schemes import *
+from store_api.schemes import Store
+from store_api.service import get_stores
 from users.schemes import Ticket, User
 
 
@@ -262,18 +264,6 @@ async def get_user_destination_by_train(
         )
 
 
-async def get_train_stores(
-        train_number: int,
-        db: sessionmaker[AsyncSession]
-) -> list[str]:
-    async with db() as session:
-        stores = (await session.execute(
-            select(TrainStore.store_id).where(TrainStore.train_number == train_number)
-        )).fetchall()
-
-    return list(map(lambda x: str(x[0]), stores))
-
-
 async def get_user_by_id(
         user_id: str,
         db: sessionmaker[AsyncSession]
@@ -288,3 +278,22 @@ async def get_user_by_id(
             id=str(users[0].id),
             name=users[0].name
         )
+
+
+async def get_train_stores(
+        train_number: int,
+        train_date: datetime.datetime,
+        db: sessionmaker[AsyncSession]
+) -> list[Store]:
+    async with db() as session:
+        stores_ids = (await session.execute(
+            select(TrainStore.store_id)
+            .where(TrainStore.train_number == train_number)
+            .where(TrainStore.train_date == train_date)
+        )).fetchall()
+
+        stores_ids = list(map(lambda x: x[0], stores_ids))
+
+        stores = await get_stores(stores_ids[:50])
+
+    return stores

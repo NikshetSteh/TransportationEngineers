@@ -3,6 +3,8 @@ from fastapi_pagination import Page, paginate
 
 from admin.service import create_store, delete_store, get_store, get_stores
 from db import DbDependency
+from robot.schemes import StoreListRequest
+from robot.service import get_store_list
 from schemes import EmptyResponse
 from store.schemes import *
 
@@ -39,3 +41,11 @@ async def delete_store_handler(
 ) -> EmptyResponse:
     await delete_store(store_id, db)
     return EmptyResponse()
+
+
+@router.get("/ids/stores")
+async def get_store_list_handler(
+        data: StoreListRequest,
+        db: DbDependency
+) -> list[Store]:
+    return await get_store_list(data.ids, db)

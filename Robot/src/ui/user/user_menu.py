@@ -4,6 +4,7 @@ import ui.user.main_menu_ui as main_design
 from config import get_config
 from fsm.fsm import FSM
 from fsm.state import State
+from states.auth_state import AuthState
 from states.destination_info_state import DestinationInfoState
 from states.store_category_selection_state import StoreCategorySelectionState
 from store.service import get_store
@@ -42,8 +43,13 @@ class UserMenu:
             self.ui.pushButton_2.setEnabled(True)
 
         # self.ui.pushButton.clicked.connect(self.train)
-        self.ui.pushButton_2.clicked.connect(self.destination_info)
         self.ui.pushButton.clicked.connect(self.open_store)
+        self.ui.pushButton_2.clicked.connect(self.destination_info)
+        self.ui.pushButton_3.clicked.connect(
+            lambda _: self.fsm.change_state(
+                AuthState(type(self.state))
+            )
+        )
 
     def stop(self):
         pass

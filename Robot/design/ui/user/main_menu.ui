@@ -74,6 +74,25 @@
      <set>Qt::AlignmentFlag::AlignCenter</set>
     </property>
    </widget>
+   <widget class="QPushButton" name="pushButton_3">
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>400</y>
+      <width>200</width>
+      <height>70</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Rubik</family>
+      <pointsize>16</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Выход</string>
+    </property>
+   </widget>
   </widget>
  </widget>
  <resources/>
