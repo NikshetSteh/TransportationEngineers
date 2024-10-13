@@ -17,6 +17,7 @@ menovideo = {git = "https://github.com/NikshetSteh/Data-efficient-video-transfor
 timm = "^1.0.8"
 scikit-image = "^0.24.0"
 numpy = "1.26.4"
+bleak = "^0.22.3"
 
 
 [tool.poetry.group.dev.dependencies]
