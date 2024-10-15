@@ -27,7 +27,7 @@ def upgrade() -> None:
     op.alter_column('train_stores', 'train_number',
                existing_type=sa.INTEGER(),
                nullable=False)
-    op.drop_constraint('train_stores_store_id_fkey', 'train_stores', type_='foreignkey')
+    # op.drop_constraint('train_stores_store_id_fkey', 'train_stores', type_='foreignkey')
     # ### end Alembic commands ###
 
 

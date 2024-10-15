@@ -12,6 +12,7 @@ from config import get_config
 from deviant.service import run_deviant_check_loop
 from fsm.context import Context
 from fsm.fsm import FSM
+from hardware.low.port import Port
 from states.auth_state import AuthState
 from states.destination_info_state import DestinationInfoState
 from states.ticket_cheking_state import TicketCheckingState
@@ -35,6 +36,7 @@ async def process(
         "6. Bind train",
         "7. Run deviant loop",
         "8. Get stores of train",
+        "9. Connect by com",
         sep="\n"
     )
     select_new_state = await async_input(
@@ -100,13 +102,24 @@ async def process(
                 }
             )
             print(await response.json())
+        case "9":
+            com_port = await async_input("Enter com port: ")
+            port = Port(
+                com_port,
+                9600,
+                loop=fsm.context["loop"]
+            )
+            async with port:
+                print(await port.read())
+                print("check")
         case _:
             print("Invalid state")
 
 
 async def run_loop(
         session: ClientSession,
-        camera: Camera
+        camera: Camera,
+        global_loop
 ) -> NoReturn:
     context = Context()
     state_machine = FSM(context)
@@ -116,6 +129,7 @@ async def run_loop(
     context["state_machine"] = state_machine
     context["window"] = main_window
     context["camera"] = camera
+    context["loop"] = global_loop
 
     while True:
         await process(
@@ -124,7 +138,7 @@ async def run_loop(
         )
 
 
-async def main() -> NoReturn:
+async def main(global_loop) -> NoReturn:
     async with ClientSession() as session:
         config = get_config()
 
@@ -146,11 +160,11 @@ async def main() -> NoReturn:
             await login("", session)
 
         with Camera() as camera:
-            await run_loop(session, camera)
+            await run_loop(session, camera, global_loop)
 
 
 if __name__ == "__main__":
     application = QApplication(sys.argv)
     loop = QEventLoop(application)
     asyncio.set_event_loop(loop)
-    loop.run_until_complete(main())
+    loop.run_until_complete(main(loop))
