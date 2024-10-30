@@ -1,5 +1,6 @@
-from dataclasses import dataclass
 import datetime
+from dataclasses import dataclass
+
 from pydantic import BaseModel
 
 from hardware.low.port import Port

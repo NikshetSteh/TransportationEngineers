@@ -24,6 +24,7 @@ class Ui_MainWindow(object):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(1024, 600)
+        MainWindow.setStyleSheet(u"background-color: white;")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.pushButton = QPushButton(self.centralwidget)
@@ -33,10 +34,14 @@ class Ui_MainWindow(object):
         font.setFamilies([u"Rubik"])
         font.setPointSize(16)
         self.pushButton.setFont(font)
+        self.pushButton.setStyleSheet(u"background: #d9d9d9;\n"
+"border-radius: 5px;")
         self.pushButton_2 = QPushButton(self.centralwidget)
         self.pushButton_2.setObjectName(u"pushButton_2")
         self.pushButton_2.setGeometry(QRect(608, 265, 200, 70))
         self.pushButton_2.setFont(font)
+        self.pushButton_2.setStyleSheet(u"background: #d9d9d9;\n"
+"border-radius: 5px;")
         self.welcomeLabel = QLabel(self.centralwidget)
         self.welcomeLabel.setObjectName(u"welcomeLabel")
         self.welcomeLabel.setGeometry(QRect(0, 0, 1024, 265))
@@ -49,6 +54,8 @@ class Ui_MainWindow(object):
         self.pushButton_3.setObjectName(u"pushButton_3")
         self.pushButton_3.setGeometry(QRect(410, 400, 200, 70))
         self.pushButton_3.setFont(font)
+        self.pushButton_3.setStyleSheet(u"background: #d9d9d9;\n"
+"border-radius: 5px;")
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)

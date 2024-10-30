@@ -8,5 +8,6 @@ class BasicWindow(QMainWindow):
 
         self.setWindowFlag(Qt.WindowType.FramelessWindowHint, True)
         self.is_active = True
+        self.setStyleSheet("background-color: white;")
 
         self.resize(1080, 600)

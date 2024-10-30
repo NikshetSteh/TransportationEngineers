@@ -60,6 +60,8 @@ class Ui_MainWindow(object):
         self.pushButton = QPushButton(self.centralwidget)
         self.pushButton.setObjectName(u"pushButton")
         self.pushButton.setGeometry(QRect(10, 10, 111, 31))
+        self.pushButton.setStyleSheet(u"background: #d9d9d9;\n"
+"border-radius: 5px;")
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)

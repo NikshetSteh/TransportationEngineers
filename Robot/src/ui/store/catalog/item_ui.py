@@ -24,9 +24,12 @@ class Ui_ItemUI(object):
         if not ItemUI.objectName():
             ItemUI.setObjectName(u"ItemUI")
         ItemUI.resize(450, 155)
+        ItemUI.setStyleSheet(u"border:1px solid rgb(0, 0, 0);")
         self.label = QLabel(ItemUI)
         self.label.setObjectName(u"label")
         self.label.setGeometry(QRect(0, 0, 130, 155))
+        self.label.setStyleSheet(u"border-radius: 5px;\n"
+"border: 2px solid rgb(0, 0, 0);")
         self.name = QLabel(ItemUI)
         self.name.setObjectName(u"name")
         self.name.setGeometry(QRect(146, 0, 304, 41))
@@ -34,7 +37,8 @@ class Ui_ItemUI(object):
         font.setFamilies([u"Arial"])
         font.setPointSize(25)
         self.name.setFont(font)
-        self.name.setStyleSheet(u"color: #E72410;")
+        self.name.setStyleSheet(u"color: #E72410;\n"
+"border: none;")
         self.price = QLabel(ItemUI)
         self.price.setObjectName(u"price")
         self.price.setGeometry(QRect(146, 52, 251, 41))
@@ -43,6 +47,7 @@ class Ui_ItemUI(object):
         font1.setPointSize(20)
         font1.setBold(True)
         self.price.setFont(font1)
+        self.price.setStyleSheet(u"border: none;")
         self.button = QPushButton(ItemUI)
         self.button.setObjectName(u"button")
         self.button.setGeometry(QRect(0, 0, 450, 155))
