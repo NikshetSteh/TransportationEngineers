@@ -13,6 +13,7 @@ from deviant.service import run_deviant_check_loop
 from fsm.context import Context
 from fsm.fsm import FSM
 from hardware.low.port import Port
+from hardware.robot import Robot, RobotModule
 from states.auth_state import AuthState
 from states.destination_info_state import DestinationInfoState
 from states.ticket_cheking_state import TicketCheckingState
@@ -20,6 +21,17 @@ from states.user_menu_state import UserMenuState
 from ui.basic_window import BasicWindow
 from utils import async_input
 from video.camera import Camera
+
+
+async def hardware_loop(
+        port: Port
+) -> NoReturn:
+    async with port:
+        print("Check")
+        while True:
+            data = await port.read()
+            print(data)
+            await asyncio.sleep(0.1)
 
 
 async def process(
@@ -37,6 +49,8 @@ async def process(
         "7. Run deviant loop",
         "8. Get stores of train",
         "9. Connect by com",
+        "10. Run hardware loop",
+        "11. Start robot loop",
         sep="\n"
     )
     select_new_state = await async_input(
@@ -109,9 +123,37 @@ async def process(
                 9600,
                 loop=fsm.context["loop"]
             )
-            async with port:
-                print(await port.read())
-                print("check")
+            fsm.context["port"] = port
+        case "10":
+            # noinspection PyAsyncCall
+            asyncio.create_task(hardware_loop(fsm.context["port"]))
+        case "11":
+            com_port = await async_input("Enter com port: ")
+            port = Port(
+                com_port,
+                9600,
+                loop=fsm.context["loop"]
+            )
+
+            fsm.context["port"] = port
+
+            robot = Robot(
+                port
+            )
+
+            class TestModule(RobotModule):
+                def check_header(self, header: str) -> bool:
+                    return header == "key"
+
+                async def handle(self, header: str, body: str):
+                    print("Find new key:", body)
+
+            robot.add_module(
+                TestModule()
+            )
+
+            # noinspection PyAsyncCall
+            asyncio.create_task(robot.loop(fsm))
         case _:
             print("Invalid state")
 
