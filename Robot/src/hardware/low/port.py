@@ -8,7 +8,7 @@ class Port:
         self.port = port
         self.baud_rate = baud_rate
         self.reader = None
-        self.writer = None
+        self.writer: asyncio.StreamWriter | None = None
         if loop is None:
             self.loop = asyncio.get_event_loop()
         else:
@@ -35,4 +35,5 @@ class Port:
         return data
 
     async def write(self, data):
-        await self.writer.write(data)
+        # await self.writer.write(data)
+        self.writer.write(data)

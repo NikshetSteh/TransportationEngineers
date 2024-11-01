@@ -3,11 +3,11 @@ import datetime
 import sys
 from typing import NoReturn
 
-from aiohttp import ClientSession
 from PySide6.QtWidgets import QApplication
+from aiohttp import ClientSession
 from qasync import QEventLoop
 
-from auth.service import is_login, login, new_login
+from auth.service import is_login, login, new_login, auth_admin
 from config import get_config
 from deviant.service import run_deviant_check_loop
 from fsm.context import Context
@@ -15,23 +15,11 @@ from fsm.fsm import FSM
 from hardware.low.port import Port
 from hardware.robot import Robot, RobotModule
 from states.auth_state import AuthState
-from states.destination_info_state import DestinationInfoState
 from states.ticket_cheking_state import TicketCheckingState
 from states.user_menu_state import UserMenuState
 from ui.basic_window import BasicWindow
 from utils import async_input
 from video.camera import Camera
-
-
-async def hardware_loop(
-        port: Port
-) -> NoReturn:
-    async with port:
-        print("Check")
-        while True:
-            data = await port.read()
-            print(data)
-            await asyncio.sleep(0.1)
 
 
 async def process(
@@ -42,15 +30,11 @@ async def process(
         "States:",
         "1. Check tickets",
         "2. User auth",
-        "3. Destination info",
-        "4. Set context var",
-        "5. Delete context var",
-        "6. Bind train",
-        "7. Run deviant loop",
-        "8. Get stores of train",
-        "9. Connect by com",
-        "10. Run hardware loop",
-        "11. Start robot loop",
+        "3. Set context var",
+        "4. Delete context var",
+        "5. Bind train",
+        "6. Run deviant loop in background",
+        "7. Start robot loop",
         sep="\n"
     )
     select_new_state = await async_input(
@@ -82,74 +66,66 @@ async def process(
                 )
             )
         case "3":
-            destination = await async_input("Enter destination: ")
-            fsm.change_state(
-                DestinationInfoState(
-                    destination
-                )
-            )
-        case "4":
             var_name = await async_input("Enter var name: ")
             var_value = await async_input("Enter var value: ")
             fsm.context[var_name] = var_value
-        case "5":
+        case "4":
             var_name = await async_input("Enter var name: ")
             fsm.context.data.pop(var_name)
-        case "6":
+        case "5":
             train_id: int = int(await async_input("Enter train id: "))
             start_date: datetime.datetime = datetime.datetime.fromisoformat(
                 await async_input("Enter date: ")
             )
             fsm.context["train_number"] = train_id
             fsm.context["train_start_date"] = start_date
-        case "7":
+        case "6":
             # noinspection PyAsyncCall
             asyncio.create_task(run_deviant_check_loop(camera=fsm.context["camera"]))
-        case "8":
-            train_number = await async_input("Enter train number: ")
-            train_date = await async_input("Enter train date: ")
-            response = await fsm.context["session"].get(
-                f"{get_config().BASE_API_URL}/robot/train/stores",
-                json={
-                    "train_number": train_number,
-                    "train_date": train_date
-                }
-            )
-            print(await response.json())
-        case "9":
+        case "7":
             com_port = await async_input("Enter com port: ")
-            port = Port(
-                com_port,
-                9600,
-                loop=fsm.context["loop"]
-            )
-            fsm.context["port"] = port
-        case "10":
-            # noinspection PyAsyncCall
-            asyncio.create_task(hardware_loop(fsm.context["port"]))
-        case "11":
-            com_port = await async_input("Enter com port: ")
-            port = Port(
+            robot_port = Port(
                 com_port,
                 9600,
                 loop=fsm.context["loop"]
             )
 
-            fsm.context["port"] = port
+            fsm.context["port"] = robot_port
 
             robot = Robot(
-                port
+                robot_port
             )
 
-            class TestModule(RobotModule):
+            class KeyModule(RobotModule):
                 def check_header(self, header: str) -> bool:
                     return header == "key"
 
-                async def handle(self, header: str, body: str):
-                    print("Find new key:", body)
+                async def handle(self, header: str, body: str, port: Port):
+                    print("Find new key:", body.strip(), "Validating...")
+                    try:
+                        admin = await auth_admin(body.strip(), fsm.context["session"])
+                        print(f"Admin: {admin.id} {admin.login}")
+                        await port.write(b"servo 1\n")
+                        await asyncio.sleep(5)
+                        await port.write(b"servo 0\n")
+                    except Exception as e:
+                        print(e)
+                        await port.write("tone".encode("utf-8"))
 
-            robot.add_module(
-                TestModule()
+            class TelemetryModule(RobotModule):
+                def check_header(self, header: str) -> bool:
+                    return header == "telemetry" or header == "!telemetry"
+
+                async def handle(self, header: str, body: str, _):
+                    if header.startswith("!"):
+                        print("Robot can`t get telemetry")
+
+                    humidity, temperature = map(float, body.split(" "))
+                    print(f"Robot telemetry: humidity: {humidity}, temperature: {temperature}")
+
+            robot.add_modules(
+                KeyModule(),
+                TelemetryModule()
             )
 
             # noinspection PyAsyncCall

@@ -15,8 +15,7 @@ class Config(BaseSettings):
     ROBOT_MODEL_ID: str = "TestRobotID1"
     ROBOT_MODEL_NAME: str = "TestRobot:0.1.0:001"
 
-    # DEFAULT_STORE: str = "0ebdbfc3-0e2c-4ce2-ac69-a414437c0482"
-    DEFAULT_STORE: str = "8041baff-c89f-4ce0-9cde-997629cf554c"
+    DEFAULT_STORE: str = "07ed497d-da82-4992-9b67-14bc3fd3fa86"
 
 
 @lru_cache()
