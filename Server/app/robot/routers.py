@@ -6,9 +6,11 @@ from auth.dependecies import RobotAuthRequired
 from db import DbDependency
 from robot.schemes import *
 from robot.service import (check_user_place_in_wagon, get_attractions,
-                           get_current_ticket, get_hotels,
-                           get_user_destination_by_train, identification_face,
-                           validate_robot_admin_access, get_train_stores, get_user_by_id)
+                           get_current_ticket, get_hotels, get_train_stores,
+                           get_user_by_id, get_user_destination_by_train,
+                           identification_face, validate_robot_admin_access)
+from schemes import TrainData
+from store_api.schemes import Store
 from users.schemes import Ticket, User
 
 router = APIRouter()
@@ -104,15 +106,6 @@ async def get_user_destination(
     )
 
 
-@router.get("/train/{train_number}/stores")
-async def get_train_stores_ids(
-        train_number: int,
-        db: DbDependency,
-        _: RobotAuthRequired
-) -> Page[str]:
-    return paginate(await get_train_stores(train_number, db))
-
-
 @router.get("/user/{user_id}")
 async def get_user(
         db: DbDependency,
@@ -120,3 +113,16 @@ async def get_user(
         user_id: str = Path(pattern="^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
 ) -> User:
     return await get_user_by_id(user_id, db)
+
+
+@router.get("/train/stores")
+async def get_train_stores_handler(
+        train_data: TrainData,
+        db: DbDependency,
+        _: RobotAuthRequired
+) -> list[Store]:
+    return await get_train_stores(
+        train_data.train_number,
+        train_data.train_date,
+        db
+    )

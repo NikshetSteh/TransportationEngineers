@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: white;</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QPushButton" name="pushButton">
     <property name="geometry">
@@ -28,6 +31,10 @@
       <family>Rubik</family>
       <pointsize>16</pointsize>
      </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background: #d9d9d9;
+border-radius: 5px;</string>
     </property>
     <property name="text">
      <string>Магазины</string>
@@ -47,6 +54,10 @@
       <family>Rubik</family>
       <pointsize>16</pointsize>
      </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background: #d9d9d9;
+border-radius: 5px;</string>
     </property>
     <property name="text">
      <string>Информация</string>
@@ -72,6 +83,29 @@
     </property>
     <property name="alignment">
      <set>Qt::AlignmentFlag::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_3">
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>400</y>
+      <width>200</width>
+      <height>70</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Rubik</family>
+      <pointsize>16</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background: #d9d9d9;
+border-radius: 5px;</string>
+    </property>
+    <property name="text">
+     <string>Выход</string>
     </property>
    </widget>
   </widget>

@@ -114,6 +114,10 @@
       <height>31</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true">background: #d9d9d9;
+border-radius: 5px;</string>
+    </property>
     <property name="text">
      <string>Назад</string>
     </property>

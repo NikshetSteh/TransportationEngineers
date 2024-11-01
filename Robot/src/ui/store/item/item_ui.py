@@ -43,6 +43,8 @@ class Ui_MainWindow(object):
         self.icon = QLabel(self.centralwidget)
         self.icon.setObjectName(u"icon")
         self.icon.setGeometry(QRect(54, 230, 300, 300))
+        self.icon.setStyleSheet(u"border:2px solid rgb(0, 0, 0);\n"
+"border-radius: 5px;")
         self.pushButton_2 = QPushButton(self.centralwidget)
         self.pushButton_2.setObjectName(u"pushButton_2")
         self.pushButton_2.setGeometry(QRect(657, 419, 287, 76))

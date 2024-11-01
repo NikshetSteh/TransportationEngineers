@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">border:1px solid rgb(0, 0, 0);</string>
+  </property>
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
@@ -21,6 +24,10 @@
      <width>130</width>
      <height>155</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border-radius: 5px;
+border: 2px solid rgb(0, 0, 0);</string>
    </property>
    <property name="text">
     <string/>
@@ -42,7 +49,8 @@
     </font>
    </property>
    <property name="styleSheet">
-    <string notr="true">color: #E72410;</string>
+    <string notr="true">color: #E72410;
+border: none;</string>
    </property>
    <property name="text">
     <string>name</string>
@@ -63,6 +71,9 @@
      <pointsize>20</pointsize>
      <bold>true</bold>
     </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border: none;</string>
    </property>
    <property name="text">
     <string>Цена: 100 руб.</string>

@@ -1,154 +1,154 @@
 [
   {
     "name": "Чипсы Lays Краб",
-    "price": 18000,
+    "price": 10000,
     "balance": 10,
     "category": "food",
     "logo_url": "chips_crab.jpg"
   },
   {
     "name": "Чипсы Lays Сметана и зелень",
-    "price": 18000,
-    "balance": 15,
+    "price": 10000,
+    "balance": 10,
     "category": "food",
     "logo_url": "chips_greenery.jpg"
   },
   {
     "name": "Вода минеральная Borjomi",
     "price": 12000,
-    "balance": 20,
+    "balance": 15,
     "category": "food",
     "logo_url": "water.jpg"
   },
   {
     "name": "Сок апельсиновый Добрый",
     "price": 15000,
-    "balance": 30,
+    "balance": 15,
     "category": "food",
     "logo_url": "juice.jpg"
   },
   {
     "name": "Чай чёрный Tess",
-    "price": 20000,
-    "balance": 12,
+    "price": 1500,
+    "balance": 30,
     "category": "food",
     "logo_url": "dark_tea.jpg"
   },
   {
     "name": "Чай зелёный Tess",
-    "price": 20000,
-    "balance": 12,
+    "price": 1500,
+    "balance": 30,
     "category": "food",
     "logo_url": "green_tea.jpg"
   },
   {
     "name": "Шоколад Алёнка",
-    "price": 25000,
-    "balance": 18,
+    "price": 8000,
+    "balance": 10,
     "category": "food",
     "logo_url": "chocolate.jpg"
   },
   {
     "name": "Шоколад Alpen Gold",
-    "price": 25000,
-    "balance": 18,
+    "price": 7500,
+    "balance": 10,
     "category": "food",
     "logo_url": "chocolate_gold.jpg"
   },
   {
     "name": "Печенье Юбилейное",
-    "price": 22000,
-    "balance": 22,
+    "price": 5000,
+    "balance": 5,
     "category": "food",
     "logo_url": "cookies.jpg"
   },
   {
     "name": "Пиво Балтика (безалкогольное)",
-    "price": 30000,
-    "balance": 10,
+    "price": 9000,
+    "balance": 3,
     "category": "food",
     "logo_url": "baltic.jpg"
   },
   {
     "name": "Магнит Москва",
-    "price": 250000,
-    "balance": 10,
+    "price": 20000,
+    "balance": 7,
     "category": "city_souvenirs",
     "logo_url": "moscow_magnet.jpg"
   },
   {
     "name": "Колокольчик Москва",
-    "price": 250000,
-    "balance": 10,
+    "price": 27000,
+    "balance": 3,
     "category": "city_souvenirs",
     "logo_url": "moscow_bell.jpg"
   },
   {
     "name": "Сувенир Москва",
-    "price": 250000,
-    "balance": 10,
+    "price": 25000,
+    "balance": 5,
     "category": "city_souvenirs",
     "logo_url": "moscow_big_toy.jpg"
   },
   {
     "name": "Мини-сувенир Москва",
-    "price": 250000,
-    "balance": 10,
+    "price": 15000,
+    "balance": 5,
     "category": "city_souvenirs",
     "logo_url": "moscow_toy.jpg"
   },
   {
     "name": "Сфера \"Кремль\"",
-    "price": 250000,
-    "balance": 10,
+    "price": 50000,
+    "balance": 3,
     "category": "city_souvenirs",
     "logo_url": "moscow_sphere.jpg"
   },
   {
     "name": "Брелок",
-    "price": 250000,
+    "price": 7500,
     "balance": 10,
     "category": "train_souvenirs",
     "logo_url": "toy.jpg"
   },
   {
     "name": "Подстаканник",
-    "price": 250000,
-    "balance": 10,
+    "price": 60000,
+    "balance": 7,
     "category": "train_souvenirs",
     "logo_url": "cup2.jpg"
   },
   {
     "name": "Кружка (1)",
-    "price": 250000,
-    "balance": 15,
+    "price": 35000,
+    "balance": 4,
     "category": "train_souvenirs",
     "logo_url": "cup1.jpg"
   },
   {
     "name": "Кружка (2)",
-    "price": 250000,
-    "balance": 9,
+    "price": 35000,
+    "balance": 4,
     "category": "train_souvenirs",
     "logo_url": "cup3.jpg"
   },
   {
     "name": "Кружка (3)",
-    "price": 250000,
-    "balance": 11,
+    "price": 35000,
+    "balance": 4,
     "category": "train_souvenirs",
     "logo_url": "cup4.jpg"
   },
   {
     "name": "Ручка",
-    "price": 250000,
-    "balance": 10,
+    "price": 10000,
+    "balance": 15,
     "category": "train_souvenirs",
     "logo_url": "pen.jpg"
   },
   {
     "name": "Флешка 32гб",
-    "price": 250000,
+    "price": 40000,
     "balance": 10,
     "category": "train_souvenirs",
     "logo_url": "usb.jpg"

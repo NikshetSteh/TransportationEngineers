@@ -1,6 +1,7 @@
+import datetime
 import uuid
 
-from sqlalchemy import UUID, Column, Integer
+from sqlalchemy import UUID, Column, DateTime, Integer
 from sqlalchemy.orm import Mapped
 
 from model.base import Base
@@ -21,5 +22,9 @@ class TrainStore(Base):
     )
     train_number: Mapped[int] = Column(
         Integer,
+        nullable=False
+    )
+    train_date: Mapped[datetime.datetime] = Column(
+        DateTime(timezone=True),
         nullable=False
     )

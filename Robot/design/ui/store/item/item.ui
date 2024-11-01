@@ -74,6 +74,10 @@ border: none;</string>
       <height>300</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true">border:2px solid rgb(0, 0, 0);
+border-radius: 5px;</string>
+    </property>
     <property name="text">
      <string/>
     </property>

@@ -18,7 +18,7 @@ from model.train_stores import TrainStore
 from model.user import User as UserModel
 from robot.schemes import Attraction, Hotel, Robot
 from robot.service import get_attractions, get_hotels
-from schemes import EmptyResponse
+from schemes import EmptyResponse, TrainData
 from users.schemes import Ticket, TicketCreation, User
 
 router = APIRouter()
@@ -484,9 +484,9 @@ async def update_auth_card(
     return EmptyResponse()
 
 
-@router.post("/train/{train_number}/store/{store_id}")
+@router.post("/store/{store_id}/train")
 async def add_store_to_train(
-        train_number: int,
+        train_data: TrainData,
         db: DbDependency,
         store_id: str = Path(pattern="[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}"),
 ) -> EmptyResponse:
@@ -495,9 +495,20 @@ async def add_store_to_train(
         raise HTTPException(status_code=404, detail="Store id not found")
 
     async with db() as session:
+        binding = (await session.execute(
+            select(TrainStore).where(
+                TrainStore.store_id == store_id,
+                TrainStore.train_number == train_data.train_number,
+                TrainStore.train_date == train_data.train_date
+            )
+        )).one_or_none()
+        if binding is not None:
+            raise HTTPException(status_code=409, detail="Binding already exists")
+
         train_store = TrainStore(
             store_id=store_id,
-            train_number=train_number
+            train_number=train_data.train_number,
+            train_date=train_data.train_date
         )
         session.add(train_store)
         await session.commit()
@@ -505,28 +516,34 @@ async def add_store_to_train(
     return EmptyResponse()
 
 
-@router.get("/train/{train_number}/stores")
+@router.get("/train/stores")
 async def get_train_stores_ids(
-        train_number: int,
+        train_data: TrainData,
         db: DbDependency
 ) -> Page[str]:
     async with db() as session:
         stores = (await session.execute(
-            select(TrainStore.store_id).where(TrainStore.train_number == train_number)
+            select(TrainStore.store_id)
+            .where(TrainStore.train_number == train_data.train_number)
+            .where(TrainStore.train_date == train_data.train_date)
         )).fetchall()
 
     return paginate(list(map(lambda x: str(x[0]), stores)))
 
 
-@router.delete("/train/{train_number}/store/{store_id}")
+@router.delete("/store/{store_id}/train/unbind")
 async def remove_store_from_train(
-        train_number: int,
+        train_data: TrainData,
         db: DbDependency,
         store_id: str = Path(pattern="[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}"),
 ) -> EmptyResponse:
     async with db() as session:
         await session.execute(
-            delete(TrainStore).where(TrainStore.train_number == train_number, TrainStore.store_id == store_id)
+            delete(TrainStore).where(
+                TrainStore.train_number == train_data.train_number,
+                TrainStore.train_date == train_data.train_date,
+                TrainStore.store_id == store_id
+            )
         )
         await session.commit()
 
