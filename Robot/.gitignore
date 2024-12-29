@@ -2,5 +2,4 @@ private/
 
 *.pyc
 
-/.idea/
 /.venv/
