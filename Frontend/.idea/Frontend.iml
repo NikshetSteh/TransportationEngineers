@@ -8,6 +8,7 @@
     </content>
     <orderEntry type="jdk" jdkName="Python 3.12 virtualenv at D:\Projects\RT\NextGen\TransportationEngineers\Frontend\.venv" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="jsqr" level="application" />
   </component>
   <component name="TemplatesService">
     <option name="TEMPLATE_FOLDERS">
