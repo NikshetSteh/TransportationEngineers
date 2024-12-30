@@ -103,6 +103,7 @@ header button {
     margin-bottom: 20px;
     background-color: var(--container-bg);
     padding: 10px;
+    width: calc(100% - 40px);
     /*border-radius: 5px;*/
 
     font-weight: 400;
@@ -132,4 +133,33 @@ footer p {
 
     justify-content: center;
     align-items: center;
+}
+
+.login-panel {
+    display: flex;
+
+    min-height: calc(100vh - 65px);
+
+    justify-content: center;
+    align-items: center;
+}
+
+.form-container {
+    padding: 20px;
+
+    background-color: var(--container-bg);
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+    align-items: center;
+
+    row-gap: 20px;
+}
+
+.form-container button {
+    font-size: 0.8em;
+    padding: 8px 16px;
+    margin: 0;
 }
