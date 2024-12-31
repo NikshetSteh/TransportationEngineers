@@ -87,7 +87,6 @@ services:
     command:
       - start-dev
       - --import-realm
-      - --verbose
 volumes:
   base_data:
   stores_data:

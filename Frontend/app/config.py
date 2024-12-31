@@ -8,6 +8,7 @@ class Config(BaseSettings):
 
     auth_redirect_uri: str = "http://localhost:8090/realms/ai_site/protocol/openid-connect/auth"
     auth_token_uri: str = "http://localhost:8090/realms/ai_site/protocol/openid-connect/token"
+    user_info_uri: str = "http://localhost:8090/realms/ai_site/protocol/openid-connect/userinfo"
 
 
 @lru_cache

@@ -27,14 +27,14 @@
   "oauth2DevicePollingInterval" : 5,
   "enabled" : true,
   "sslRequired" : "external",
-  "registrationAllowed" : false,
+  "registrationAllowed" : true,
   "registrationEmailAsUsername" : false,
-  "rememberMe" : false,
+  "rememberMe" : true,
   "verifyEmail" : false,
   "loginWithEmailAllowed" : true,
   "duplicateEmailsAllowed" : false,
-  "resetPasswordAllowed" : false,
-  "editUsernameAllowed" : false,
+  "resetPasswordAllowed" : true,
+  "editUsernameAllowed" : true,
   "bruteForceProtected" : false,
   "permanentLockout" : false,
   "maxTemporaryLockouts" : 0,
@@ -525,7 +525,7 @@
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
     "secret" : "7mbHVQGTLUKSNXrNYowg26SMCKv1YeLe",
-    "redirectUris" : [ "/*" ],
+    "redirectUris" : [ "http://localhost:8000/login" ],
     "webOrigins" : [ "/*" ],
     "notBefore" : 0,
     "bearerOnly" : false,
@@ -592,7 +592,7 @@
         "jsonType.label" : "String"
       }
     } ],
-    "defaultClientScopes" : [ "web-origins", "acr", "profile", "roles", "basic", "email" ],
+    "defaultClientScopes" : [ "web-origins", "acr", "profile", "roles", "basic", "email", "openid"],
     "optionalClientScopes" : [ "address", "phone", "organization", "offline_access", "microprofile-jwt" ],
     "authorizationSettings" : {
       "allowRemoteResourceManagement" : true,
@@ -724,6 +724,17 @@
     "optionalClientScopes" : [ "address", "phone", "organization", "offline_access", "microprofile-jwt" ]
   } ],
   "clientScopes" : [ {
+      "id": "6da558fc-330f-461d-a4de-a5199f83cc32",
+      "name": "openid",
+      "description": "",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "true",
+        "gui.order": "",
+        "consent.screen.text": ""
+      }
+    }, {
     "id" : "5c6d1aed-3984-4d6b-a4ee-173a4a602bca",
     "name" : "organization",
     "description" : "Additional claims about the organization a subject belongs to",
@@ -884,7 +895,7 @@
         "claim.name" : "email_verified",
         "jsonType.label" : "boolean"
       }
-    } ]
+    }]
   }, {
     "id" : "a34a4515-a66f-4c74-ae90-fac339fb26c6",
     "name" : "offline_access",

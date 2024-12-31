@@ -9,8 +9,9 @@
     <link rel="icon" type="image/x-icon" href="/static/favicon.svg">
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
     <script src="/static/config.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 </head>
 <body>
 <header>
@@ -21,14 +22,15 @@
     </div>
     <div>
         <button onclick="location.href='/login'">
-            <svg width="24px" height="16px">
-                <use xlink:href="/static/adaptive_sprite.svg#login"></use>
-            </svg>
+            
+            <span class="material-icons">
+                login
+            </span>
         </button>
         <button>
-            <svg width="24px" height="16px">
-                <use xlink:href="/static/adaptive_sprite.svg#burgerMenu"></use>
-            </svg>
+            <span class="material-icons">
+                menu
+            </span>
         </button>
     </div>
 </header>
