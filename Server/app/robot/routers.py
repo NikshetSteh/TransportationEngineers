@@ -49,7 +49,8 @@ async def ticket_validation(
             request.wagon_number,
             request.date,
             str(user.id),
-            db
+            db,
+            request.mark_as_used
         )
     if request.code is not None:
         return await check_ticket(
@@ -58,18 +59,24 @@ async def ticket_validation(
             request.wagon_number,
             request.date,
             request.code,
-            db
+            db,
+            request.mark_as_used
         )
 
 
-@router.get("/station/{station_id}/user/{user_id}/current_ticket")
+@router.post("/user/current_ticket")
 async def get_user_current_ticket(
         db: DbDependency,
         _: RobotAuthRequired,
-        station_id: str,
-        user_id: str = Path(pattern="^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
+        request: UserLastTicketRequest
 ) -> Ticket:
-    ticket = await get_current_ticket(user_id, station_id, db)
+    ticket = await get_current_ticket(
+        request.user_id,
+        request.train_id,
+        request.start_date,
+        db
+    )
+
     if ticket is None:
         raise HTTPException(status_code=404, detail="Ticket not found")
 

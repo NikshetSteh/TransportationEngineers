@@ -59,6 +59,8 @@ services:
       - chroma_data:/chroma/chroma
   base_db:
     image: postgres:14-alpine
+    ports:
+      - "5431:5432"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=root
@@ -68,6 +70,8 @@ services:
       - base_data:/var/lib/postgresql/data
   store_db:
     image: postgres:14-alpine
+    ports:
+      - "5430:5432"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=root

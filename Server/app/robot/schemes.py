@@ -20,6 +20,7 @@ class TicketValidationRequest(BaseModel):
     date: datetime.datetime
     face: str | None = Field(max_length=10_485_760, default=None)
     code: str | None = Field(default=None)
+    mark_as_used: bool
 
 
 class Attraction(BaseModel):
@@ -48,3 +49,9 @@ class DestinationDeterminationRequest(BaseModel):
 
 class Destination(BaseModel):
     id: str
+
+
+class UserLastTicketRequest(BaseModel):
+    user_id: str
+    train_id: int
+    start_date: datetime.datetime
