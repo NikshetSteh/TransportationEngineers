@@ -11,3 +11,4 @@ class Ticket(BaseModel):
     place_number: int
     station_id: str
     date: datetime.datetime
+    code: str

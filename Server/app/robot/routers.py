@@ -8,7 +8,7 @@ from robot.schemes import *
 from robot.service import (check_user_place_in_wagon, get_attractions,
                            get_current_ticket, get_hotels, get_train_stores,
                            get_user_by_id, get_user_destination_by_train,
-                           identification_face, validate_robot_admin_access)
+                           identification_face, validate_robot_admin_access, check_ticket)
 from schemes import TrainData
 from store_api.schemes import Store
 from users.schemes import Ticket, User
@@ -35,17 +35,31 @@ async def ticket_validation(
         db: DbDependency,
         _: RobotAuthRequired
 ) -> Ticket:
-    user = await identification_face(request.face, db)
-    if user is None:
-        raise HTTPException(status_code=404, detail="Face not found")
+    if request.face is None and request.code is None:
+        raise HTTPException(status_code=422)
 
-    return await check_user_place_in_wagon(
-        request.station_id,
-        request.train_number,
-        request.wagon_number,
-        request.date,
-        db
-    )
+    if request.face is not None:
+        user = await identification_face(request.face, db)
+        if user is None:
+            raise HTTPException(status_code=404, detail="Face not found")
+
+        return await check_user_place_in_wagon(
+            request.station_id,
+            request.train_number,
+            request.wagon_number,
+            request.date,
+            str(user.id),
+            db
+        )
+    if request.code is not None:
+        return await check_ticket(
+            request.station_id,
+            request.train_number,
+            request.wagon_number,
+            request.date,
+            request.code,
+            db
+        )
 
 
 @router.get("/station/{station_id}/user/{user_id}/current_ticket")

@@ -1,3 +1,5 @@
+import random
+
 import bcrypt
 from fastapi import APIRouter, HTTPException, Path
 from fastapi_pagination import Page, paginate
@@ -6,6 +8,7 @@ from sqlalchemy import delete, select
 import store_api.service
 from admin.schemes import *
 from auth.engineer_privileges import engineer_privileges_translations
+from config import get_config
 from db import DbDependency
 from face_api.service import delete_face, save_face
 from model.auth_cards import AuthCard as AuthCardModel
@@ -22,6 +25,8 @@ from schemes import EmptyResponse, TrainData
 from users.schemes import Ticket, TicketCreation, User
 
 router = APIRouter()
+
+config = get_config()
 
 
 @router.post("/user")
@@ -293,7 +298,8 @@ async def create_ticket(
             station_id=data.station_id,
             date=data.date,
             destination_id=data.destination,
-            start_date=data.date
+            start_date=data.date,
+            code="".join(random.choices(config.SYMBOLS_POOL, k=config.TICKET_CODE_LEN))
         )
         session.add(ticket)
         await session.commit()
@@ -307,7 +313,8 @@ async def create_ticket(
         station_id=ticket.station_id,
         date=ticket.date,
         destination=ticket.destination_id,
-        start_date=ticket.start_date
+        start_date=ticket.start_date,
+        code=ticket.code
     )
 
 
@@ -345,7 +352,8 @@ async def get_tickets(
                 station_id=x[0].station_id,
                 date=x[0].date,
                 destination=x[0].destination_id,
-                start_date=x[0].start_date
+                start_date=x[0].start_date,
+                code=x[0].code
             ),
             tickets
         )

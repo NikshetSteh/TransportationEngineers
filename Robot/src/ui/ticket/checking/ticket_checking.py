@@ -47,6 +47,8 @@ class TicketChecking:
         self.state = state
         self.window = None
 
+        self.qr_code_detector = cv2.QRCodeDetector()
+
     def update_frame(self):
         ret, frame = self.camera.get_frame()
         if ret:
@@ -84,16 +86,60 @@ class TicketChecking:
             return
 
         _, frame = self.camera.get_frame()
-        # frame = cv2.imread("t/a.jpg")
-        frame = np.ascontiguousarray(frame[:, 84:84 + 476])
-        _, frame = cv2.imencode('.jpg', frame)
-        im_bytes = frame.tobytes()
-        im_b64 = base64.b64encode(im_bytes).decode("utf-8")
+
+
+        code, bbox, _ = self.qr_code_detector.detectAndDecode(frame)
 
         status = False
         ticket = None
         user = None
         ready = False
+
+        if bbox is not None:
+            try:
+                self.is_waiting = True
+
+                ticket = await validate_user_ticket(
+                    station_id=self.station_id,
+                    train_number=self.train_number,
+                    wagon_number=self.wagon_number,
+                    date=self.date,
+                    code=code,
+                    session=self.session
+                )
+                status = True
+                ready = True
+            except InvalidTicket as ticket_exception:
+                ticket = ticket_exception.right_ticket
+                status = False
+                ready = True
+            except Exception as e:
+                print("Ticket Check Error:", e)
+                self.is_waiting = False
+
+            if ticket is not None:
+                user = await get_user_by_id(ticket.user_id, self.session)
+
+            if ready:
+                self.fsm.change_state(
+                    TicketCheckingResultState(
+                        station_id=self.station_id,
+                        train_number=self.train_number,
+                        wagon_number=self.wagon_number,
+                        date=self.date,
+                        handle_state=self.state,
+                        status=status,
+                        ticket=ticket,
+                        user=user
+                    )
+                )
+
+
+        # frame = cv2.imread("t/a.jpg")
+        frame = np.ascontiguousarray(frame[:, 84:84 + 476])
+        _, frame = cv2.imencode('.jpg', frame)
+        im_bytes = frame.tobytes()
+        im_b64 = base64.b64encode(im_bytes).decode("utf-8")
 
         try:
             self.is_waiting = True

@@ -75,6 +75,18 @@ services:
       - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
       - stores_data:/var/lib/postgresql/data
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    ports:
+      - "8090:8080"
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: TheRealAdmin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: TheR@alAdmin)
+    volumes:
+      - ./keycloack_realm.json:/opt/keycloak/data/import/main_realm.json
+    command:
+      - start-dev
+      - --import-realm
 volumes:
   base_data:
   stores_data:

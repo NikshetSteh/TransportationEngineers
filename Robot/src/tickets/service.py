@@ -14,8 +14,9 @@ async def validate_user_ticket(
         train_number: int,
         wagon_number: int,
         date: datetime.datetime,
-        face: str,
-        session: ClientSession
+        session: ClientSession,
+        face: str = None,
+        code: str = None
 ) -> Ticket:
     async with session.post(
         f"{config.BASE_API_URL}/robot/ticket_validation",
@@ -25,10 +26,19 @@ async def validate_user_ticket(
             "wagon_number": wagon_number,
             "date": date.isoformat(),
             "face": face
+        } if face is not None else {
+            "station_id": station_id,
+            "train_number": train_number,
+            "wagon_number": wagon_number,
+            "date": date.isoformat(),
+            "code": code
         }
     ) as response:
         if response.status == 404:
-            raise Exception("can`t find people face")
+            raise InvalidTicket("Ticket not found", None)
+
+        if response.status == 403:
+            raise InvalidTicket("Invalid ticket code", None)
 
         if response.status == 400:
             response_data = await response.json()

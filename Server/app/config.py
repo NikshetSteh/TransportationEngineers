@@ -19,6 +19,8 @@ class Config(BaseSettings):
     AUTH_REQUEST_TIMEOUT: int = 30
     AUTH_SESSION_TIMEOUT: int = 3600
 
+    TICKET_CODE_LEN: int = 128
+
 
 @lru_cache()
 def get_config() -> Config:

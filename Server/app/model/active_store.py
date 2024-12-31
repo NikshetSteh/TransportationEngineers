@@ -10,7 +10,7 @@ from model.base import Base
 class ActiveStore(Base):
     __tablename__ = "active_stores"
 
-    id: Mapped[int] = Column(
+    id: Mapped[str] = Column(
         UUID,
         name="id",
         primary_key=True,

@@ -37,3 +37,9 @@ class InvalidTicketTrain(HTTPException):
 class InvalidWithoutTickets(HTTPException):
     def __init__(self):
         super().__init__(status_code=400, detail="User haven`t any active tickets")
+
+
+class InvalidTicketCode(HTTPException):
+    def __init__(self):
+        super().__init__(status_code=401, detail="Invalid ticket code")
+

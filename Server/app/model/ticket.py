@@ -40,6 +40,10 @@ class Ticket(Base):
         String(60)
     )
 
+    code: Mapped[str] = Column(
+        String(128)
+    )
+
     destination_id: Mapped[str] = Column(
         String(60)
     )

@@ -1,0 +1,72 @@
+{% extends 'template.html' %}
+{% block content %}
+
+<div class="face-login-container">
+    <video id="video" autoplay playsinline class="camera" style="width: 100vw"></video>
+    <canvas id="canvas" style="display: none;"></canvas>
+    <button id="capture">Capture Photo</button>
+    <p id="message"></p>
+</div>
+
+<script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const captureButton = document.getElementById('capture');
+    const message = document.getElementById('message');
+
+    async function startCamera() {
+        navigator.getUserMedia =
+            navigator.getUserMedia ||
+            navigator.webkitGetUserMedia ||
+            navigator.mozGetUserMedia;
+
+        if (navigator.getUserMedia) {
+            navigator.getUserMedia(
+                {audio: false, video: {width: 1280, height: 720}},
+                (stream) => {
+                    video.srcObject = stream;
+                },
+                (err) => {
+                    console.error(`The following error occurred: ${err.name}`);
+                },
+            );
+        } else {
+            message.textContent = 'getUserMedia not supported';
+            console.log("getUserMedia not supported");
+        }
+    }
+
+    // Capture a photo and send it to the server
+    captureButton.addEventListener('click', () => {
+        const context = canvas.getContext('2d');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        const photo = canvas.toDataURL('image/png');
+
+        // Send the photo to the server
+        fetch('/api/auth/face', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({image: photo}),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    message.textContent = 'Login successful!';
+                } else {
+                    message.textContent = 'Authentication failed: ' + data.message;
+                }
+            })
+            .catch(error => {
+                message.textContent = 'Error: ' + error.message;
+            });
+    });
+
+    window.addEventListener('load', startCamera);
+</script>
+
+{% endblock %}
