@@ -18,8 +18,8 @@ class TicketValidationRequest(BaseModel):
     train_number: int
     wagon_number: int
     date: datetime.datetime
-    face: str | None = Field(max_length=10_485_760)
-    code: str | None
+    face: str | None = Field(max_length=10_485_760, default=None)
+    code: str | None = Field(default=None)
 
 
 class Attraction(BaseModel):
