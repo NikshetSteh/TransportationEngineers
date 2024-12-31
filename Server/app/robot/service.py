@@ -49,6 +49,7 @@ async def check_user_place_in_wagon(
         train_number: int,
         wagon_number: int,
         date: datetime.datetime,
+        user_id: str,
         db: sessionmaker[AsyncSession]
 ) -> Ticket:
     async with db() as session:
@@ -57,7 +58,8 @@ async def check_user_place_in_wagon(
                 TicketModel.train_number == train_number,
                 TicketModel.wagon_number == wagon_number,
                 TicketModel.date == date,
-                TicketModel.station_id == station_id
+                TicketModel.station_id == station_id,
+                TicketModel.user_id == user_id
             ).limit(1)
         )).one_or_none()
 
@@ -71,7 +73,8 @@ async def check_user_place_in_wagon(
                 station_id=tickets[0].station_id,
                 date=tickets[0].date,
                 destination=tickets[0].destination_id,
-                start_date=tickets[0].start_date
+                start_date=tickets[0].start_date,
+                code=tickets[0].code
             )
 
         tickets = (await session.execute(
@@ -79,7 +82,8 @@ async def check_user_place_in_wagon(
                 TicketModel.train_number == train_number,
                 TicketModel.wagon_number != wagon_number,
                 TicketModel.date == date,
-                TicketModel.station_id == station_id
+                TicketModel.station_id == station_id,
+                TicketModel.user_id == user_id
             ).limit(1)
         )).one_or_none()
 
@@ -93,14 +97,16 @@ async def check_user_place_in_wagon(
                 station_id=tickets[0].station_id,
                 date=tickets[0].date,
                 destination=tickets[0].destination_id,
-                start_date=tickets[0].start_date
+                start_date=tickets[0].start_date,
+                code=tickets[0].code
             ))
 
         tickets = (await session.execute(
             select(TicketModel).where(
                 TicketModel.train_number == train_number,
                 TicketModel.date >= date,
-                TicketModel.station_id == station_id
+                TicketModel.station_id == station_id,
+                TicketModel.user_id == user_id
             ).limit(1)
         )).one_or_none()
 
@@ -114,12 +120,14 @@ async def check_user_place_in_wagon(
                 station_id=tickets[0].station_id,
                 date=tickets[0].date,
                 destination=tickets[0].destination_id,
-                start_date=tickets[0].start_date
+                start_date=tickets[0].start_date,
+                code=tickets[0].code
             ))
 
         tickets = (await session.execute(
             select(TicketModel).where(
-                TicketModel.date >= date
+                TicketModel.date >= date,
+                TicketModel.user_id == user_id
             ).limit(1)
         )).one_or_none()
 
@@ -133,7 +141,8 @@ async def check_user_place_in_wagon(
                 station_id=tickets[0].station_id,
                 date=tickets[0].date,
                 destination=tickets[0].destination_id,
-                start_date=tickets[0].start_date
+                start_date=tickets[0].start_date,
+                code=tickets[0].code
             ))
 
         raise InvalidWithoutTickets()
@@ -166,7 +175,8 @@ async def get_current_ticket(
             station_id=tickets[0].station_id,
             date=tickets[0].date,
             destination=tickets[0].destination_id,
-            start_date=tickets[0].start_date
+            start_date=tickets[0].start_date,
+            code=tickets[0].code
         )
 
 
@@ -297,3 +307,39 @@ async def get_train_stores(
         stores = await get_stores(stores_ids[:50])
 
     return stores
+
+
+async def check_ticket(
+        station_id: str,
+        train_number: int,
+        wagon_number: int,
+        date: datetime.datetime,
+        code: str,
+        db: sessionmaker[AsyncSession]
+) -> Ticket:
+    async with db() as session:
+        tickets = (await session.execute(
+            select(TicketModel).where(
+                TicketModel.train_number == train_number,
+                TicketModel.wagon_number == wagon_number,
+                TicketModel.date == date,
+                TicketModel.station_id == station_id,
+                TicketModel.code == code
+            ).limit(1)
+        )).one_or_none()
+
+        if tickets is None:
+            raise InvalidTicketCode()
+
+        return Ticket(
+            id=str(tickets[0].id),
+            user_id=str(tickets[0].user_id),
+            train_number=tickets[0].train_number,
+            wagon_number=tickets[0].wagon_number,
+            place_number=tickets[0].place_number,
+            station_id=tickets[0].station_id,
+            date=tickets[0].date,
+            destination=tickets[0].destination_id,
+            start_date=tickets[0].start_date,
+            code=tickets[0].code
+        )

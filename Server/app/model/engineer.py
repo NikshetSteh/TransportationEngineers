@@ -23,7 +23,7 @@ class Engineer(Base):
     password: Mapped[str] = Column(
         String(60)
     )
-    privileges: Mapped[str] = Column(
+    privileges: Mapped[int] = Column(
         Integer,
         default=0
     )

@@ -28,7 +28,7 @@ async def validate_user_ticket(
         }
     ) as response:
         if response.status == 404:
-            raise Exception("can`t find people face")
+            raise InvalidTicket("Ticket not found", None)
 
         if response.status == 400:
             response_data = await response.json()
