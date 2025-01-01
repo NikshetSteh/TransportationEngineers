@@ -72,7 +72,7 @@ class TicketCheckingResults:
     @asyncSlot()
     async def open(self):
         port: Port = self.fsm.context["port"]
-        await port.write("open\n")
+        await port.write(b"open\n")
 
     def stop(self):
         self.auto_close_timer.stop()
