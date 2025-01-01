@@ -3,12 +3,14 @@ import datetime
 from aiohttp import ClientSession
 from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import QMainWindow
+from qasync import asyncSlot
 
 import ui.ticket.checking.ticket_result_f_ui as design_f
 import ui.ticket.checking.ticket_result_s_ui as design_s
 from fsm.context import Context
 from fsm.fsm import FSM
 from fsm.state import State
+from hardware.low.port import Port
 from tickets.schemes import Ticket
 from users.schemes import User
 
@@ -44,6 +46,9 @@ class TicketCheckingResults:
         self.fsm: FSM = context["fsm"]
         self.handle_state = handle_state
 
+        self.open_timer = QTimer()
+        self.open_timer.timeout.connect(self.open)
+
     def start(self, window: QMainWindow):
         self.ui = design_s.Ui_MainWindow() if self.status else design_f.Ui_MainWindow()
         self.ui.setupUi(window)
@@ -58,8 +63,16 @@ class TicketCheckingResults:
         else:
             pass
 
+        if "port" in self.fsm.context:
+            self.open_timer.start(1)
+
         self.auto_close_timer.timeout.connect(self.go_back)
-        self.auto_close_timer.start(1000)
+        self.auto_close_timer.start(2000)
+
+    @asyncSlot()
+    async def open(self):
+        port: Port = self.fsm.context["port"]
+        await port.write("open\n")
 
     def stop(self):
         self.auto_close_timer.stop()
