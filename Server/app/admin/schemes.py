@@ -43,3 +43,8 @@ class HotelCreation(BaseModel):
 
 class AuthCardCreation(BaseModel):
     key: str | None = Field(max_length=256, default=None)
+
+
+class KeycloakUserCreation(BaseModel):
+    k_id: str
+    user_id: str

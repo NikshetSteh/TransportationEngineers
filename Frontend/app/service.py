@@ -29,7 +29,10 @@ async def get_token(
         ) as response:
             data = await response.json()
 
-            print(data)
+            print(data, response.status)
+
+            if response.status != 200:
+                raise Exception("Something went wrong: " + data["error"] + "; " + data["error_description"])
 
             return data["access_token"], data["expires_in"], data["refresh_token"], data["refresh_expires_in"]
 

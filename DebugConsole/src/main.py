@@ -27,6 +27,8 @@ while True:
             "2. Просмотреть пользователей",
             "3. Узнать id пользователя",
             "4. Удалить пользователя",
+            "5. Привязать keycloak",
+            "6. Отвязать keycloak",
             sep="\n"
         )
 
@@ -40,6 +42,10 @@ while True:
                 pass
             case 4:
                 delete_user()
+            case 5:
+                link_keycloak()
+            case 6:
+                unlink_keycloak()
 
 
     def tickets():

@@ -20,6 +20,8 @@ from model.ticket import Ticket
 # noinspection PyUnresolvedReferences
 from model.train_stores import TrainStore
 # noinspection PyUnresolvedReferences
+from model.keycloak_users import KeycloakUser
+# noinspection PyUnresolvedReferences
 from model.user import User
 
 config = context.config

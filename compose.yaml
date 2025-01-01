@@ -7,6 +7,7 @@ services:
       - DB_URI=postgresql+asyncpg://postgres:root@base_db:5432/TransportEngineers
       - DB_URI_ALEMBIC=postgresql+psycopg2://postgres:root@base_db:5432/TransportEngineers
       - REDIS_URI=redis://redis:6379
+      - KEYCLOAK_INTROSPECTIVE_ENDPOINT=http://nginx:80/keycloak/realms/ai_site/protocol/openid-connect/token/introspect
     depends_on:
       base_db:
         condition: service_started
@@ -86,11 +87,15 @@ services:
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: TheRealAdmin
       KC_BOOTSTRAP_ADMIN_PASSWORD: TheR@alAdmin)
+      KC_HTTP_RELATIVE_PATH: /keycloak
     volumes:
-      - ./keycloack_realm.json:/opt/keycloak/data/import/main_realm.json
+      - ./keycloak_realm.json:/opt/keycloak/data/import/main_realm.json
     command:
       - start-dev
       - --import-realm
+      - --verbose
+      - --hostname 
+      - http://localhost:8080/keycloak
 volumes:
   base_data:
   stores_data:

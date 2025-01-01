@@ -21,9 +21,12 @@ class Config(BaseSettings):
 
     TICKET_CODE_LEN: int = 128
 
+    KEYCLOAK_INTROSPECTIVE_ENDPOINT: str = "http://localhost:8090/realms/ai_site/protocol/openid-connect/userinfo"
+
+    CLIENT_ID: str = "ai_server"
+    CLIENT_SECRET: str = "cJWeTBL6EdanuIuwp37k2toHx4ghsrKA"
+
 
 @lru_cache()
 def get_config() -> Config:
     return Config()
-
-

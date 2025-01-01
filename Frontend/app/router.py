@@ -1,3 +1,4 @@
+import base64
 import urllib.parse as urllib
 
 from fastapi import APIRouter, Request
@@ -33,20 +34,32 @@ async def auth(request: Request, code: str = None) -> RedirectResponse:
             })
         )
 
-    if "refresh_token" in request.cookies:
-        access_token, expires_in, refresh_token, refresh_expires_in = await get_token(
-            request.cookies.get(
-                "refresh_token"
-            ),
-            "refresh_token",
-            str(request.url_for("auth"))
-        )
-    else:
+    if code is not None:
         access_token, expires_in, refresh_token, refresh_expires_in = await get_token(
             code,
             "authorization_code",
             str(request.url_for("auth"))
         )
+    else:
+        if "refresh_token" in request.cookies:
+            try:
+                access_token, expires_in, refresh_token, refresh_expires_in = await get_token(
+                    request.cookies.get(
+                        "refresh_token"
+                    ),
+                    "refresh_token",
+                    str(request.url_for("auth"))
+                )
+            except Exception as e:
+                print(e)
+                print(e.with_traceback(None))
+                return RedirectResponse(
+                    url=config.auth_redirect_uri + "?" + urllib.urlencode({
+                        "response_type": "code",
+                        "client_id": config.client_id,
+                        "redirect_uri": request.url_for("auth"),
+                    })
+                )
 
     user_data = await get_user_data(access_token)
 
@@ -54,9 +67,11 @@ async def auth(request: Request, code: str = None) -> RedirectResponse:
         url=request.url_for("profile")
     )
 
+    response.charset = "utf-8"
+
     response.set_cookie("access_token", access_token, expires=expires_in)
     response.set_cookie("refresh_token", refresh_token, expires=refresh_expires_in)
-    response.set_cookie("given_name", user_data["given_name"])
+    response.set_cookie("given_name", base64.b64encode(user_data["given_name"].encode()).decode())
     response.set_cookie("user_id", user_data["sub"])
 
     return response

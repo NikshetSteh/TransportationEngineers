@@ -15,6 +15,7 @@ from model.auth_cards import AuthCard as AuthCardModel
 from model.destinations_info import Attraction as AttractionModel
 from model.destinations_info import Hotel as HotelModel
 from model.engineer import Engineer as EngineerModel
+from model.keycloak_users import KeycloakUser
 from model.robot import Robot as RobotModel
 from model.ticket import Ticket as TicketModel
 from model.train_stores import TrainStore
@@ -552,6 +553,36 @@ async def remove_store_from_train(
                 TrainStore.train_date == train_data.train_date,
                 TrainStore.store_id == store_id
             )
+        )
+        await session.commit()
+
+    return EmptyResponse()
+
+
+
+@router.post("/keycloak_user")
+async def create_keycloak_user(
+        keycloak_user: KeycloakUserCreation,
+        db: DbDependency
+) -> EmptyResponse:
+    async with db() as session:
+        session.add(KeycloakUser(
+            k_id=keycloak_user.k_id,
+            user_id=keycloak_user.user_id
+        ))
+        await session.commit()
+
+    return EmptyResponse()
+
+
+@router.delete("/keycloak_user")
+async def delete_keycloak_user(
+        keycloak_user: KeycloakUserCreation,
+        db: DbDependency
+) -> EmptyResponse:
+    async with db() as session:
+        await session.execute(
+            delete(KeycloakUser).where(KeycloakUser.k_id == keycloak_user.k_id)
         )
         await session.commit()
 
