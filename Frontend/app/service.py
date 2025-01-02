@@ -29,8 +29,6 @@ async def get_token(
         ) as response:
             data = await response.json()
 
-            print(data, response.status)
-
             if response.status != 200:
                 raise Exception("Something went wrong: " + data["error"] + "; " + data["error_description"])
 

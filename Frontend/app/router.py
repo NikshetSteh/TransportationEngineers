@@ -5,6 +5,7 @@ from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
+from pydantic import BaseModel
 
 from config import get_config
 from service import get_token, get_user_data
@@ -60,6 +61,14 @@ async def auth(request: Request, code: str = None) -> RedirectResponse:
                         "redirect_uri": request.url_for("auth"),
                     })
                 )
+        else:
+            return RedirectResponse(
+                url=config.auth_redirect_uri + "?" + urllib.urlencode({
+                    "response_type": "code",
+                    "client_id": config.client_id,
+                    "redirect_uri": request.url_for("auth"),
+                })
+            )
 
     user_data = await get_user_data(access_token)
 
@@ -75,6 +84,42 @@ async def auth(request: Request, code: str = None) -> RedirectResponse:
     response.set_cookie("user_id", user_data["sub"])
 
     return response
+
+
+class RefreshTokenResponse(BaseModel):
+    access_token: str
+    refresh_token: str
+    expire_in: int
+    refresh_expire_in: int
+
+
+@router.post("/api/refresh")
+async def refresh(request: Request) -> RedirectResponse:
+    try:
+        access_token, expires_in, refresh_token, refresh_expires_in = await get_token(
+            request.cookies.get(
+                "refresh_token"
+            ),
+            "refresh_token",
+            str(request.url_for("auth"))
+        )
+    except Exception as e:
+        print(e)
+        print(e.with_traceback(None))
+        return RedirectResponse(
+            url=config.auth_redirect_uri + "?" + urllib.urlencode({
+                "response_type": "code",
+                "client_id": config.client_id,
+                "redirect_uri": request.url_for("auth"),
+            })
+        )
+
+    return RefreshTokenResponse(
+        access_token=access_token,
+        refresh_token=refresh_token,
+        expire_in=expires_in,
+        refresh_expire_in=refresh_expires_in
+    )
 
 
 @router.get("/profile")

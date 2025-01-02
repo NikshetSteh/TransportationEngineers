@@ -2214,5 +2214,6 @@
   },
   "clientPolicies" : {
     "policies" : [ ]
-  }
+  },
+  "loginTheme": "keycloak"
 }
