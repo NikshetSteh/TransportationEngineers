@@ -15,7 +15,10 @@ def check_deviant(
         running_model: torch.nn.Module
 ) -> None:
     with torch.no_grad():
-        print(running_model(data).item())
+        result = running_model(data).item()
+        if result >= 0.5:
+            # Send notification
+            pass
 
 
 def run_checking(
@@ -46,7 +49,6 @@ async def run_deviant_check_loop(
 
         frames_buffer = np.zeros((1, TIME_STEP, RGB, HEIGHT, WIDTH), dtype=np.float32)
         current_frame_id = 0
-        print("Start loop")
         while True:
             if process is not None and process.is_alive():
                 await asyncio.sleep(0.01)
@@ -58,15 +60,13 @@ async def run_deviant_check_loop(
                 frames_buffer[0][current_frame_id] = frame.reshape((RGB, HEIGHT, WIDTH))
                 current_frame_id += 1
                 if current_frame_id >= TIME_STEP:
-                    print("Start process")
                     if process is not None:
-                        print(process, process.is_alive())
+                        pass
                     process = run_checking(
                         torch.from_numpy(frames_buffer),
                         model
                     )
                     process.start()
-                    print("Process started")
                     current_frame_id = 0
                     frames_buffer = np.zeros((1, TIME_STEP, RGB, HEIGHT, WIDTH), dtype=np.float32)
 

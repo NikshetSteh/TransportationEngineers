@@ -777,7 +777,7 @@ torchvision = "*"
 type = "git"
 url = "https://github.com/NikshetSteh/Data-efficient-video-transformer.git"
 reference = "HEAD"
-resolved_reference = "0bef5810d91abe6a24cf42fd3e32199c3798426b"
+resolved_reference = "79d01305a0f1731f395239d86281b817e83a1be0"
 
 [[package]]
 name = "mpmath"
