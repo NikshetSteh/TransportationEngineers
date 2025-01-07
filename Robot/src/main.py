@@ -26,6 +26,10 @@ async def process(
         fsm: FSM,
         main_window: BasicWindow,
 ) -> NoReturn:
+    if "stop" in fsm.context and fsm.context["stop"]:
+        await asyncio.sleep(0.1)
+        return
+
     print(
         "States:",
         "1. Check tickets",
@@ -35,6 +39,7 @@ async def process(
         "5. Bind train",
         "6. Run deviant loop in background",
         "7. Start robot loop",
+        "8. Stop config",
         sep="\n"
     )
     select_new_state = await async_input(
@@ -130,6 +135,8 @@ async def process(
 
             # noinspection PyAsyncCall
             asyncio.create_task(robot.loop(fsm))
+        case "8":
+            fsm.context["stop"] = True
         case _:
             print("Invalid state")
 

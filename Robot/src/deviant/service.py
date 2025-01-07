@@ -14,6 +14,7 @@ def check_deviant(
         data: torch.Tensor,
         running_model: torch.nn.Module
 ) -> None:
+    print("Process running...")
     with torch.no_grad():
         result = running_model(data).item()
         if result >= 0.5:
@@ -66,7 +67,9 @@ async def run_deviant_check_loop(
                         torch.from_numpy(frames_buffer),
                         model
                     )
+                    print("Process created")
                     process.start()
+                    print("Process started")
                     current_frame_id = 0
                     frames_buffer = np.zeros((1, TIME_STEP, RGB, HEIGHT, WIDTH), dtype=np.float32)
 
