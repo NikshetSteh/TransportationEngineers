@@ -22,6 +22,41 @@ from store_api.service import get_stores
 from users.schemes import Ticket, User
 
 
+
+async def get_user_last_ticket(
+        user_id: str,
+        train_id: int,
+        start_date: datetime.datetime,
+        db: sessionmaker[AsyncSession]
+) -> Ticket | None:
+    async with db() as session:
+        tickets = (await session.execute(
+            select(TicketModel).where(
+                TicketModel.user_id == user_id,
+                TicketModel.train_number == train_id,
+                TicketModel.start_date == start_date,
+                TicketModel.used == True
+            )
+        )).one_or_none()
+
+        if tickets is None:
+            return None
+        else:
+            ticket: TicketModel = tickets[0]
+
+            return Ticket(
+                id=str(ticket.id),
+                user_id=str(ticket.user_id),
+                train_number=ticket.train_number,
+                wagon_number=ticket.wagon_number,
+                place_number=ticket.place_number,
+                station_id=ticket.station_id,
+                date=ticket.date,
+                destination=ticket.destination_id,
+                start_date=ticket.start_date,
+            )
+
+
 async def identification_face(
         face: str,
         db: sessionmaker[AsyncSession]
@@ -50,7 +85,8 @@ async def check_user_place_in_wagon(
         wagon_number: int,
         date: datetime.datetime,
         user_id: str,
-        db: sessionmaker[AsyncSession]
+        db: sessionmaker[AsyncSession],
+        mark_as_used: bool = False
 ) -> Ticket:
     async with db() as session:
         tickets = (await session.execute(
@@ -64,17 +100,24 @@ async def check_user_place_in_wagon(
         )).one_or_none()
 
         if tickets is not None:
+            ticket = tickets[0]
+
+            if mark_as_used:
+                ticket.used = True
+                session.add(ticket)
+                await session.commit()
+
             return Ticket(
-                id=str(tickets[0].id),
-                user_id=str(tickets[0].user_id),
-                train_number=tickets[0].train_number,
-                wagon_number=tickets[0].wagon_number,
-                place_number=tickets[0].place_number,
-                station_id=tickets[0].station_id,
-                date=tickets[0].date,
-                destination=tickets[0].destination_id,
-                start_date=tickets[0].start_date,
-                code=tickets[0].code
+                id=str(ticket.id),
+                user_id=str(ticket.user_id),
+                train_number=ticket.train_number,
+                wagon_number=ticket.wagon_number,
+                place_number=ticket.place_number,
+                station_id=ticket.station_id,
+                date=ticket.date,
+                destination=ticket.destination_id,
+                start_date=ticket.start_date,
+                code=ticket.code
             )
 
         tickets = (await session.execute(
@@ -150,34 +193,11 @@ async def check_user_place_in_wagon(
 
 async def get_current_ticket(
         user_id: str,
-        station_id: str,
+        train_id: int,
+        start_date: datetime.datetime,
         db: sessionmaker[AsyncSession]
 ) -> Ticket | None:
-    async with db() as session:
-        now_datetime = datetime.datetime.now()
-        tickets = (await session.execute(
-            select(TicketModel).where(
-                TicketModel.date >= now_datetime,
-                station_id == TicketModel.station_id,
-                user_id == TicketModel.user_id
-            )
-        )).one_or_none()
-
-        if tickets is None:
-            return None
-
-        return Ticket(
-            id=str(tickets[0].id),
-            user_id=str(tickets[0].user_id),
-            train_number=tickets[0].train_number,
-            wagon_number=tickets[0].wagon_number,
-            place_number=tickets[0].place_number,
-            station_id=tickets[0].station_id,
-            date=tickets[0].date,
-            destination=tickets[0].destination_id,
-            start_date=tickets[0].start_date,
-            code=tickets[0].code
-        )
+    return await get_user_last_ticket(user_id, train_id, start_date, db)
 
 
 T = TypeVar('T')
@@ -254,24 +274,19 @@ async def validate_robot_admin_access(
 async def get_user_destination_by_train(
         user_id: str,
         train_number: int,
-        date: datetime.datetime,
+        start_date: datetime.datetime,
         db: sessionmaker[AsyncSession]
 ) -> Destination:
-    async with db() as session:
-        tickets = (await session.execute(
-            select(TicketModel).where(
-                TicketModel.start_date == date,
-                TicketModel.user_id == user_id,
-                TicketModel.train_number == train_number
-            )
-        )).scalars().all()
+    ticket = await get_user_last_ticket(
+        user_id=user_id,
+        train_id=train_number,
+        start_date=start_date,
+        db=db,
+    )
 
-        if len(tickets) == 0:
-            raise InvalidWithoutTickets()
-
-        return Destination(
-            id=str(tickets[0].destination_id)
-        )
+    return Destination(
+        id=str(ticket.destination)
+    )
 
 
 async def get_user_by_id(
@@ -315,7 +330,8 @@ async def check_ticket(
         wagon_number: int,
         date: datetime.datetime,
         code: str,
-        db: sessionmaker[AsyncSession]
+        db: sessionmaker[AsyncSession],
+        mark_as_used: bool
 ) -> Ticket:
     async with db() as session:
         tickets = (await session.execute(
@@ -330,6 +346,12 @@ async def check_ticket(
 
         if tickets is None:
             raise InvalidTicketCode()
+
+        if mark_as_used:
+            ticket = tickets[0]
+            ticket.used = True
+            session.add(ticket)
+            await session.commit()
 
         return Ticket(
             id=str(tickets[0].id),

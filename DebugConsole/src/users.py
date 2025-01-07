@@ -38,3 +38,17 @@ def delete_user() -> None:
     user_id = input("User ID: ")
     response = requests.delete(f"{BASE_API_URL}/admin/users/{user_id}")
     default_print_response(response)
+
+
+def link_keycloak() -> None:
+    k_id = input("Keycloak ID: ")
+    user_id = input("User ID: ")
+    response = requests.post(f"{BASE_API_URL}/admin/keycloak_user", json={"k_id": k_id, "user_id": user_id})
+    default_print_response(response)
+
+
+def unlink_keycloak() -> None:
+    k_id = input("Keycloak ID: ")
+    user_id = input("User ID: ")
+    response = requests.delete(f"{BASE_API_URL}/admin/keycloak_user", json={"k_id": k_id, "user_id": user_id})
+    default_print_response(response)

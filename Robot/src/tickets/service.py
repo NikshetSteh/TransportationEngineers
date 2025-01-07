@@ -25,13 +25,15 @@ async def validate_user_ticket(
             "train_number": train_number,
             "wagon_number": wagon_number,
             "date": date.isoformat(),
-            "face": face
+            "face": face,
+            "mark_as_used": True
         } if face is not None else {
             "station_id": station_id,
             "train_number": train_number,
             "wagon_number": wagon_number,
             "date": date.isoformat(),
-            "code": code
+            "code": code,
+            "mark_as_used": True
         }
     ) as response:
         if response.status == 404:

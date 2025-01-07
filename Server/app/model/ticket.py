@@ -1,7 +1,7 @@
 import datetime
 import uuid
 
-from sqlalchemy import UUID, Column, DateTime, ForeignKey, Integer, String
+from sqlalchemy import UUID, Column, DateTime, ForeignKey, Integer, String, Boolean
 from sqlalchemy.orm import Mapped, relationship
 
 from model.base import Base
@@ -49,4 +49,9 @@ class Ticket(Base):
     )
     start_date: Mapped[datetime.datetime] = Column(
         DateTime(timezone=True)
+    )
+
+    used: Mapped[bool] = Column(
+        Boolean,
+        default=False
     )

@@ -21,4 +21,4 @@ class TicketCreation(BaseModel):
 
 class Ticket(TicketCreation):
     id: str
-    code: str
+    code: str = ""
