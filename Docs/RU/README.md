@@ -75,7 +75,7 @@ class Accounting dottedNode
 
 ```mermaid
 classDiagram
-    direction BT
+    direction LR
     class active_stores {
         varchar(500) public_key
         timestamp with time zone created_at
@@ -237,6 +237,8 @@ loop = QEventLoop(application)
 asyncio.set_event_loop(loop)
 loop.run_until_complete(main(loop))
 ```
+
+### Особенности системы 
 
 
 
