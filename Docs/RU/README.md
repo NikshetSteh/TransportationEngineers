@@ -217,19 +217,23 @@ classDiagram
 ```
 
 ### Компонент системы
+
 При разработке базы для всех компонентов системы был использован асинхронный-функциональный подход.
 Графическим фреймворком послужил `PySide`. Так как PySide построен на основе синхронной архитектуры,
-для асинхронной обработки использовались дополнительные пакеты, такие как `qasync`, а так же 
+для асинхронной обработки использовались дополнительные пакеты, такие как `qasync`, а так же
 встраивание кастомного event-loop в основную логику приложения:
+
 ```python
 from PySide6.QtWidgets import QApplication
 from qasync import QEventLoop
 import sys
 import asyncio
 
+
 async def main(app_loop):
-  while True:
-    pass
+    while True:
+        pass
+
 
 # Запуск PySide приложение параллельно с асинхронным кастомным event-loop
 application = QApplication(sys.argv)
@@ -238,87 +242,105 @@ asyncio.set_event_loop(loop)
 loop.run_until_complete(main(loop))
 ```
 
-### Особенности системы 
+### Особенности системы
 
+Система не обладает какими-то особыми алгоритмами и структурами данных,
+в основном только массивы и словари.
+Временная сложность у всех endpoints можно считать константой или линейной
+от количества пользователей в системе.
 
+## Алгоритмы
 
-## Алгоритмы 
 ### Авторизация и Аутентификация компонентов системы
+
 Первая аутентификация компонентов системы происходит на основе данных
 инженера с соответствующими правами
+
 ```mermaid
 sequenceDiagram
-    NOTE over Robot: генерация RSA ключей
-    Robot ->> Server: public_key, engineer credentials, robot data 
-    Server ->> Robot: Robot id
+NOTE over Robot: генерация RSA ключей
+Robot ->> Server: public_key, engineer credentials, robot data
+Server ->> Robot: Robot id
 ```
+
 Повторная аутентификация происходит на основе RSA ключей:
+
 ```mermaid
 sequenceDiagram
     Robot ->> Server: Запрос на авторизацию
-    Server ->> Robot: Зашифрованный публичным ключом код 
+    Server ->> Robot: Зашифрованный публичным ключом код
     Robot ->> Server: Расшифрованный код
     Server ->> Robot: Токены доступа 
 ```
-Для авторизации соответственно используются токены доступа полученные при аунтентификации 
+
+Для авторизации соответственно используются токены доступа полученные при аунтентификации
 через заголовок `Authorization: Bearer <token>`
 
 ### Рекомендательный алгоритм
-Для систем рекомендации временно используется упрощенный алгоритм. В момента запроса 
+
+Для систем рекомендации временно используется упрощенный алгоритм. В момента запроса
 формируется несколько списков популярных товаров:
+
 - Личные предпочтения пользователя
 - Товары популярные в магазине
 
-А так же список последних покупок товаров. На их основе определяется рекомендованный список 
+А так же список последних покупок товаров. На их основе определяется рекомендованный список
 товаров
 
-
 ### Проверка доступа к админ-панели робота
+
 ```mermaid
 sequenceDiagram
-    Engineer ->> Robot: NFC карта доступа 
+    Engineer ->> Robot: NFC карта доступа
     Robot ->> Server: Проверка прав доступа
     Server ->> Robot: Результат
 ```
 
+### Система интеллектуального видеонаблюдения
 
-### Система интеллектуального видеонаблюдения 
 На текущий момент алгоритм выглядит следующим образом:
+
 ```mermaid
 sequenceDiagram
-    NOTE over Robot: Запуск системы в фоновом режиме 
-    NOTE over Robot: Обнаружение девиантного поведения 
-    Robot ->> Server: Сигнал о девиантном поведении
+NOTE over Robot: Запуск системы в фоновом режиме
+NOTE over Robot: Обнаружение девиантного поведения
+Robot ->> Server: Сигнал о девиантном поведении
 ```
 
 Планируется расширение функционала до:
-1. Обнаружение девиантного поведения 
+
+1. Обнаружение девиантного поведения
+
 ```mermaid
 sequenceDiagram
     Terminal ->> Server: Конфигурация мониторинга
-    NOTE over Robot: Настройка информации о камере (местоположение, название)
-    NOTE over Robot: Запуск системы в фоновом режиме 
-    NOTE over Robot: Обнаружение девиантного поведения 
-    loop
-        Robot ->> Server: Сигнал о девиантном поведении
-        Server ->> Terminal: Сигнал о девиантном поведении
-        Server ->> Terminal: Информация об участниках
-    end
+NOTE over Robot: Настройка информации о камере (местоположение, название)
+NOTE over Robot: Запуск системы в фоновом режиме
+NOTE over Robot: Обнаружение девиантного поведения
+loop
+Robot ->> Server: Сигнал о девиантном поведении
+Server ->> Terminal: Сигнал о девиантном поведении
+Server ->> Terminal: Информация об участниках
+end
 ```
-2. Обнаружение нежелательных лиц 
+
+2. Обнаружение нежелательных лиц
+
 ```mermaid
 sequenceDiagram
-    NOTE over Robot: Настройка информации о камере (местоположение, название)
-    NOTE over Robot: Запуск системы в фоновом режиме 
-    NOTE over Robot: Обнаружение девиантного поведения 
-    loop
-        NOTE over Robot: Обнаружение нового лица
-        Robot ->> Server: Запрос на распознавание     
-        NOTE over Server: Проверка биометрии по базе 
-        Server ->> Terminal: Информация об угрозе
-    end
+NOTE over Robot: Настройка информации о камере (местоположение, название)
+NOTE over Robot: Запуск системы в фоновом режиме
+NOTE over Robot: Обнаружение девиантного поведения
+loop
+NOTE over Robot: Обнаружение нового лица
+Robot ->> Server: Запрос на распознавание
+NOTE over Server: Проверка биометрии по базе
+Server ->> Terminal: Информация об угрозе
+end
 ```
-### Проверка билетов 
+
+### Проверка билетов
+
 ```mermaid
 flowchart
     getCam[Получение данных с камеры]
@@ -336,3 +358,58 @@ flowchart
     codeCheck --> results
 ```
 
+## Используемые технологии
+
+- Основной язык программирования - Python 3.12
+- Контроль версий - [Git](https://git-scm.com/)
+- Конфигурации системы - pydantic-settings
+- Миграции базы данных - alembic
+- Работа с базой данных - sqlalchemy
+- Драйвер подключения к базе данных - asyncpg
+- Построение API - fastapi + pydantic
+- Работа с Redis - redis
+- Интерфейс - PySide + qasync
+- Бекенд для моделей - pytorch
+- Распознавание лиц - insightface
+- Работа с камерой и QR кодами - OpenCV
+- Драйвер базы данных для alembic - psycopg2  
+- Асинхронное взаимодействие с низкоуровневым железом - pyserial-asyncio
+- Менеджер пакетов - [poetry](https://python-poetry.org/)
+- Контейнеризация и оркестрация - Docker и Docker Compose
+
+Список всех используемых сторонних библиотек с ссылками на них:
+- [PySide](https://pypi.org/project/PySide6/)
+- [FastAPI](https://pypi.org/project/fastapi/)
+- [bcrypt](https://pypi.org/project/bcrypt/)
+- [pydantic-settings](https://pypi.org/project/pydantic-settings/)
+- [fastapi-pagination](https://pypi.org/project/fastapi-pagination/)
+- [insightface](https://pypi.org/project/insightface/)
+- [chromadb](https://pypi.org/project/chromadb/)
+- [asyncpg](https://pypi.org/project/asyncpg/)
+- [asyncpg](https://pypi.org/project/asyncpg/)
+- [redis](https://pypi.org/project/redis/)
+- [cryptography](https://pypi.org/project/cryptography/)
+- [aiohttp](https://pypi.org/project/aiohttp/)
+- [alembic](https://pypi.org/project/alembic/)
+- [uvicorn](https://pypi.org/project/uvicorn/)
+- [psycopg2-binary](https://pypi.org/project/psycopg2-binary/)
+- [isort](https://pypi.org/project/isort/)
+- [qasync](https://pypi.org/project/qasync/)
+- [opencv-python](https://pypi.org/project/opencv-python/)
+- menovideo [оригинал](https://pypi.org/project/menovideo) и 
+[исправленная нами версия](https://github.com/NikshetSteh/Data-efficient-video-transformer.git)
+- [timm](https://pypi.org/project/timm/)
+- [scikit-image](https://pypi.org/project/scikit-image/)
+- [numpy](https://pypi.org/project/numpy/)
+- [pyserial-asyncio](https://pypi.org/project/pyserial-asyncio/)
+- [shiboken6](https://pypi.org/project/shiboken6/)
+- [jinja2](https://pypi.org/project/jinja2/)
+- [insightface](https://pypi.org/project/insightface/)
+- [chromadb](https://pypi.org/project/chromadb/)
+- [requests](https://pypi.org/project/requests/)
+
+
+## Исходный код
+Весь код, модели, схемы и исходники самой этой технической документации 
+представлены на [github](https://github.com/NikshetSteh/TransportationEngineers/)  
+https://github.com/NikshetSteh/TransportationEngineers/
