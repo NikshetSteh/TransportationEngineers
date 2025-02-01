@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "docs"
+version = "0.1.0"
+description = ""
+authors = ["NikshetSteh <88205797+NikshetSteh@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+pypandoc = "^1.15"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
