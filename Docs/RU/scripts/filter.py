@@ -6,28 +6,20 @@ import hashlib
 import sys
 import os
 import subprocess
+import shutil
+
 
 import panflute as pf
 
-PLANTUML_BIN = os.environ.get('PLANTUML_BIN', 'plantuml')
-# MERMAID_BIN = os.path.expanduser(os.environ.get('MERMAID_BIN', 'mmdc'))
-MERMAID_BIN = "C:\\Users\\NikshetI\\AppData\\Roaming\\npm\\mmdc.cmd".replace("\\", "/")
-pf.debug(MERMAID_BIN)
+dirname_of_included_mdfile = ""
 
-# def prepare(doc):
-#     pass
+MERMAID_BIN = shutil.which("mmdc.cmd")
+if MERMAID_BIN is None:
+    pf.debug("Mermaid executable not found. Please check your installation.")
+else:
+    MERMAID_BIN = MERMAID_BIN.replace("\\", "/")
+    pf.debug(f"Mermaid executable found at: {MERMAID_BIN}")
 
-
-# def finalize(doc):
-#     pf.debug("Doc Format ", doc.format)
-#     pf.debug("Doc Meta ", doc.metadata)
-#     pf.debug("Doc Meta Content ", doc.metadata.content)
-#     pf.debug("Doc Meta Content ", doc.metadata.content.items())
-#     # for key, value in doc.metadata.content.items():
-#     #     pf.debug("Meta Key")
-#     #     pf.debug("Meta Key: ", key, " MetaValue: ", value)
-#
-#     pass
 
 
 def process_mermaid(elem, doc):
@@ -65,7 +57,7 @@ def process_mermaid(elem, doc):
 
         # stdout PIPE required to avoid 'BlockingIOError: [Errno 11] write could not complete without blocking'
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-        output, err = p.communicate()
+        _ = p.communicate()
 
         sys.stderr.write('Created image ' + dest + '\n')
 
@@ -73,46 +65,7 @@ def process_mermaid(elem, doc):
                                 attributes=elem.attributes, url=dest, title=typef))
 
 
-# def process_plantuml(elem, doc):
-#     """Change Text in codeblock from plantUML
-#     to an Image reference
-#
-#     The image is rendered during execution
-#
-#     Arguments:
-#     elem -- The element that should be processed
-#     doc  -- The document
-#     """
-#     if isinstance(elem, pf.CodeBlock) and 'plantuml' in elem.classes:
-#         # Extract the caption from element attributes
-#         if 'caption' in elem.attributes:
-#             caption = [pf.Str(elem.attributes['caption'])]
-#             typef = 'fig:'
-#         else:
-#             caption = []
-#             typef = ''
-#
-#         filename = get_filename4code("plantuml", elem.text)
-#         filetype = get_extension(doc.format, "png", html="svg", latex="png")
-#
-#         src = filename + '.uml'
-#         dest = filename + '.' + filetype
-#
-#         if not os.path.isfile(dest):
-#             txt = elem.text.encode(sys.getfilesystemencoding())
-#             if not txt.startswith(b"@start"):
-#                 txt = b"@startuml\n" + txt + b"\n@enduml\n"
-#             with open(src, "wb") as f:
-#                 f.write(txt)
-#
-#         subprocess.check_call(PLANTUML_BIN.split() + ["-t" + filetype, src])
-#         sys.stderr.write('Created image ' + dest + '\n')
-#
-#         return pf.Para(pf.Image(*caption, identifier=elem.identifier,
-#                                 attributes=elem.attributes, url=dest, title=typef))
-
-
-def process_codeblockinclude(elem, doc):
+def process_codeblockinclude(elem, _):
     """Change Text in codeblock from an included
     file that is placed in the codeblock
 
@@ -157,13 +110,13 @@ def get_filename4code(module, content, ext=None):
     return os.path.join(imagedir, fn)
 
 
-def get_extension(format, default, **alternates):
+def get_extension(ext_format, default, **alternates):
     """get the extension for the result, needs a default and some specialisations
     Example:
       filetype = get_extension(format, "png", html="svg", latex="eps")
     """
     try:
-        return alternates[format]
+        return alternates[ext_format]
     except KeyError:
         return default
 
@@ -176,35 +129,34 @@ def process_mdinclude(elem, doc):
     doc  -- The document
     """
 
-    # if isinstance(elem, pf.CodeBlock) and 'mdinclude' in elem.classes:
-    #     # We take the received element and turn it into a list of elements
-    #     # that are derived from the included markdown file
-    #     list_of_converted_elements = convert_code_element_to_list_of_elements(
-    #         elem, doc)
-    #
-    #     # Enumerate over the new elements and see if there are
-    #     # further mdinclude codeblocks to include
-    #     # Since enumerate is also working over a list that is changed
-    #     # during enumeration this works in a recursive manner
-    #     for n, element in enumerate(list_of_converted_elements):
-    #
-    #         # There seems to be one
-    #         if isinstance(element, pf.CodeBlock) and 'mdinclude' in element.classes:
-    #             # Convert it
-    #             next_converted_list = convert_code_element_to_list_of_elements(
-    #                 element, doc)
-    #             # Remove the codeblock
-    #             del list_of_converted_elements[n]
-    #             # Insert the new elements at the place
-    #             # Where the codeblock was
-    #             list_of_converted_elements[n:n] = next_converted_list
-    #
-    #     pf.debug(list_of_converted_elements)
-    #     return list_of_converted_elements
-    pass
+    if isinstance(elem, pf.CodeBlock) and 'mdinclude' in elem.classes:
+        # We take the received element and turn it into a list of elements
+        # that are derived from the included markdown file
+        list_of_converted_elements = convert_code_element_to_list_of_elements(
+            elem, doc)
+
+        # Enumerate over the new elements and see if there are
+        # further mdinclude codeblocks to include
+        # Since enumerate is also working over a list that is changed
+        # during enumeration this works in a recursive manner
+        for n, element in enumerate(list_of_converted_elements):
+
+            # There seems to be one
+            if isinstance(element, pf.CodeBlock) and 'mdinclude' in element.classes:
+                # Convert it
+                next_converted_list = convert_code_element_to_list_of_elements(
+                    element, doc)
+                # Remove the codeblock
+                del list_of_converted_elements[n]
+                # Insert the new elements at the place
+                # Where the codeblock was
+                list_of_converted_elements[n:n] = next_converted_list
+
+        pf.debug(list_of_converted_elements)
+        return list_of_converted_elements
 
 
-def convert_code_element_to_list_of_elements(elem, doc):
+def convert_code_element_to_list_of_elements(elem, _):
     """Conversion of a codeblock element to a list of elements
     that have been extracted from the included markdown
 
@@ -224,9 +176,8 @@ def convert_code_element_to_list_of_elements(elem, doc):
     # If Not, we can remove it anyway
     if isinstance(elem, pf.CodeBlock) and 'mdinclude' in elem.classes:
         # All files in one codeblock will be combined as if they
-        # where one file. We need a string to concatinate the file_content
+        # where one file. We need a string to concatenate the file_content
         # of all files
-        concatinated_file_content = ''
         increase_headers = False
 
         included_elements = []
@@ -281,7 +232,7 @@ def convert_code_element_to_list_of_elements(elem, doc):
     pass
 
 
-def change_uri(elem, doc):
+def change_uri(elem, _):
     """Private Helper that is called in mdinclude parser to change
     relative URIs
 
