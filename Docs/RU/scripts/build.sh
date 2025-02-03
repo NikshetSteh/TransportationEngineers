@@ -14,7 +14,7 @@ command_exists_or_die "xelatex"
 
 mainfont="Arial"
 sansfont="Arial"
-monofont="Arial"
+monofont="Courier New"
 mathfont="Arial"
 
 font_name_exists_or_die "$mainfont"
@@ -51,5 +51,5 @@ pandoc \
     -V mathfont="$mathfont" \
     -V fontsize=14pt \
     --pdf-engine=lualatex \
-    --reference-doc=reference.docx \
+    --reference-doc=scripts/ref.docx \
     "$@"

@@ -262,12 +262,26 @@ def change_uri(elem, _):
         elem.text = new_text
 
 
+# def process_codeblocks(elem, doc):
+#     if isinstance(elem, pf.CodeBlock):
+#         # Wrap code blocks in a specific Word style
+#         # elem.
+#         # return pf.RawBlock(r'<w:pStyle w:val="body"/>', format="openxml")
+
+
+def process_codeblocks(elem, doc):
+    if isinstance(elem, pf.CodeBlock):
+        # Apply a paragraph style named "CodeBlock"
+        return pf.Div(elem, attributes={"custom-style": "code"})
+
+
+
+
 def main(doc=None):
     #    return pf.run_filters([process_mdinclude, process_codeblockinclude, process_plantuml, process_mermaid],
-    return pf.run_filters([process_mdinclude, process_codeblockinclude, process_mermaid],
-                          # prepare=prepare,
-                          # finalize=finalize,
-                          doc=doc)
+    # return pf.run_filters([process_mdinclude, process_codeblockinclude, process_mermaid],
+    return pf.run_filters([process_mdinclude, process_codeblockinclude, process_mermaid, process_codeblocks], doc=doc)
+
 
 
 if __name__ == '__main__':
