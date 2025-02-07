@@ -245,6 +245,383 @@ classDiagram
     tickets --> users: user_id&#58id
 ```
 
+## Endpoints
+
+### 1. User Management
+
+#### Add User
+
+**Endpoint:** `POST /admin/user`
+
+**Description:** Adds a new user.
+
+**Request Body:**
+
+```json
+{
+  "name": "string",
+  "face": "string (optional)"
+}
+```
+
+**Response:**
+
+```json
+{
+  "id": "string",
+  "name": "string"
+}
+```
+
+**Errors:**
+
+- `422 Validation Error`
+
+#### Update User Face
+
+**Endpoint:** `PATCH /admin/user/{user_id}/face`
+
+**Description:** Updates the face data of a user.
+
+**Parameters:**
+
+- `user_id` (string, required): The ID of the user.
+
+**Request Body:**
+
+```json
+{
+  "face": "string"
+}
+```
+
+**Response:**
+
+```json
+{
+  "status": "OK"
+}
+```
+
+**Errors:**
+
+- `422 Validation Error`
+
+#### Delete User Face
+
+**Endpoint:** `DELETE /admin/user/face`
+
+**Description:** Deletes a user's face data.
+
+**Parameters:**
+
+- `user_id` (query, required, string): The ID of the user.
+
+**Response:**
+
+```json
+{
+  "status": "OK"
+}
+```
+
+**Errors:**
+
+- `422 Validation Error`
+
+#### Get Users
+
+**Endpoint:** `GET /admin/users`
+
+**Description:** Retrieves a paginated list of users.
+
+**Parameters:**
+
+- `page` (query, optional, integer, default: 1): Page number.
+- `size` (query, optional, integer, default: 50, max: 100): Page size.
+
+**Response:**
+
+```json
+{
+  "items": [
+    {
+      "id": "string",
+      "name": "string"
+    }
+  ],
+  "total": 100,
+  "page": 1,
+  "size": 50
+}
+```
+
+**Errors:**
+
+- `422 Validation Error`
+
+#### Delete User
+
+**Endpoint:** `DELETE /admin/users/{user_id}`
+
+**Description:** Deletes a specific user.
+
+**Parameters:**
+
+- `user_id` (path, required, string): The ID of the user.
+
+**Response:**
+
+```json
+{
+  "status": "OK"
+}
+```
+
+**Errors:**
+
+- `422 Validation Error`
+
+### 2. Engineer Management
+
+#### Create Engineer
+
+**Endpoint:** `POST /admin/engineer`
+
+**Description:** Creates a new engineer.
+
+**Request Body:**
+
+```json
+{
+  "login": "string",
+  "password": "string"
+}
+```
+
+**Response:**
+
+```json
+{
+  "id": "string",
+  "login": "string"
+}
+```
+
+**Errors:**
+
+- `422 Validation Error`
+
+#### Delete Engineer
+
+**Endpoint:** `DELETE /admin/engineers/{engineer_id}`
+
+**Description:** Deletes an engineer.
+
+**Parameters:**
+
+- `engineer_id` (path, required, string): The ID of the engineer.
+
+**Response:**
+
+```json
+{
+  "status": "OK"
+}
+```
+
+**Errors:**
+
+- `422 Validation Error`
+
+#### Get Engineers
+
+**Endpoint:** `GET /admin/engineers`
+
+**Description:** Retrieves a paginated list of engineers.
+
+**Parameters:**
+
+- `page` (query, optional, integer, default: 1): Page number.
+- `size` (query, optional, integer, default: 50, max: 100): Page size.
+
+**Response:**
+
+```json
+{
+  "items": [
+    {
+      "id": "string",
+      "login": "string"
+    }
+  ],
+  "total": 100,
+  "page": 1,
+  "size": 50
+}
+```
+
+**Errors:**
+
+- `422 Validation Error`
+
+#### Update Engineer Privileges
+
+**Endpoint:** `PUT /admin/engineer_privileges`
+
+**Description:** Updates the privileges of an engineer.
+
+**Request Body:**
+
+```json
+{
+  "id": "string",
+  "privileges": [
+    "ROBOT_LOGIN",
+    "STORE_LOGIN"
+  ]
+}
+```
+
+**Response:**
+
+```json
+{
+  "status": "OK"
+}
+```
+
+**Errors:**
+
+- `422 Validation Error`
+
+### 3. Store Management
+
+#### Add Store to Training
+
+**Endpoint:** `POST /admin/store/{store_id}/train`
+
+**Description:** Adds a store to training data.
+
+**Parameters:**
+
+- `store_id` (path, required, string): The ID of the store.
+
+**Request Body:**
+
+```json
+{
+  "train_number": 123,
+  "train_date": "2025-02-01T00:00:00Z"
+}
+```
+
+**Response:**
+
+```json
+{
+  "status": "OK"
+}
+```
+
+**Errors:**
+
+- `422 Validation Error`
+
+#### Remove Store from Training
+
+**Endpoint:** `DELETE /admin/store/{store_id}/train/unbind`
+
+**Description:** Removes a store from training data.
+
+**Parameters:**
+
+- `store_id` (path, required, string): The ID of the store.
+
+**Request Body:**
+
+```json
+{
+  "train_number": 123,
+  "train_date": "2025-02-01T00:00:00Z"
+}
+```
+
+**Response:**
+
+```json
+{
+  "status": "OK"
+}
+```
+
+**Errors:**
+
+- `422 Validation Error`
+
+### 4. Ticket Management
+
+#### Create Ticket
+
+**Endpoint:** `POST /admin/ticket`
+
+**Description:** Creates a new ticket.
+
+**Request Body:**
+
+```json
+{
+  "user_id": "string",
+  "train_number": 123,
+  "wagon_number": 5,
+  "place_number": 12,
+  "station_id": "string",
+  "destination": "string",
+  "date": "2025-02-01T00:00:00Z",
+  "start_date": "2025-02-01T00:00:00Z"
+}
+```
+
+**Response:**
+
+```json
+{
+  "id": "string",
+  "train_number": 123,
+  "wagon_number": 5,
+  "place_number": 12,
+  "destination": "string"
+}
+```
+
+**Errors:**
+
+- `422 Validation Error`
+
+#### Delete Ticket
+
+**Endpoint:** `DELETE /admin/ticket/{ticket_id}`
+
+**Description:** Deletes a ticket.
+
+**Parameters:**
+
+- `ticket_id` (path, required, string): The ID of the ticket.
+
+**Response:**
+
+```json
+{
+  "status": "OK"
+}
+```
+
+**Errors:**
+
+- `422 Validation Error`
+
+This document covers the main API endpoints. Let me know if you need additional formatting or more endpoints!
+
 # Store Server
 
 Отвечает за работу магазинов
@@ -627,3 +1004,182 @@ classDiagram
 **Errors:**
 
 - `422 Validation Error`
+
+# Robot
+
+Данный модуль агрегирует в себе все компоненты для физических устройств экосистемы.
+В нем есть реализация всех методов API серверов необходимых для функционирования компонентов системы.
+В основе разработки, как и в остальных модулях лежит асинхронный подход.
+Для пользовательского интерфейса был выбран PySide6.
+Так как он основывается на синхронном PyQT, был использован дополнительный пакет `qasync`:
+
+```python
+from PySide6.QtWidgets import QApplication
+from qasync import QEventLoop
+import sys
+import asyncio
+
+
+async def main(app_loop):
+    while True:
+        pass
+
+
+# Запуск PySide приложение параллельно с асинхронным кастомным event-loop
+application = QApplication(sys.argv)
+loop = QEventLoop(application)
+asyncio.set_event_loop(loop)
+loop.run_until_complete(main(loop))
+```
+
+## Submodule
+
+- `auth`. Реализует API авторизации, а так же содержит методы для работы с ключами авторизации
+- `deviatn`. Реализует распознавания девиантного поведения
+- `fsm`. Реализация finite-state-machine
+- `hardware`. Модуль для работы с низкоуровневыми устройствами
+- `info_service`. Модуль для работы с информационными сервисами (получениие данных о местоположении)
+- `states`. Состояния для fsm
+- `store`. Модуль для работы с магазинами
+- `tickets`. Модуль для работы с билетами
+- `ui`. Реализация пользовательского интерфейса
+- `users`. Модуль для работы с пользователями
+- `video`. Небольшая обертка для асинхронного использования камеры
+
+## Особенности
+
+Ввиду отсутствия интерфейса конфигурации, настройка осуществляется через консоль.
+Так как она может быть динамической, то она доступна во время всей работы приложения.
+Из-за синхронности стандартного `input`, он запускается в асинхронном режиме:
+
+```python
+import asyncio
+
+
+async def async_input(
+        title: str = "> "
+):
+    loop = asyncio.get_event_loop()
+    return await loop.run_in_executor(None, input, title)
+```
+
+Был обнаружен баг на стороне python, из-за которого при использовании данного подхода блокируется создание новых
+потоков,
+а разблокировка возможна только при завершении выполнения текущего `await input()`.
+
+Для временного исправления данного бага была введена функция `Stop config`, которая прекращает работу с консолью.
+Много поточность использует система распознавания девиантного поведения, так что перед её запуском следует
+воспользоваться данной функцией
+
+## Распознавание девиантного поведения
+
+На текущий момент алгоритм выглядит следующим образом:
+
+```mermaid
+sequenceDiagram
+NOTE over Robot: Запуск системы в фоновом режиме
+NOTE over Robot: Обнаружение девиантного поведения
+Robot ->> Server: Сигнал о девиантном поведении
+```
+
+Алгоритм работы модели:
+
+```mermaid
+flowchart
+    loadModel[Загрузка модели]
+    getCam[Получение N кадров с камеры]
+    createThread[Создание потока]
+    runModel[Работа модели]
+    sendResult[Отправка результата]
+    loadModel --> getCam
+    getCam --> createThread
+    createThread --> runModel
+    runModel --> sendResult
+    sendResult --> getCam
+```
+
+Планируется расширение функционала до:
+
+1. Обнаружение девиантного поведения
+
+```mermaid
+sequenceDiagram
+    Terminal ->> Server: Конфигурация мониторинга
+NOTE over Robot: Настройка информации о камере (местоположение, название)
+NOTE over Robot: Запуск системы в фоновом режиме
+NOTE over Robot: Обнаружение девиантного поведения
+loop
+Robot ->> Server: Сигнал о девиантном поведении
+Server ->> Terminal: Сигнал о девиантном поведении
+Server ->> Terminal: Информация об участниках
+end
+```
+
+2. Обнаружение нежелательных лиц
+
+```mermaid
+sequenceDiagram
+NOTE over Robot: Настройка информации о камере (местоположение, название)
+NOTE over Robot: Запуск системы в фоновом режиме
+NOTE over Robot: Обнаружение девиантного поведения
+loop
+NOTE over Robot: Обнаружение нового лица
+Robot ->> Server: Запрос на распознавание
+NOTE over Server: Проверка биометрии по базе
+Server ->> Terminal: Информация об угрозе
+end
+```
+
+Алгоритм работы модели:
+
+```mermaid
+sequenceDiagram
+NOTE over ModelThread: Загрузка модели
+MainThread ->> ModelThread: единичный батч данных
+NOTE over ModelThread: Работа модели
+ModelThread ->> MainThread: Результат
+NOTE over MainThread: Отправка отчета 
+```
+
+Как основная модель был выбран [Data-efficient-video-transformer](https://github.com/NikshetSteh/Data-efficient-video-transformer)
+- Модель основана на архитектуре [ViT](https://arxiv.org/abs/2010.11929), поэтому может работать с изображениями произвольного размера.
+- Shape входного батча: `[BATCH_SIZE, FRAME_COUNT, CHANNEL, HEIGHT, WIDTH]`
+- Выход модели: `[BATCH_SIZE, 1]`
+
+Проект был разработан более 4 лет назад, так что была проведена работа над переводом его на новые версии библиотек, а
+так же восстановлены веса pre-trained модели (были удалены авторам, из-за чего сейчас оригинальный пакет не работает).
+Обновленная версия представлена на [GitHub](https://github.com/NikshetSteh/Data-efficient-video-transformer)
+
+
+# Алгоритмы работы системы 
+## Авторизация компонентов системы 
+Авторизация компонентов системы построена на основе RSA ключей 
+(планируется переход на более быстрые эллиптические кривые).
+
+Первая аутентификация компонентов системы происходит на основе данных
+инженера с соответствующими правами
+
+```mermaid
+sequenceDiagram
+    NOTE over Robot: генерация RSA ключей
+    Robot ->> Server: public_key, engineer credentials, robot data
+    NOTE over Server: Проверка прав доступа
+    Server ->> DB: Сохранения публичного ключа 
+    Server ->> Robot: Robot id
+```
+
+Повторная аутентификация происходит на основе RSA ключей:
+
+```mermaid
+sequenceDiagram
+    Robot ->> Server: Запрос на авторизацию
+    Server ->> Robot: Зашифрованный публичным ключом код
+    Robot ->> Server: Расшифрованный код
+    NOTE over Server: Валидация кода
+    NOTE over Server: Генерация случайного токена
+    Server ->> Redis: Сохранения данных новой сессии 
+    Server ->> Robot: Токе доступа 
+```
+
+
+Для доступа к требующим авторизациям endpoint\`s используется схема `Bearer` (заголовок `Authorization: Bearer <token>`)

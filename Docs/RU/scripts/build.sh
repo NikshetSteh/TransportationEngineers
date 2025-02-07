@@ -26,20 +26,6 @@ font_name_exists_or_die "$mathfont"
 
 DIR0=$(dirname "$0")
 
-#pandoc \
-#    --filter=scripts/filter.py \
-#    -V linkcolor:blue \
-#        -V geometry:b5paper \
-#	    -V geometry:margin=2cm \
-#	        -V mainfont="$mainfont" \
-#		    -V sansfont="$sansfont" \
-#		        -V monofont="$monofont" \
-#			    -V mathfont="$mathfont" \
-#			        -V fontsize=14pt \
-#				    --pdf-engine=lualatex \
-#										       "$@"
-
-
 pandoc \
     --filter=scripts/filter.py \
     -V linkcolor:blue \
