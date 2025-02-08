@@ -3,13 +3,16 @@ Pandoc filter using panflute for plantUML and mermaid
 """
 
 import hashlib
-import sys
 import os
-import subprocess
 import shutil
-
+import subprocess
+import sys
 
 import panflute as pf
+import requests
+from pygments import highlight
+from pygments.formatters.svg import SvgFormatter
+from pygments.lexers.python import PythonLexer
 
 dirname_of_included_mdfile = ""
 
@@ -19,7 +22,6 @@ if MERMAID_BIN is None:
 else:
     MERMAID_BIN = MERMAID_BIN.replace("\\", "/")
     pf.debug(f"Mermaid executable found at: {MERMAID_BIN}")
-
 
 
 def process_mermaid(elem, doc):
@@ -53,7 +55,7 @@ def process_mermaid(elem, doc):
                 f.write(txt)
 
         # Default command to execute
-        cmd = [MERMAID_BIN, "-i", src, "-o", dest]
+        cmd = [MERMAID_BIN, "--scale", "2", "-i", src, "-o", dest]
 
         # stdout PIPE required to avoid 'BlockingIOError: [Errno 11] write could not complete without blocking'
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
@@ -61,11 +63,18 @@ def process_mermaid(elem, doc):
 
         sys.stderr.write('Created image ' + dest + '\n')
 
-        return pf.Para(pf.Image(*caption, identifier=elem.identifier,
-                                attributes=elem.attributes, url=dest, title=typef))
+        return pf.Para(
+            pf.Image(
+                *caption,
+                identifier=elem.identifier,
+                attributes=elem.attributes,
+                url=dest,
+                title=typef
+            )
+        )
 
 
-def process_codeblockinclude(elem, _):
+def process_codeblock_include(elem, _):
     """Change Text in codeblock from an included
     file that is placed in the codeblock
 
@@ -121,7 +130,7 @@ def get_extension(ext_format, default, **alternates):
         return default
 
 
-def process_mdinclude(elem, doc):
+def process_md_include(elem, doc):
     """Recursive mdinclude based on mdinclude CodeBlock
 
     Arguments:
@@ -262,26 +271,46 @@ def change_uri(elem, _):
         elem.text = new_text
 
 
-# def process_codeblocks(elem, doc):
-#     if isinstance(elem, pf.CodeBlock):
-#         # Wrap code blocks in a specific Word style
-#         # elem.
-#         # return pf.RawBlock(r'<w:pStyle w:val="body"/>', format="openxml")
+def convert_svg_to_png(input_svg, output_png, dpi=300):
+    command = [
+        "inkscape",
+        "--export-type=png",
+        f"--export-dpi={dpi}",
+        "--export-area-drawing",
+        f"--export-filename={output_png}",
+        input_svg
+    ]
+
+    try:
+        subprocess.run(command, check=True)
+    except subprocess.CalledProcessError as e:
+        pf.debug(f"Error converting file: {e}")
+
+
+def convert_code_to_image_pygments(code, output_path, dpi=1200):
+    """Converts Python code to an SVG using Pygments and then converts it to PNG."""
+    svg_path = output_path.replace(".png", ".svg")
+    formatter = SvgFormatter(fontfamily="Aptos")
+    svg_data = highlight(code, PythonLexer(), formatter)
+
+    with open(svg_path, "w", encoding="utf-8") as f:
+        f.write(svg_data)
+
+    convert_svg_to_png(svg_path, output_path, dpi)
 
 
 def process_codeblocks(elem, doc):
-    if isinstance(elem, pf.CodeBlock):
-        # Apply a paragraph style named "CodeBlock"
-        return pf.Div(elem, attributes={"custom-style": "code"})
+    """Processes code blocks and converts them to images if enabled."""
+    if isinstance(elem, pf.CodeBlock) and 'python' in elem.classes:
+        filename = get_filename4code("code", elem.text, "png")
 
+        convert_code_to_image_pygments(elem.text, filename)
 
+        return pf.Para(pf.Image(url=filename))
 
 
 def main(doc=None):
-    #    return pf.run_filters([process_mdinclude, process_codeblockinclude, process_plantuml, process_mermaid],
-    # return pf.run_filters([process_mdinclude, process_codeblockinclude, process_mermaid],
-    return pf.run_filters([process_mdinclude, process_codeblockinclude, process_mermaid, process_codeblocks], doc=doc)
-
+    return pf.run_filters([process_md_include, process_codeblock_include, process_mermaid, process_codeblocks], doc=doc)
 
 
 if __name__ == '__main__':

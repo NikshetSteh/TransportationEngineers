@@ -204,45 +204,50 @@ classDiagram
         timestamp with time zone created_at
         uuid id
     }
-    class keycloak_users {
-        uuid user_id
-        uuid id
-    }
-    class robots {
-        varchar(60) robot_model_id
-        varchar(60) robot_model_name
-        varchar(500) public_key
-        timestamp with time zone created_at
-        uuid id
-    }
-    class tickets {
-        uuid user_id
-        integer train_number
-        integer wagon_number
-        integer place_number
-        timestamp with time zone date
-        varchar(60) station_id
-        varchar(60) destination_id
-        timestamp with time zone start_date
-        varchar(128) code
-        boolean used
-        uuid id
-    }
-    class train_stores {
-        uuid store_id
-        integer train_number
-        timestamp with time zone train_date
-        uuid id
-    }
-    class users {
-        varchar(60) name
-        timestamp with time zone created_at
-        uuid id
-    }
-
+    
     auth_cards --> engineers: engineer_id&#58id
-    keycloak_users --> users: user_id&#58id
-    tickets --> users: user_id&#58id
+```
+```mermaid
+classDiagram
+  direction LR
+  class keycloak_users {
+    uuid user_id
+    uuid id
+  }
+  class robots {
+    varchar(60) robot_model_id
+    varchar(60) robot_model_name
+    varchar(500) public_key
+    timestamp with time zone created_at
+    uuid id
+  }
+  class tickets {
+    uuid user_id
+    integer train_number
+    integer wagon_number
+    integer place_number
+    timestamp with time zone date
+    varchar(60) station_id
+    varchar(60) destination_id
+    timestamp with time zone start_date
+    varchar(128) code
+    boolean used
+    uuid id
+  }
+  class train_stores {
+    uuid store_id
+    integer train_number
+    timestamp with time zone train_date
+    uuid id
+  }
+  class users {
+    varchar(60) name
+    timestamp with time zone created_at
+    uuid id
+  }
+
+  keycloak_users --> users: user_id&#58id
+  tickets --> users: user_id&#58id
 ```
 
 ## Endpoints
@@ -1071,6 +1076,15 @@ async def async_input(
 Много поточность использует система распознавания девиантного поведения, так что перед её запуском следует
 воспользоваться данной функцией
 
+
+## Доступ к админ панели
+На данный момент сама система администрирования находится в разработке, но уже реализована система авторизация инженера 
+на основе RFID-карты.
+В базе данных хранится ключ карты (на данный момент установка осуществляется через 
+`DebugConsole`: `5. Инженеры/5. Редактировать карту доступа`).
+Так же администрирование робота используется как отдельная привилегия (`ROBOT_ADMIN`).
+
+
 ## Распознавание девиантного поведения
 
 На текущий момент алгоритм выглядит следующим образом:
@@ -1105,7 +1119,7 @@ flowchart
 ```mermaid
 sequenceDiagram
     Terminal ->> Server: Конфигурация мониторинга
-NOTE over Robot: Настройка информации о камере (местоположение, название)
+NOTE over Robot: Настройка информации о камере
 NOTE over Robot: Запуск системы в фоновом режиме
 NOTE over Robot: Обнаружение девиантного поведения
 loop
@@ -1119,7 +1133,7 @@ end
 
 ```mermaid
 sequenceDiagram
-NOTE over Robot: Настройка информации о камере (местоположение, название)
+NOTE over Robot: Настройка информации о камере
 NOTE over Robot: Запуск системы в фоновом режиме
 NOTE over Robot: Обнаружение девиантного поведения
 loop
@@ -1183,3 +1197,26 @@ sequenceDiagram
 
 
 Для доступа к требующим авторизациям endpoint\`s используется схема `Bearer` (заголовок `Authorization: Bearer <token>`)
+
+
+# Engineer
+Инженеры - пользователи системы, ответственные за её администрирование. 
+На данный момент их учетные записи создаются вручную через `DebugConsole` (login + password).
+Авторизация инженеров так же возможна в ряде случаев через RFID карту (задаётся так же через `DebugConsole`).
+
+Инженеры могут иметь различные независимые права доступа:
+- `ROBOT_LOGIN`
+- `STORE_LOGIN`
+- `ROBOT_ADMIN`
+
+# DebugConsole
+Данный модуль временно заменяет админ панель. 
+В ней есть функционал для создания и управления пользователями, инженерами, магазинами, роботами и т. д.
+Метод работы максимально прост, все действия выполняются синхронно. 
+Взаимодействие происходит по средствам консоли. 
+
+Структура проекта:
+- `main.py` - интерфейс взаимодействия через командную строку
+- `data/` - готовые тестовые наборы данный в формате json
+- `auth` - вспомогательный модуль для работы с ключами
+- `engineer`, `users`, ... - отдельные модули отвечают за отдельные системы 
