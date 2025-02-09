@@ -51,7 +51,9 @@ Backend состоит из 4 основных модулей:
 - Сервис магазинов
 - Сервис биометрии
 - Frontend
-  Так же есть несколько дополнительных модулей:
+
+Так же есть несколько дополнительных модулей:
+
 - DebugConsole (для отладки, временно заменяет админ панель)
 - DebugData (набор тестовых данных)
 
@@ -155,8 +157,8 @@ app
   инженеров
   и так далее. Исключительно на время разработки, использование на проде не предусмотренно
 - `auth` - отвечает за авторизацию. Предоставляет Dependencies для авторизации пользователя
-- `robot` - отвечает за работу с роботом. Реализует такие функции как проверка билетов, авторизация пользователей и т.
-  д.
+- `robot` - отвечает за работу компонентов системы.
+  Реализует такие функции как проверка билетов, авторизация пользователей и т. д.
 - `users` - отвечает за работу с пользователями. В основном предоставление информации для робота
 - `face_api` - внешняя зависимость сервиса биометрии
 - `store_api` - внешняя зависимость сервиса магазинов
@@ -167,11 +169,6 @@ app
 ```mermaid
 classDiagram
     direction LR
-    class active_stores {
-        varchar(500) public_key
-        timestamp with time zone created_at
-        uuid id
-    }
     class alembic_version {
         varchar(32) version_num
     }
@@ -204,50 +201,63 @@ classDiagram
         timestamp with time zone created_at
         uuid id
     }
-    
-    auth_cards --> engineers: engineer_id&#58id
+
+    auth_cards --> engineers: engineer_id id
 ```
+
 ```mermaid
 classDiagram
-  direction LR
-  class keycloak_users {
-    uuid user_id
-    uuid id
-  }
-  class robots {
-    varchar(60) robot_model_id
-    varchar(60) robot_model_name
-    varchar(500) public_key
-    timestamp with time zone created_at
-    uuid id
-  }
-  class tickets {
-    uuid user_id
-    integer train_number
-    integer wagon_number
-    integer place_number
-    timestamp with time zone date
-    varchar(60) station_id
-    varchar(60) destination_id
-    timestamp with time zone start_date
-    varchar(128) code
-    boolean used
-    uuid id
-  }
-  class train_stores {
-    uuid store_id
-    integer train_number
-    timestamp with time zone train_date
-    uuid id
-  }
-  class users {
-    varchar(60) name
-    timestamp with time zone created_at
-    uuid id
-  }
+    direction LR
 
-  keycloak_users --> users: user_id&#58id
-  tickets --> users: user_id&#58id
+    class keycloak_users {
+        uuid user_id
+        uuid id
+    }
+    class robots {
+        varchar(60) robot_model_id
+        varchar(60) robot_model_name
+        varchar(500) public_key
+        timestamp with time zone created_at
+        uuid id
+    }
+    class tickets {
+        uuid user_id
+        integer train_number
+        integer wagon_number
+        integer place_number
+        timestamp with time zone date
+        varchar(60) station_id
+        varchar(60) destination_id
+        timestamp with time zone start_date
+        varchar(128) code
+        boolean used
+        uuid id
+    }
+    class train_stores {
+        uuid store_id
+        integer train_number
+        timestamp with time zone train_date
+        uuid id
+    }
+    class users {
+        varchar(60) name
+        timestamp with time zone created_at
+        uuid id
+    }
+
+    keycloak_users --> users: user_id id
+    tickets --> users: user_id id
+```
+
+```mermaid
+classDiagram
+    direction LR
+
+    class active_stores {
+        varchar(500) public_key
+        timestamp with time zone created_at
+        uuid id
+    }
 ```
 
 ## Endpoints
@@ -625,8 +635,6 @@ classDiagram
 
 - `422 Validation Error`
 
-This document covers the main API endpoints. Let me know if you need additional formatting or more endpoints!
-
 # Store Server
 
 Отвечает за работу магазинов
@@ -694,12 +702,12 @@ classDiagram
         uuid id
     }
 
-    purchase_items --> purchases: purchase_id&#58id
-    purchase_items --> store_items: store_item_id&#58id
-    purchases --> stores: store_id&#58id
-    store_items --> stores: store_id&#58id
-    tasks --> purchases: purchase_id&#58id
-    tasks --> stores: store_id&#58id
+    purchase_items --> purchases: purchase_id id
+    purchase_items --> store_items: store_item_id id
+    purchases --> stores: store_id id
+    store_items --> stores: store_id id
+    tasks --> purchases: purchase_id id
+    tasks --> stores: store_id id
 ```
 
 ## Endpoints
@@ -1073,17 +1081,16 @@ async def async_input(
 а разблокировка возможна только при завершении выполнения текущего `await input()`.
 
 Для временного исправления данного бага была введена функция `Stop config`, которая прекращает работу с консолью.
-Много поточность использует система распознавания девиантного поведения, так что перед её запуском следует
+Многопоточность использует система распознавания девиантного поведения, так что перед её запуском следует
 воспользоваться данной функцией
 
-
 ## Доступ к админ панели
-На данный момент сама система администрирования находится в разработке, но уже реализована система авторизация инженера 
+
+На данный момент сама система администрирования находится в разработке, но уже реализована система авторизация инженера
 на основе RFID-карты.
-В базе данных хранится ключ карты (на данный момент установка осуществляется через 
+В базе данных хранится ключ карты (на данный момент установка осуществляется через
 `DebugConsole`: `5. Инженеры/5. Редактировать карту доступа`).
 Так же администрирование робота используется как отдельная привилегия (`ROBOT_ADMIN`).
-
 
 ## Распознавание девиантного поведения
 
@@ -1114,7 +1121,7 @@ flowchart
 
 Планируется расширение функционала до:
 
-1. Обнаружение девиантного поведения
+1. Новая схема обнаружение девиантного поведения
 
 ```mermaid
 sequenceDiagram
@@ -1155,8 +1162,11 @@ ModelThread ->> MainThread: Результат
 NOTE over MainThread: Отправка отчета 
 ```
 
-Как основная модель был выбран [Data-efficient-video-transformer](https://github.com/NikshetSteh/Data-efficient-video-transformer)
-- Модель основана на архитектуре [ViT](https://arxiv.org/abs/2010.11929), поэтому может работать с изображениями произвольного размера.
+Как основная модель был
+выбран [Data-efficient-video-transformer](https://github.com/NikshetSteh/Data-efficient-video-transformer)
+
+- Модель основана на архитектуре [ViT](https://arxiv.org/abs/2010.11929), поэтому может работать с изображениями
+  произвольного размера.
 - Shape входного батча: `[BATCH_SIZE, FRAME_COUNT, CHANNEL, HEIGHT, WIDTH]`
 - Выход модели: `[BATCH_SIZE, 1]`
 
@@ -1164,10 +1174,11 @@ NOTE over MainThread: Отправка отчета
 так же восстановлены веса pre-trained модели (были удалены авторам, из-за чего сейчас оригинальный пакет не работает).
 Обновленная версия представлена на [GitHub](https://github.com/NikshetSteh/Data-efficient-video-transformer)
 
+# Алгоритмы работы системы
 
-# Алгоритмы работы системы 
-## Авторизация компонентов системы 
-Авторизация компонентов системы построена на основе RSA ключей 
+## Авторизация компонентов системы
+
+Авторизация компонентов системы построена на основе RSA ключей
 (планируется переход на более быстрые эллиптические кривые).
 
 Первая аутентификация компонентов системы происходит на основе данных
@@ -1175,11 +1186,11 @@ NOTE over MainThread: Отправка отчета
 
 ```mermaid
 sequenceDiagram
-    NOTE over Robot: генерация RSA ключей
-    Robot ->> Server: public_key, engineer credentials, robot data
-    NOTE over Server: Проверка прав доступа
-    Server ->> DB: Сохранения публичного ключа 
-    Server ->> Robot: Robot id
+NOTE over Robot: генерация RSA ключей
+Robot ->> Server: public_key, engineer credentials, robot data
+NOTE over Server: Проверка прав доступа
+Server ->> DB: Сохранения публичного ключа
+Server ->> Robot: Robot id
 ```
 
 Повторная аутентификация происходит на основе RSA ключей:
@@ -1189,34 +1200,119 @@ sequenceDiagram
     Robot ->> Server: Запрос на авторизацию
     Server ->> Robot: Зашифрованный публичным ключом код
     Robot ->> Server: Расшифрованный код
-    NOTE over Server: Валидация кода
-    NOTE over Server: Генерация случайного токена
-    Server ->> Redis: Сохранения данных новой сессии 
-    Server ->> Robot: Токе доступа 
+NOTE over Server: Валидация кода
+NOTE over Server: Генерация случайного токена
+Server ->> Redis: Сохранения данных новой сессии
+Server ->> Robot: Токе доступа 
 ```
-
 
 Для доступа к требующим авторизациям endpoint\`s используется схема `Bearer` (заголовок `Authorization: Bearer <token>`)
 
-
 # Engineer
-Инженеры - пользователи системы, ответственные за её администрирование. 
+
+Инженеры - пользователи системы, ответственные за её администрирование.
 На данный момент их учетные записи создаются вручную через `DebugConsole` (login + password).
 Авторизация инженеров так же возможна в ряде случаев через RFID карту (задаётся так же через `DebugConsole`).
 
 Инженеры могут иметь различные независимые права доступа:
+
 - `ROBOT_LOGIN`
 - `STORE_LOGIN`
 - `ROBOT_ADMIN`
 
 # DebugConsole
-Данный модуль временно заменяет админ панель. 
+
+Данный модуль временно заменяет админ панель.
 В ней есть функционал для создания и управления пользователями, инженерами, магазинами, роботами и т. д.
-Метод работы максимально прост, все действия выполняются синхронно. 
-Взаимодействие происходит по средствам консоли. 
+Метод работы максимально прост, все действия выполняются синхронно.
+Взаимодействие происходит по средствам консоли.
 
 Структура проекта:
+
 - `main.py` - интерфейс взаимодействия через командную строку
 - `data/` - готовые тестовые наборы данный в формате json
 - `auth` - вспомогательный модуль для работы с ключами
-- `engineer`, `users`, ... - отдельные модули отвечают за отдельные системы 
+- `engineer`, `users`, ... - отдельные модули отвечают за отдельные системы
+
+# Запуск системы
+
+1. Запуск сервера `docker compose up -d --build`
+2. Запуск `DebugConsole`:
+
+```bash
+cd DebugConsole
+poetry install
+poetry shell
+cd src
+python main.py
+```
+
+3. Создание инженера через `DebugConsole`:
+
+```console
+1. Пользователи
+2. Билеты
+3. Информация о городах
+4. Магазины
+5. Инженеры
+6. Загрузка данных для тестирования
+7. Магазины поездов
+Введите номер режима:
+> 5
+1. Добавить инженера
+2. Показать инженеров
+3. Настройка прав
+4. Удалить инженера
+5. Редактировать карту доступа
+> 1
+Login: 
+> Engineer
+Password:
+> EnPass
+200
+{
+  "login": "Engineer",
+  "id": "db0b3a93-a220-408e-a5b3-890a79e1a865"
+}
+```
+
+4. Настройка прав инженера в `DebugConsole`:
+
+```console
+1. Пользователи
+2. Билеты
+3. Информация о городах
+4. Магазины
+5. Инженеры
+6. Загрузка данных для тестирования
+7. Магазины поездов
+Введите номер режима:
+> 5
+1. Добавить инженера
+2. Показать инженеров
+3. Настройка прав
+4. Удалить инженера
+5. Редактировать карту доступа
+> 3
+Engineer ID: 
+> db0b3a93-a220-408e-a5b3-890a79e1a865
+ROBOT_LOGIN [None]:
+> 1
+STORE_LOGIN [None]:
+> 1
+ROBOT_ADMIN [None]:
+> 1
+200
+{
+  "status": "OK"
+}
+```
+
+5. Авторизация компонента системы. При первом запуске потребуется ввести логин и пароль инженера:
+
+```console
+Enter engineer login: 
+> Engineer
+Enter engineer password: 
+> EnPass
+```
