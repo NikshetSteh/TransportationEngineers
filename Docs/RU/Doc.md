@@ -85,7 +85,7 @@ docker-compose up -d --build
 
 Все модули имеют определенный шаблон:
 
-```
+```dirs-tree
 /module_name
 ├── app
 ├──── main.py
@@ -113,6 +113,8 @@ in-project = true # Создавать виртуальное окружение
 
 ## Серверные модули
 
+Как осноной способ взаимодействия используется REST API
+
 - Основной фреймворк - [FastAPI](https://fastapi.tiangolo.com)
 - Реляциональная база данных - [Postgres](https://www.postgresql.org/)
 - Кэш - [Redis](https://redis.io/)
@@ -121,7 +123,7 @@ in-project = true # Создавать виртуальное окружение
 
 Базовая структура:
 
-```
+```dirs-tree
 app
 ├── alembic
 ├── models
@@ -132,7 +134,7 @@ app
 ├──── depencies
 ├── main.py
 ├── alembic.ini
-├── depencies
+├── dependencies
 └── schemes
 ```
 
@@ -260,26 +262,26 @@ classDiagram
     }
 ```
 
-## Endpoints
+## Эндпоинты
 
-### 1. User Management
+### 1. Управление пользователями
 
-#### Add User
+#### Добавить пользователя
 
-**Endpoint:** `POST /admin/user`
+**Эндпоинт:** `POST /admin/user`
 
-**Description:** Adds a new user.
+**Описание:** Добавляет нового пользователя.
 
-**Request Body:**
+**Тело запроса:**
 
 ```json
 {
   "name": "string",
-  "face": "string (optional)"
+  "face": "string (необязательно)"
 }
 ```
 
-**Response:**
+**Ответ:**
 
 ```json
 {
@@ -288,21 +290,21 @@ classDiagram
 }
 ```
 
-**Errors:**
+**Ошибки:**
 
-- `422 Validation Error`
+- `422 Ошибка валидации`
 
-#### Update User Face
+#### Обновить лицо пользователя
 
-**Endpoint:** `PATCH /admin/user/{user_id}/face`
+**Эндпоинт:** `PATCH /admin/user/{user_id}/face`
 
-**Description:** Updates the face data of a user.
+**Описание:** Обновляет данные лица пользователя.
 
-**Parameters:**
+**Параметры:**
 
-- `user_id` (string, required): The ID of the user.
+- `user_id` (строка, обязательно): ID пользователя.
 
-**Request Body:**
+**Тело запроса:**
 
 ```json
 {
@@ -310,7 +312,7 @@ classDiagram
 }
 ```
 
-**Response:**
+**Ответ:**
 
 ```json
 {
@@ -318,21 +320,21 @@ classDiagram
 }
 ```
 
-**Errors:**
+**Ошибки:**
 
-- `422 Validation Error`
+- `422 Ошибка валидации`
 
-#### Delete User Face
+#### Удалить лицо пользователя
 
-**Endpoint:** `DELETE /admin/user/face`
+**Эндпоинт:** `DELETE /admin/user/face`
 
-**Description:** Deletes a user's face data.
+**Описание:** Удаляет данные лица пользователя.
 
-**Parameters:**
+**Параметры:**
 
-- `user_id` (query, required, string): The ID of the user.
+- `user_id` (query, обязательно, строка): ID пользователя.
 
-**Response:**
+**Ответ:**
 
 ```json
 {
@@ -340,22 +342,22 @@ classDiagram
 }
 ```
 
-**Errors:**
+**Ошибки:**
 
-- `422 Validation Error`
+- `422 Ошибка валидации`
 
-#### Get Users
+#### Получить пользователей
 
-**Endpoint:** `GET /admin/users`
+**Эндпоинт:** `GET /admin/users`
 
-**Description:** Retrieves a paginated list of users.
+**Описание:** Получает список пользователей с пагинацией.
 
-**Parameters:**
+**Параметры:**
 
-- `page` (query, optional, integer, default: 1): Page number.
-- `size` (query, optional, integer, default: 50, max: 100): Page size.
+- `page` (query, необязательно, целое число, по умолчанию: 1): Номер страницы.
+- `size` (query, необязательно, целое число, по умолчанию: 50, макс: 100): Размер страницы.
 
-**Response:**
+**Ответ:**
 
 ```json
 {
@@ -371,21 +373,21 @@ classDiagram
 }
 ```
 
-**Errors:**
+**Ошибки:**
 
-- `422 Validation Error`
+- `422 Ошибка валидации`
 
-#### Delete User
+#### Удалить пользователя
 
-**Endpoint:** `DELETE /admin/users/{user_id}`
+**Эндпоинт:** `DELETE /admin/users/{user_id}`
 
-**Description:** Deletes a specific user.
+**Описание:** Удаляет конкретного пользователя.
 
-**Parameters:**
+**Параметры:**
 
-- `user_id` (path, required, string): The ID of the user.
+- `user_id` (path, обязательно, строка): ID пользователя.
 
-**Response:**
+**Ответ:**
 
 ```json
 {
@@ -393,19 +395,19 @@ classDiagram
 }
 ```
 
-**Errors:**
+**Ошибки:**
 
-- `422 Validation Error`
+- `422 Ошибка валидации`
 
-### 2. Engineer Management
+### 2. Управление инженерами
 
-#### Create Engineer
+#### Создать инженера
 
-**Endpoint:** `POST /admin/engineer`
+**Эндпоинт:** `POST /admin/engineer`
 
-**Description:** Creates a new engineer.
+**Описание:** Создает нового инженера.
 
-**Request Body:**
+**Тело запроса:**
 
 ```json
 {
@@ -414,7 +416,7 @@ classDiagram
 }
 ```
 
-**Response:**
+**Ответ:**
 
 ```json
 {
@@ -423,21 +425,21 @@ classDiagram
 }
 ```
 
-**Errors:**
+**Ошибки:**
 
-- `422 Validation Error`
+- `422 Ошибка валидации`
 
-#### Delete Engineer
+#### Удалить инженера
 
-**Endpoint:** `DELETE /admin/engineers/{engineer_id}`
+**Эндпоинт:** `DELETE /admin/engineers/{engineer_id}`
 
-**Description:** Deletes an engineer.
+**Описание:** Удаляет инженера.
 
-**Parameters:**
+**Параметры:**
 
-- `engineer_id` (path, required, string): The ID of the engineer.
+- `engineer_id` (path, обязательно, строка): ID инженера.
 
-**Response:**
+**Ответ:**
 
 ```json
 {
@@ -445,22 +447,22 @@ classDiagram
 }
 ```
 
-**Errors:**
+**Ошибки:**
 
-- `422 Validation Error`
+- `422 Ошибка валидации`
 
-#### Get Engineers
+#### Получить инженеров
 
-**Endpoint:** `GET /admin/engineers`
+**Эндпоинт:** `GET /admin/engineers`
 
-**Description:** Retrieves a paginated list of engineers.
+**Описание:** Получает список инженеров с пагинацией.
 
-**Parameters:**
+**Параметры:**
 
-- `page` (query, optional, integer, default: 1): Page number.
-- `size` (query, optional, integer, default: 50, max: 100): Page size.
+- `page` (query, необязательно, целое число, по умолчанию: 1): Номер страницы.
+- `size` (query, необязательно, целое число, по умолчанию: 50, макс: 100): Размер страницы.
 
-**Response:**
+**Ответ:**
 
 ```json
 {
@@ -476,17 +478,17 @@ classDiagram
 }
 ```
 
-**Errors:**
+**Ошибки:**
 
-- `422 Validation Error`
+- `422 Ошибка валидации`
 
-#### Update Engineer Privileges
+#### Обновить привилегии инженера
 
-**Endpoint:** `PUT /admin/engineer_privileges`
+**Эндпоинт:** `PUT /admin/engineer_privileges`
 
-**Description:** Updates the privileges of an engineer.
+**Описание:** Обновляет привилегии инженера.
 
-**Request Body:**
+**Тело запроса:**
 
 ```json
 {
@@ -498,7 +500,7 @@ classDiagram
 }
 ```
 
-**Response:**
+**Ответ:**
 
 ```json
 {
@@ -506,23 +508,23 @@ classDiagram
 }
 ```
 
-**Errors:**
+**Ошибки:**
 
-- `422 Validation Error`
+- `422 Ошибка валидации`
 
-### 3. Store Management
+### 3. Управление магазинами
 
-#### Add Store to Training
+#### Добавить магазин в обучение
 
-**Endpoint:** `POST /admin/store/{store_id}/train`
+**Эндпоинт:** `POST /admin/store/{store_id}/train`
 
-**Description:** Adds a store to training data.
+**Описание:** Добавляет магазин в обучающие данные.
 
-**Parameters:**
+**Параметры:**
 
-- `store_id` (path, required, string): The ID of the store.
+- `store_id` (path, обязательно, строка): ID магазина.
 
-**Request Body:**
+**Тело запроса:**
 
 ```json
 {
@@ -531,7 +533,7 @@ classDiagram
 }
 ```
 
-**Response:**
+**Ответ:**
 
 ```json
 {
@@ -539,21 +541,21 @@ classDiagram
 }
 ```
 
-**Errors:**
+**Ошибки:**
 
-- `422 Validation Error`
+- `422 Ошибка валидации`
 
-#### Remove Store from Training
+#### Удалить магазин из обучения
 
-**Endpoint:** `DELETE /admin/store/{store_id}/train/unbind`
+**Эндпоинт:** `DELETE /admin/store/{store_id}/train/unbind`
 
-**Description:** Removes a store from training data.
+**Описание:** Удаляет магазин из обучающих данных.
 
-**Parameters:**
+**Параметры:**
 
-- `store_id` (path, required, string): The ID of the store.
+- `store_id` (path, обязательно, строка): ID магазина.
 
-**Request Body:**
+**Тело запроса:**
 
 ```json
 {
@@ -562,7 +564,7 @@ classDiagram
 }
 ```
 
-**Response:**
+**Ответ:**
 
 ```json
 {
@@ -570,19 +572,19 @@ classDiagram
 }
 ```
 
-**Errors:**
+**Ошибки:**
 
-- `422 Validation Error`
+- `422 Ошибка валидации`
 
-### 4. Ticket Management
+### 4. Управление билетами
 
-#### Create Ticket
+#### Создать билет
 
-**Endpoint:** `POST /admin/ticket`
+**Эндпоинт:** `POST /admin/ticket`
 
-**Description:** Creates a new ticket.
+**Описание:** Создает новый билет.
 
-**Request Body:**
+**Тело запроса:**
 
 ```json
 {
@@ -597,7 +599,7 @@ classDiagram
 }
 ```
 
-**Response:**
+**Ответ:**
 
 ```json
 {
@@ -609,31 +611,9 @@ classDiagram
 }
 ```
 
-**Errors:**
+**Ошибки:**
 
-- `422 Validation Error`
-
-#### Delete Ticket
-
-**Endpoint:** `DELETE /admin/ticket/{ticket_id}`
-
-**Description:** Deletes a ticket.
-
-**Parameters:**
-
-- `ticket_id` (path, required, string): The ID of the ticket.
-
-**Response:**
-
-```json
-{
-  "status": "OK"
-}
-```
-
-**Errors:**
-
-- `422 Validation Error`
+- `422 Ошибка валидации`
 
 # Store Server
 
@@ -651,11 +631,11 @@ classDiagram
 ## База данных
 
 ```mermaid
----
-config:
-    flowchart:
-        defaultRenderer: elk
----
+%%---
+%%config:
+%%    flowchart:
+%%        defaultRenderer: elk
+%%---
 classDiagram
     direction BT
     class alembic_version {
@@ -710,17 +690,17 @@ classDiagram
     tasks --> stores: store_id id
 ```
 
-## Endpoints
+## Эндпоинты
 
-### 1. Store Management
+### 1. Управление магазинами
 
-#### Create Store
+#### Создание магазина
 
-**Endpoint:** `POST /admin/store`
+**Конечная точка:** `POST /admin/store`
 
-**Description:** Creates a new store.
+**Описание:** Создает новый магазин.
 
-**Request Body:**
+**Тело запроса:**
 
 ```json
 {
@@ -731,7 +711,7 @@ classDiagram
 }
 ```
 
-**Response:**
+**Ответ:**
 
 ```json
 {
@@ -743,22 +723,22 @@ classDiagram
 }
 ```
 
-**Errors:**
+**Ошибки:**
 
-- `422 Validation Error`
+- `422 Ошибка валидации`
 
-#### Get Stores
+#### Получение списка магазинов
 
-**Endpoint:** `GET /admin/stores`
+**Конечная точка:** `GET /admin/stores`
 
-**Description:** Retrieves a list of stores.
+**Описание:** Получает список магазинов.
 
-**Query Parameters:**
+**Параметры запроса:**
 
-- `page` (integer, default: 1) - Page number
-- `size` (integer, default: 50, max: 100) - Number of results per page
+- `page` (integer, по умолчанию: 1) - Номер страницы
+- `size` (integer, по умолчанию: 50, макс: 100) - Количество результатов на странице
 
-**Response:**
+**Ответ:**
 
 ```json
 {
@@ -777,21 +757,21 @@ classDiagram
 }
 ```
 
-**Errors:**
+**Ошибки:**
 
-- `422 Validation Error`
+- `422 Ошибка валидации`
 
-#### Get Store
+#### Получение информации о магазине
 
-**Endpoint:** `GET /admin/store/{store_id}`
+**Конечная точка:** `GET /admin/store/{store_id}`
 
-**Description:** Retrieves details of a specific store.
+**Описание:** Получает детали конкретного магазина.
 
-**Path Parameters:**
+**Параметры пути:**
 
-- `store_id` (string) - Unique identifier of the store
+- `store_id` (string) - Уникальный идентификатор магазина
 
-**Response:**
+**Ответ:**
 
 ```json
 {
@@ -803,21 +783,21 @@ classDiagram
 }
 ```
 
-**Errors:**
+**Ошибки:**
 
-- `422 Validation Error`
+- `422 Ошибка валидации`
 
-#### Delete Store
+#### Удаление магазина
 
-**Endpoint:** `DELETE /admin/store/{store_id}`
+**Конечная точка:** `DELETE /admin/store/{store_id}`
 
-**Description:** Deletes a store.
+**Описание:** Удаляет магазин.
 
-**Path Parameters:**
+**Параметры пути:**
 
-- `store_id` (string) - Unique identifier of the store
+- `store_id` (string) - Уникальный идентификатор магазина
 
-**Response:**
+**Ответ:**
 
 ```json
 {
@@ -825,24 +805,24 @@ classDiagram
 }
 ```
 
-**Errors:**
+**Ошибки:**
 
-- `422 Validation Error`
+- `422 Ошибка валидации`
 
-### 2. Store Items Management
+### 2. Управление товарами
 
-#### Get Items
+#### Получение списка товаров
 
-**Endpoint:** `GET /store/items`
+**Конечная точка:** `GET /store/items`
 
-**Description:** Retrieves a list of store items.
+**Описание:** Получает список товаров в магазине.
 
-**Query Parameters:**
+**Параметры запроса:**
 
-- `page` (integer, default: 1) - Page number
-- `size` (integer, default: 50, max: 100) - Number of results per page
+- `page` (integer, по умолчанию: 1) - Номер страницы
+- `size` (integer, по умолчанию: 50, макс: 100) - Количество результатов на странице
 
-**Response:**
+**Ответ:**
 
 ```json
 {
@@ -860,52 +840,21 @@ classDiagram
 }
 ```
 
-**Errors:**
+**Ошибки:**
 
-- `422 Validation Error`
+- `422 Ошибка валидации`
 
-#### Get Item
+#### Получение информации о товаре
 
-**Endpoint:** `GET /store/item/{item_id}`
+**Конечная точка:** `GET /store/item/{item_id}`
 
-**Description:** Retrieves details of a specific item.
+**Описание:** Получает детали конкретного товара.
 
-**Path Parameters:**
+**Параметры пути:**
 
-- `item_id` (string) - Unique identifier of the item
+- `item_id` (string) - Уникальный идентификатор товара
 
-**Response:**
-
-```json
-{
-  "id": "string",
-  "name": "string",
-  "description": "string",
-  "price_penny": 1000
-}
-```
-
-**Errors:**
-
-- `422 Validation Error`
-
-#### Add Item
-
-**Endpoint:** `POST /store/item`
-
-**Description:** Adds a new item to the store.
-
-**Request Body:**
-
-```json
-{
-  "name": "string",
-  "description": "string",
-  "price_penny": 1000
-}
-```
-
-**Response:**
+**Ответ:**
 
 ```json
 {
@@ -916,17 +865,27 @@ classDiagram
 }
 ```
 
-**Errors:**
+**Ошибки:**
 
-- `422 Validation Error`
+- `422 Ошибка валидации`
 
-### Update Item
+#### Добавление товара
 
-**Endpoint:** `PUT /store/item`
+**Конечная точка:** `POST /store/item`
 
-**Description:** Updates an existing item.
+**Описание:** Добавляет новый товар в магазин.
 
-**Request Body:**
+**Тело запроса:**
+
+```json
+{
+  "name": "string",
+  "description": "string",
+  "price_penny": 1000
+}
+```
+
+**Ответ:**
 
 ```json
 {
@@ -937,7 +896,17 @@ classDiagram
 }
 ```
 
-**Response:**
+**Ошибки:**
+
+- `422 Ошибка валидации`
+
+### Обновление товара
+
+**Конечная точка:** `PUT /store/item`
+
+**Описание:** Обновляет существующий товар.
+
+**Тело запроса:**
 
 ```json
 {
@@ -948,21 +917,32 @@ classDiagram
 }
 ```
 
-**Errors:**
+**Ответ:**
 
-- `422 Validation Error`
+```json
+{
+  "id": "string",
+  "name": "string",
+  "description": "string",
+  "price_penny": 1000
+}
+```
 
-#### Remove Item
+**Ошибки:**
 
-**Endpoint:** `DELETE /store/item/{item_id}`
+- `422 Ошибка валидации`
 
-**Description:** Removes an item from the store.
+#### Удаление товара
 
-**Path Parameters:**
+**Конечная точка:** `DELETE /store/item/{item_id}`
 
-- `item_id` (string) - Unique identifier of the item
+**Описание:** Удаляет товар из магазина.
 
-**Response:**
+**Параметры пути:**
+
+- `item_id` (string) - Уникальный идентификатор товара
+
+**Ответ:**
 
 ```json
 {
@@ -970,19 +950,19 @@ classDiagram
 }
 ```
 
-**Errors:**
+**Ошибки:**
 
-- `422 Validation Error`
+- `422 Ошибка валидации`
 
-### 3. Purchase Management
+### 3. Управление покупками
 
-#### Make Purchase
+#### Совершение покупки
 
-**Endpoint:** `POST /store/purchase`
+**Конечная точка:** `POST /store/purchase`
 
-**Description:** Creates a new purchase.
+**Описание:** Создает новую покупку.
 
-**Request Body:**
+**Тело запроса:**
 
 ```json
 {
@@ -997,7 +977,7 @@ classDiagram
 }
 ```
 
-**Response:**
+**Ответ:**
 
 ```json
 {
@@ -1014,9 +994,9 @@ classDiagram
 }
 ```
 
-**Errors:**
+**Ошибки:**
 
-- `422 Validation Error`
+- `422 Ошибка валидации`
 
 # Robot
 
@@ -1091,6 +1071,8 @@ async def async_input(
 В базе данных хранится ключ карты (на данный момент установка осуществляется через
 `DebugConsole`: `5. Инженеры/5. Редактировать карту доступа`).
 Так же администрирование робота используется как отдельная привилегия (`ROBOT_ADMIN`).
+
+# Алгоритмы работы системы
 
 ## Распознавание девиантного поведения
 
@@ -1174,7 +1156,10 @@ NOTE over MainThread: Отправка отчета
 так же восстановлены веса pre-trained модели (были удалены авторам, из-за чего сейчас оригинальный пакет не работает).
 Обновленная версия представлена на [GitHub](https://github.com/NikshetSteh/Data-efficient-video-transformer)
 
-# Алгоритмы работы системы
+Сложность: данный "алгоритм" не имеет определенного масштабирования, то есть входные данные имеют постоянную размерность,
+не меняются, а значит нельзя и оценить сложность алгоритма. 
+Если все же рассматривать сложность относительное количества роботов, то она будет линейная (`O(n)`), так как обработка 
+данных с каждого робота независима и соответственно выполняется за константное время[*](#Сложность-алгоритмов)
 
 ## Авторизация компонентов системы
 
@@ -1207,6 +1192,10 @@ Server ->> Robot: Токе доступа
 ```
 
 Для доступа к требующим авторизациям endpoint\`s используется схема `Bearer` (заголовок `Authorization: Bearer <token>`)
+
+Сложность: если рассматривать алгоритм авторизации со стороны сервера и взять на входные данные запросы на авторизацию,
+то тогда сложность относительно количества запросов будет линейная (`O(n)`), так как обработка каждого запроса 
+происходит независимо и за константное время[*](#complexity)
 
 # Engineer
 
@@ -1316,3 +1305,77 @@ Enter engineer login:
 Enter engineer password: 
 > EnPass
 ```
+
+# Обобщение
+
+## Используемые технологии
+
+- Основной язык программирования - Python 3.12
+- Контроль версий - [Git](https://git-scm.com/)
+- Конфигурации системы - pydantic-settings
+- Миграции базы данных - alembic
+- Работа с базой данных - sqlalchemy
+- Драйвер подключения к базе данных - asyncpg
+- Построение API - fastapi + pydantic
+- Работа с Redis - redis
+- Интерфейс - PySide + qasync
+- Бекенд для моделей - pytorch
+- Распознавание лиц - insightface
+- Работа с камерой и QR кодами - OpenCV
+- Драйвер базы данных для alembic - psycopg2
+- Асинхронное взаимодействие с низкоуровневым железом - pyserial-asyncio
+- Менеджер пакетов - [poetry](https://python-poetry.org/)
+- Контейнеризация и оркестрация - Docker и Docker Compose
+
+Список всех используемых сторонних библиотек с ссылками на них:
+
+- [PySide](https://pypi.org/project/PySide6/)
+- [FastAPI](https://pypi.org/project/fastapi/)
+- [bcrypt](https://pypi.org/project/bcrypt/)
+- [pydantic-settings](https://pypi.org/project/pydantic-settings/)
+- [fastapi-pagination](https://pypi.org/project/fastapi-pagination/)
+- [insightface](https://pypi.org/project/insightface/)
+- [chromadb](https://pypi.org/project/chromadb/)
+- [asyncpg](https://pypi.org/project/asyncpg/)
+- [asyncpg](https://pypi.org/project/asyncpg/)
+- [redis](https://pypi.org/project/redis/)
+- [cryptography](https://pypi.org/project/cryptography/)
+- [aiohttp](https://pypi.org/project/aiohttp/)
+- [alembic](https://pypi.org/project/alembic/)
+- [uvicorn](https://pypi.org/project/uvicorn/)
+- [psycopg2-binary](https://pypi.org/project/psycopg2-binary/)
+- [isort](https://pypi.org/project/isort/)
+- [qasync](https://pypi.org/project/qasync/)
+- [opencv-python](https://pypi.org/project/opencv-python/)
+- menovideo [оригинал](https://pypi.org/project/menovideo) и
+  [исправленная нами версия](https://github.com/NikshetSteh/Data-efficient-video-transformer.git)
+- [timm](https://pypi.org/project/timm/)
+- [scikit-image](https://pypi.org/project/scikit-image/)
+- [numpy](https://pypi.org/project/numpy/)
+- [pyserial-asyncio](https://pypi.org/project/pyserial-asyncio/)
+- [shiboken6](https://pypi.org/project/shiboken6/)
+- [jinja2](https://pypi.org/project/jinja2/)
+- [insightface](https://pypi.org/project/insightface/)
+- [chromadb](https://pypi.org/project/chromadb/)
+- [requests](https://pypi.org/project/requests/)
+
+### Нейронные сети
+
+#### [InsightFace](https://github.com/deepinsight/insightface)
+
+На вход модели поступает изображение произвольного размера, далее
+во внутреннем алгоритме оно приводится к размеру `640*640*3`.
+На выходе модели есть несколько параметров, включающих BBOXs для каждого
+обнаруженного лица, а так же эмбеддинги (размерность `512`) для них.
+
+# Исходный код
+
+Весь код, модели, схемы и исходники самой этой технической документации
+(в формате markdown и схемы в формате mermaid)
+представлены на [github](https://github.com/NikshetSteh/TransportationEngineers/)  
+https://github.com/NikshetSteh/TransportationEngineers/
+
+# Ремарки 
+## Сложность алгоритмов
+*оценивать сложность данных алгоритмов не совсем корректно, так как оценка сложность в большой степени относятся к 
+алгоритма обработки данных не постоянной размерности, а в данном случае речь идет об системах взаимодействия (API)

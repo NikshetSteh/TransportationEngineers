@@ -9,12 +9,13 @@ import subprocess
 import sys
 
 import panflute as pf
-import requests
 from pygments import highlight
 from pygments.formatters.svg import SvgFormatter
 from pygments.lexers.python import PythonLexer
 
 dirname_of_included_mdfile = ""
+
+USE_PDF = False
 
 MERMAID_BIN = shutil.which("mmdc.cmd")
 if MERMAID_BIN is None:
@@ -84,7 +85,7 @@ def process_codeblock_include(elem, _):
     """
 
     if isinstance(elem, pf.CodeBlock) and 'codeblock-include' in elem.classes:
-        concatinated_file_content = ''
+        concatenated_file_content = ''
 
         # Within the codeblock the files are listed. We extract them
         file_names = elem.text.splitlines()
@@ -92,11 +93,11 @@ def process_codeblock_include(elem, _):
             if not file_name.startswith('#'):
                 try:
                     file_content = open(file_name, "r", encoding="utf-8")
-                    concatinated_file_content = concatinated_file_content + file_content.read()
+                    concatenated_file_content = concatenated_file_content + file_content.read()
                 except:
                     pf.debug('Error in reading ' + str(file_name) + '\n')
 
-        elem.text = concatinated_file_content
+        elem.text = concatenated_file_content
     pass
 
 
@@ -287,30 +288,67 @@ def convert_svg_to_png(input_svg, output_png, dpi=300):
         pf.debug(f"Error converting file: {e}")
 
 
-def convert_code_to_image_pygments(code, output_path, dpi=1200):
+def convert_code_to_image_pygments(code, output_path, lexer: type = PythonLexer, font: str = "Aptos"):
     """Converts Python code to an SVG using Pygments and then converts it to PNG."""
-    svg_path = output_path.replace(".png", ".svg")
-    formatter = SvgFormatter(fontfamily="Aptos")
-    svg_data = highlight(code, PythonLexer(), formatter)
+    if not USE_PDF:
+        svg_path = output_path.replace(".png", ".svg")
+    else:
+        svg_path = output_path
+
+    formatter = SvgFormatter(fontfamily=font)
+    svg_data = highlight(code, lexer(), formatter)
 
     with open(svg_path, "w", encoding="utf-8") as f:
         f.write(svg_data)
 
-    convert_svg_to_png(svg_path, output_path, dpi)
+    if not USE_PDF:
+        convert_svg_to_png(svg_path, output_path)
+
+    pf.debug("Created image: " + output_path)
 
 
-def process_codeblocks(elem, doc):
+def process_codeblocks_python(elem, _):
     """Processes code blocks and converts them to images if enabled."""
-    if isinstance(elem, pf.CodeBlock) and 'python' in elem.classes:
+    if isinstance(elem, pf.CodeBlock) and ('python' in elem.classes or 'console' in elem.classes) and not USE_PDF:
         filename = get_filename4code("code", elem.text, "png")
 
-        convert_code_to_image_pygments(elem.text, filename)
+        convert_code_to_image_pygments(elem.text, filename, PythonLexer)
 
         return pf.Para(pf.Image(url=filename))
 
 
+def process_codeblocks_dirs(elem, _):
+    """Processes code blocks and converts them to images if enabled."""
+    if isinstance(elem, pf.CodeBlock) and 'dirs-tree' in elem.classes and not USE_PDF:
+        filename = get_filename4code("code", elem.text, "png")
+
+        convert_code_to_image_pygments(elem.text, filename, font="Fira Code")
+
+        return pf.Para(pf.Image(url=filename))
+    pass
+
+
+def process_headers(elem, doc):
+    """Center H1 headers in PDF output."""
+    if isinstance(elem, pf.Header) and elem.level == 1 and doc.format == "latex":
+        return pf.RawBlock(
+            f"\\begin{{center}} \\fontsize{{18}}{{32}}\\selectfont \\textbf{{{pf.stringify(elem)}}} \\end{{center}}",
+            format="latex"
+        )
+
+
 def main(doc=None):
-    return pf.run_filters([process_md_include, process_codeblock_include, process_mermaid, process_codeblocks], doc=doc)
+    return pf.run_filters(
+        [
+            process_md_include,
+            process_codeblock_include,
+            process_mermaid,
+            process_codeblocks_python,
+            process_codeblocks_dirs,
+            process_headers
+        ],
+        doc=doc
+    )
 
 
 if __name__ == '__main__':
