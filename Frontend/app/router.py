@@ -8,7 +8,7 @@ from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 
 from config import get_config
-from service import get_token, get_user_data
+from service import get_token, get_user_data, AuthRequired
 
 config = get_config()
 
@@ -52,8 +52,6 @@ async def auth(request: Request, code: str = None) -> RedirectResponse:
                     str(request.url_for("auth"))
                 )
             except Exception as e:
-                print(e)
-                print(e.with_traceback(None))
                 return RedirectResponse(
                     url=config.auth_redirect_uri + "?" + urllib.urlencode({
                         "response_type": "code",
@@ -104,8 +102,6 @@ async def refresh(request: Request) -> RedirectResponse:
             str(request.url_for("auth"))
         )
     except Exception as e:
-        print(e)
-        print(e.with_traceback(None))
         return RedirectResponse(
             url=config.auth_redirect_uri + "?" + urllib.urlencode({
                 "response_type": "code",
@@ -123,7 +119,40 @@ async def refresh(request: Request) -> RedirectResponse:
 
 
 @router.get("/profile")
-async def profile(request: Request) -> HTMLResponse:
+async def profile(
+        request: Request,
+        _: AuthRequired
+) -> HTMLResponse:
     return templates.TemplateResponse(
         request=request, name="profile.html", context={"authed": "access_token" in request.cookies}
+    )
+
+
+@router.get("/ticket")
+async def ticket(
+        request: Request,
+        _: AuthRequired
+) -> HTMLResponse:
+    return templates.TemplateResponse(
+        request=request, name="ticket.html", context={"authed": "access_token" in request.cookies}
+    )
+
+
+@router.post("/ticket-ready")
+async def ticket_ready(
+        request: Request,
+        _: AuthRequired
+) -> HTMLResponse:
+    return templates.TemplateResponse(
+        request=request, name="ready-ticket.html", context={"authed": "access_token" in request.cookies}
+    )
+
+
+@router.get("/bio")
+async def bio(
+        request: Request,
+        _: AuthRequired
+) -> HTMLResponse:
+    return templates.TemplateResponse(
+        request=request, name="bio.html", context={"authed": "access_token" in request.cookies}
     )

@@ -1,6 +1,10 @@
+from typing import Literal, Annotated
+
 import aiohttp
+from fastapi import Request, HTTPException, Depends
+
 from config import get_config
-from typing import Literal
+from exceptions import UnauthorizedException
 
 config = get_config()
 
@@ -45,4 +49,39 @@ async def get_user_data(
                     "Authorization": f"Bearer {access_token}"
                 }
         ) as response:
+            if response.status != 200:
+                raise HTTPException(status_code=401, detail="Not authenticated")
             return await response.json()
+
+
+async def validate_token(
+        access_token: str,
+) -> None | dict:
+    async with aiohttp.ClientSession() as session:
+        async with session.post(
+                config.user_info_uri,
+                headers={
+                    "Authorization": f"Bearer {access_token}"
+                },
+        ) as response:
+            if response.status != 200:
+                raise UnauthorizedException()
+
+            return await response.json()
+
+
+async def auth_required(
+        request: Request
+) -> dict:
+    if request.cookies.get("access_token") is None:
+        raise UnauthorizedException()
+
+    user_data = await validate_token(
+        request.cookies.get("access_token")
+    )
+
+    return user_data
+
+
+
+AuthRequired = Annotated[dict, Depends(auth_required)]
