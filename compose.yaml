@@ -101,7 +101,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - auth_redirect_uri=http://nginx/keycloak/realms/ai_site/protocol/openid-connect/auth
+      - auth_redirect_uri=http://localhost:8080/keycloak/realms/ai_site/protocol/openid-connect/auth
       - auth_token_uri=http://nginx/keycloak/realms/ai_site/protocol/openid-connect/token
       - user_info_uri=http://nginx/keycloak/realms/ai_site/protocol/openid-connect/userinfo
 volumes:
