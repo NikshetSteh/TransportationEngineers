@@ -1,4 +1,11 @@
 {% extends 'template.html' %}
+
+{% block head %}
+
+<script src="/site/static/auth.js"></script>
+
+{% endblock %}
+
 {% block content %}
 
 <style>
@@ -23,29 +30,7 @@
         <button onclick="window.location.href='/ticket'">Купить билет</button>
         <button onclick="window.location.href='/bio'">Загрузить биометрию</button>
     </div>
-
-
-    <!--    <div class="authorized" style="display: none">-->
-    <!--        <p>Ваш вагон: <b id="wagon_number">13</b></p>-->
-    <!--        <p>Ваше место: <b id="seat_number">13</b></p>-->
-    <!--    </div>-->
-
-    <!--    <div class="authorized" style="display: none">-->
-    <!--        <h3>Магазин</h3>-->
-    <!--        <p>Воспользуйтесь нашим магазином с доставкой до вашего места</p>-->
-    <!--        <div class="container-center">-->
-    <!--            <button class="small-button">Магазин</button>-->
-    <!--        </div>-->
-    <!--    </div>-->
-
-    <!--    <div class="authorized" style="display: none">-->
-    <!--        <h3>Информация</h3>-->
-    <!--        <p>Запланируй свое путешествие или узнай о новых достопримечательностях</p>-->
-    <!--        <div class="container-center">-->
-    <!--            <button class="small-button">Информация</button>-->
-    <!--        </div>-->
-    <!--    </div>-->
 </div>
 
-<script src="/static/profile.js"></script>
+<script src="/site/static/profile.js"></script>
 {% endblock %}

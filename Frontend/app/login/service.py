@@ -2,6 +2,7 @@ from typing import Literal, Annotated
 
 import aiohttp
 from fastapi import Request, HTTPException, Depends
+from fastapi.responses import RedirectResponse
 
 from config import get_config
 from exceptions import UnauthorizedException
@@ -16,16 +17,16 @@ async def get_token(
 ) -> tuple[str, int, str, int]:
     async with aiohttp.ClientSession() as session:
         async with session.post(
-                config.auth_token_uri,
+                config.AUTH_TOKEN_URI,
                 data={
-                    "client_id": config.client_id,
-                    "client_secret": config.client_secret,
+                    "client_id": config.CLIENT_ID,
+                    "client_secret": config.CLIENT_SECRET,
                     "grant_type": "authorization_code",
                     "code": data,
                     "redirect_uri": redirect_uri
                 } if grant_type == "authorization_code" else {
-                    "client_id": config.client_id,
-                    "client_secret": config.client_secret,
+                    "client_id": config.CLIENT_ID,
+                    "client_secret": config.CLIENT_SECRET,
                     "grant_type": "refresh_token",
                     "refresh_token": data,
                     "redirect_uri": redirect_uri
@@ -44,7 +45,7 @@ async def get_user_data(
 ) -> dict:
     async with aiohttp.ClientSession() as session:
         async with session.post(
-                config.user_info_uri,
+                config.USER_INFO_URI,
                 headers={
                     "Authorization": f"Bearer {access_token}"
                 }
@@ -59,7 +60,7 @@ async def validate_token(
 ) -> None | dict:
     async with aiohttp.ClientSession() as session:
         async with session.post(
-                config.user_info_uri,
+                config.USER_INFO_URI,
                 headers={
                     "Authorization": f"Bearer {access_token}"
                 },
@@ -82,6 +83,9 @@ async def auth_required(
 
     return user_data
 
+
+async def auth_exception_handler(request: Request, exc: UnauthorizedException) -> RedirectResponse:
+    return RedirectResponse("/login?redirect=" + request.url.path)
 
 
 AuthRequired = Annotated[dict, Depends(auth_required)]

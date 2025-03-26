@@ -4,6 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["NikshetSteh <88205797+NikshetSteh@users.noreply.github.com>"]
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.12"

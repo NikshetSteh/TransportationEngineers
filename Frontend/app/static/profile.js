@@ -12,7 +12,7 @@ function getCookie(name) {
 const accessToken = getCookie("access_token");
 
 if (accessToken) {
-    fetch("http://localhost:8080/base_api/v1/frontend/get_ticket", {
+    fetch(window.ROBOT_API + "/frontend/get_ticket", {
         method: "GET",
         headers: {
             "Authorization": `Bearer ${accessToken}`,
@@ -44,31 +44,24 @@ if (accessToken) {
     console.error("Access token not found in cookies.");
 }
 
-function decodeBase64Unicode(encodedStr) {
-    try {
-        // Decode base64 and handle Unicode characters
-        return decodeURIComponent(
-            Array.from(atob(encodedStr))
-                .map(c => `%${c.charCodeAt(0).toString(16).padStart(2, '0')}`)
-                .join("")
-        );
-    } catch (e) {
-        console.error("Failed to decode base64 string with Unicode:", e);
-        return null;
-    }
-}
 
-const encodedUsername = getCookie("given_name");
-if (encodedUsername) {
-    const username = decodeBase64Unicode(encodedUsername);
-    if (username) {
-        document.getElementById("name").textContent = `Здравствуйте, ${username}!`;
-    } else {
-        console.error("Failed to decode username.");
-    }
-} else {
-    console.error("Username cookie not found.");
-}
+fetch("/api/v1/users", {
+    method: "GET",
+    headers: {
+        "Content-Type": "application/json",
+    },
+})
+    .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
 
-
-
+            return response.json();
+        }
+    )
+    .then(data => {
+        document.getElementById("name").textContent = `Здравствуйте, ${data.username}!`;
+    })
+    .catch(error => {
+        console.error("Error:", error);
+    });

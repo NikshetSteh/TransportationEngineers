@@ -23,6 +23,9 @@ class Config(BaseSettings):
 
     KEYCLOAK_INTROSPECTIVE_ENDPOINT: str = "http://localhost:8090/realms/ai_site/protocol/openid-connect/userinfo"
 
+    KEYCLOAK_WEBHOOK_LOGIN: str = "admin"
+    KEYCLOAK_WEBHOOK_PASSWORD: str = "password"
+
     CLIENT_ID: str = "ai_server"
     CLIENT_SECRET: str = "cJWeTBL6EdanuIuwp37k2toHx4ghsrKA"
 

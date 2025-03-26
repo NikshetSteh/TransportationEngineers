@@ -21,10 +21,9 @@ async def k_id_to_user_id(
         return user[0].user_id
 
 
-
 async def get_user_last_ticket(
-    k_user_id: str,
-    db: sessionmaker[AsyncSession]
+        k_user_id: str,
+        db: sessionmaker[AsyncSession]
 ) -> Ticket | None:
     user_id = await k_id_to_user_id(k_user_id, db)
 

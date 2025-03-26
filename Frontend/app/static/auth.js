@@ -1,8 +1,3 @@
-window.ROBOT_API = "http://127.0.0.1:8080/base_api/v1";
-
-
-
-// Function to get a specific cookie value by name
 function getCookie(name) {
     const cookieArr = document.cookie.split(";"); // Split cookies into an array
     for (let cookie of cookieArr) {
@@ -11,10 +6,9 @@ function getCookie(name) {
             return cookie.substring((name + "=").length);
         }
     }
-    return null; // Return null if the cookie is not found
+    return null;
 }
 
-// Function to request a new access token
 async function refreshAccessToken() {
     try {
         const response = await fetch("/api/refresh", {

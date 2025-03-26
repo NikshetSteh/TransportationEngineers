@@ -43,6 +43,7 @@ services:
       - ./DebugData/static:/app/static
     ports:
       - "8080:80"
+      - "80:80"
     depends_on:
       store_server:
         condition: service_started
@@ -88,8 +89,12 @@ services:
       KC_BOOTSTRAP_ADMIN_USERNAME: TheRealAdmin
       KC_BOOTSTRAP_ADMIN_PASSWORD: TheR@alAdmin)
       KC_HTTP_RELATIVE_PATH: /keycloak
+      WEBHOOK_HTTP_BASE_PATH: "http://base_server:8000/base_api/v1/frontend/keycloak_listener"
+      WEBHOOK_HTTP_AUTH_USERNAME: "admin"
+      WEBHOOK_HTTP_AUTH_PASSWORD: "password"
     volumes:
       - ./keycloak_realm.json:/opt/keycloak/data/import/main_realm.json
+      - ./KeycloakPlugins:/opt/keycloak/providers:ro
     command:
       - start-dev
       - --import-realm

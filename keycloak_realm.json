@@ -525,7 +525,7 @@
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
     "secret" : "7mbHVQGTLUKSNXrNYowg26SMCKv1YeLe",
-    "redirectUris" : [ "http://localhost:8000/login" ],
+    "redirectUris" : [ "http://localhost:8000/login", "http://localhost/login" ],
     "webOrigins" : [ "/*" ],
     "notBefore" : 0,
     "bearerOnly" : false,
@@ -1447,7 +1447,10 @@
   },
   "smtpServer" : { },
   "eventsEnabled" : false,
-  "eventsListeners" : [ "jboss-logging" ],
+  "eventsListeners" : [ 
+      "jboss-logging",
+      "webhook-http"
+  ],
   "enabledEventTypes" : [ ],
   "adminEventsEnabled" : false,
   "adminEventsDetailsEnabled" : false,

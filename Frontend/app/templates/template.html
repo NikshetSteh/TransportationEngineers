@@ -5,29 +5,34 @@
 
     <meta charset="UTF-8">
 
-    <link rel="stylesheet" href="/static/style.css">
-    <link rel="icon" type="image/x-icon" href="/static/favicon.svg">
+    <link rel="stylesheet" href="/site/static/style.css">
+    <link rel="icon" type="image/x-icon" href="/site/static/favicon.svg">
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <script src="/static/config.js"></script>
+    <script>
+        // window.ROBOT_API = "{{  ROBOT_API_URI  }}";
+        window.ROBOT_API = "http://localhost/base_api/v1";
+    </script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+    {% block head %}{% endblock %}
 </head>
 <body>
 <header>
     <div class="icon">
         <a href="/">
-            <img src="/static/favicon.svg">
+            <img src="/site/static/favicon.svg">
         </a>
     </div>
     <div>
         <button onclick="location.href='/login'">
             {% if authed %}
-                <span class="material-icons">
+            <span class="material-icons">
                     person
                 </span>
             {% else %}
-                <span class="material-icons">
+            <span class="material-icons">
                     login
                 </span>
             {% endif %}
