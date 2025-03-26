@@ -45,5 +45,5 @@ async def get_faces_handler(
     chromadb: ChromaDependency
 ) -> list[User]:
     collection = await chromadb.get_or_create_collection("faces")
-    users = await collection.get(ids=[])
+    users = await collection.get()
     return [User(user_id=user_id) for user_id in users["ids"]]
