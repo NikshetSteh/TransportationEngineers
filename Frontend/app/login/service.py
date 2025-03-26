@@ -81,6 +81,8 @@ async def auth_required(
         request.cookies.get("access_token")
     )
 
+    user_data["access_token"] = request.cookies.get("access_token")
+
     return user_data
 
 

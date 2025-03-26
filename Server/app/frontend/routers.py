@@ -3,10 +3,12 @@ from fastapi.security import HTTPBasic, HTTPBasicCredentials
 
 from config import get_config
 from db import DbDependency
+from face_api.service import save_face, delete_face
 from frontend.dependecies import KeycloakAuthRequired
-from frontend.schemes import WebhookRequest
+from frontend.schemes import WebhookRequest, Face
 from frontend.service import get_user_last_ticket, k_id_to_user_id
 from loggers import base_logger
+from schemes import EmptyResponse
 from users.schemes import Ticket
 from users.service import create_user, delete_user
 
@@ -29,6 +31,22 @@ async def get_ticket(
         raise HTTPException(status_code=404, detail="Ticket not found")
 
     return ticket
+
+
+@router.post("/face")
+async def add_face(
+        k_id: KeycloakAuthRequired,
+        face: Face,
+        db: DbDependency
+) -> EmptyResponse:
+    user_id = str(await k_id_to_user_id(k_id, db))
+
+    if face.face is not None:
+        await save_face(face.face, user_id)
+    else:
+        await delete_face(user_id)
+
+    return EmptyResponse()
 
 
 keycloak_auth = HTTPBasic()
@@ -63,7 +81,7 @@ async def keycloak_listener(
         elif request_data.type == "USER-DELETE":
             await delete_user(
                 await k_id_to_user_id(
-                    request_data.userId,
+                    request_data.resourcePath.removeprefix("users/"),
                     db
                 ),
                 db
