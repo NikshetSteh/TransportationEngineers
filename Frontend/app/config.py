@@ -10,6 +10,8 @@ class Config(BaseSettings):
     AUTH_TOKEN_URI: str = "http://localhost/keycloak/realms/ai_site/protocol/openid-connect/token"
     USER_INFO_URI: str = "http://localhost/keycloak/realms/ai_site/protocol/openid-connect/userinfo"
 
+    ROBOT_API_URI: str = "http://localhost/base_api/v1"
+
     API_URI: str = "http://nginx"
 
     MAX_IMAGE_SIZE: int = int(1.25 * 8 * 1024 * 1024)

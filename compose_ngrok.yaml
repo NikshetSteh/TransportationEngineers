@@ -1,0 +1,175 @@
+services:
+  base_server:
+    build: Server
+    environment:
+      - FACE_API=http://face_server:8000/face_api/v1
+      - STORE_API=http://nginx/store_api/v1
+      - DB_URI=postgresql+asyncpg://postgres:root@base_db:5432/TransportEngineers
+      - DB_URI_ALEMBIC=postgresql+psycopg2://postgres:root@base_db:5432/TransportEngineers
+      - REDIS_URI=redis://redis:6379
+      - KEYCLOAK_INTROSPECTIVE_ENDPOINT=http://nginx:80/keycloak/realms/ai_site/protocol/openid-connect/token/introspect
+    depends_on:
+      base_db:
+        condition: service_started
+      redis:
+        condition: service_started
+      face_server:
+        condition: service_started
+      store_server:
+        condition: service_started
+    restart: unless-stopped
+
+
+
+  store_server:
+    build: StoresServer
+    environment:
+      - DB_URI=postgresql+asyncpg://postgres:root@store_db:5432/TransportEngineersStores
+      - DB_URI_ALEMBIC=postgresql+psycopg2://postgres:root@store_db:5432/TransportEngineersStores
+      - REDIS_URI=redis://redis:6379
+    depends_on:
+      store_db:
+        condition: service_started
+    restart: unless-stopped
+
+
+
+  face_server:
+    build: FaceServer
+    environment:
+      - CHROMA_DB_PORT=8000
+      - CHROMA_DB_HOST=chromadb
+    ports:
+      - "8050:8000"
+    volumes:
+      - face_model:/root/.insightface/models
+    depends_on:
+      chromadb:
+        condition: service_started
+    restart: unless-stopped
+
+
+
+  nginx:
+    image: nginx:1.27-alpine
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./DebugData/static:/app/static
+    ports:
+      - "80:80"
+    depends_on:
+      store_server:
+        condition: service_started
+      base_server:
+        condition: service_started
+      face_server:
+        condition: service_started
+    restart: unless-stopped
+
+
+
+  redis:
+    image: "redis:alpine"
+    restart: unless-stopped
+
+
+
+  chromadb:
+    image: chromadb/chroma
+    environment:
+      - PERSIST_DIRECTORY=/chroma/chroma
+    volumes:
+      - chroma_data:/chroma/chroma
+    restart: unless-stopped
+
+
+
+  base_db:
+    image: postgres:14-alpine
+    ports:
+      - "5431:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=TransportEngineers
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - base_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+
+
+  store_db:
+    image: postgres:14-alpine
+    ports:
+      - "5430:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=TransportEngineersStores
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - stores_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+
+
+  keycloak_db:
+    image: postgres:14-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=TransportEngineersKeycloak
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - keycloak_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: TheRealAdmin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: TheR@alAdmin)
+      KC_HTTP_RELATIVE_PATH: /keycloak
+      WEBHOOK_HTTP_BASE_PATH: "http://base_server:8000/base_api/v1/frontend/keycloak_listener"
+      WEBHOOK_HTTP_AUTH_USERNAME: "admin"
+      WEBHOOK_HTTP_AUTH_PASSWORD: "password"
+      KC_DB: postgres
+      KC_DB_URL_HOST: keycloak_db
+      KC_DB_URL_DATABASE: TransportEngineersKeycloak
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: root
+    volumes:
+      - ./keycloak_realm_ngrok.json:/opt/keycloak/data/import/main_realm.json
+      - ./KeycloakPlugins:/opt/keycloak/providers:ro
+    command:
+      - start-dev
+      - --import-realm
+      - --verbose
+      - --hostname
+      - https://pleasantly-real-kitten.ngrok-free.app/keycloak
+    depends_on:
+      - keycloak_db
+    restart: unless-stopped
+
+
+
+  frontend:
+    build: Frontend
+    environment:
+      - AUTH_REDIRECT_URI=https://pleasantly-real-kitten.ngrok-free.app/keycloak/realms/ai_site/protocol/openid-connect/auth
+      - AUTH_TOKEN_URI=http://nginx/keycloak/realms/ai_site/protocol/openid-connect/token
+      - USER_INFO_URI=http://nginx/keycloak/realms/ai_site/protocol/openid-connect/userinfo
+      - ROBOT_API_URI=https://pleasantly-real-kitten.ngrok-free.app/base_api/v1
+    restart: unless-stopped
+
+
+
+volumes:
+  base_data:
+  stores_data:
+  chroma_data:
+  face_model:
+  keycloak_data:

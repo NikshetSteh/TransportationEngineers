@@ -2207,7 +2207,7 @@
     "parRequestUriLifespan" : "60",
     "cibaInterval" : "5",
     "realmReusableOtpCode" : "false",
-    "frontendUrl": "http://localhost/keycloak"
+    "frontendUrl": "http://pleasantly-real-kitten.ngrok-free.app/keycloak"
   },
   "keycloakVersion" : "26.0.7",
   "userManagedAccessAllowed" : false,

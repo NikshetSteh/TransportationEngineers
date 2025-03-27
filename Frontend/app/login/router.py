@@ -68,7 +68,6 @@ async def auth(request: Request, code: str = None) -> RedirectResponse:
     response.set_cookie("access_token", access_token, expires=expires_in)
     response.set_cookie("refresh_token", refresh_token, expires=refresh_expires_in)
     response.set_cookie("given_name", base64.b64encode(user_data["given_name"].encode()).decode())
-    print("Set given_name to {}".format(base64.b64encode(user_data["given_name"].encode()).decode()))
     response.set_cookie("user_id", user_data["sub"])
 
     return response
