@@ -20,7 +20,7 @@ async def auth(request: Request, code: str = None) -> RedirectResponse:
             url=config.AUTH_REDIRECT_URI + "?" + urllib.urlencode({
                 "response_type": "code",
                 "client_id": config.CLIENT_ID,
-                "redirect_uri": request.url_for("auth"),
+                "redirect_uri": request.url_for("auth") if config.FRONTEND_URL is None else f"{config.FRONTEND_URL}/login",
             })
         )
 
@@ -28,7 +28,7 @@ async def auth(request: Request, code: str = None) -> RedirectResponse:
         access_token, expires_in, refresh_token, refresh_expires_in = await get_token(
             code,
             "authorization_code",
-            str(request.url_for("auth"))
+            str(request.url_for("auth") if config.FRONTEND_URL is None else f"{config.FRONTEND_URL}/login")
         )
     else:
         if "refresh_token" in request.cookies:
@@ -38,14 +38,14 @@ async def auth(request: Request, code: str = None) -> RedirectResponse:
                         "refresh_token"
                     ),
                     "refresh_token",
-                    str(request.url_for("auth"))
+                    str(request.url_for("auth") if config.FRONTEND_URL is None else f"{config.FRONTEND_URL}/login")
                 )
             except Exception:
                 return RedirectResponse(
                     url=config.AUTH_REDIRECT_URI + "?" + urllib.urlencode({
                         "response_type": "code",
                         "client_id": config.CLIENT_ID,
-                        "redirect_uri": request.url_for("auth"),
+                        "redirect_uri": request.url_for("auth") if config.FRONTEND_URL is None else f"{config.FRONTEND_URL}/login",
                     })
                 )
         else:
@@ -53,14 +53,14 @@ async def auth(request: Request, code: str = None) -> RedirectResponse:
                 url=config.AUTH_REDIRECT_URI + "?" + urllib.urlencode({
                     "response_type": "code",
                     "client_id": config.CLIENT_ID,
-                    "redirect_uri": request.url_for("auth"),
+                    "redirect_uri": request.url_for("auth") if config.FRONTEND_URL is None else f"{config.FRONTEND_URL}/login",
                 })
             )
 
     user_data = await get_user_data(access_token)
 
     response = RedirectResponse(
-        url=request.url_for("profile")
+        url=request.url_for("profile") if config.FRONTEND_URL is None else f"{config.FRONTEND_URL}/profile",
     )
 
     response.charset = "utf-8"
@@ -81,14 +81,14 @@ async def refresh(request: Request):
                 "refresh_token"
             ),
             "refresh_token",
-            str(request.url_for("auth"))
+            str(request.url_for("auth") if config.FRONTEND_URL is None else f"{config.FRONTEND_URL}/login")
         )
     except Exception:
         return RedirectResponse(
             url=config.AUTH_REDIRECT_URI + "?" + urllib.urlencode({
                 "response_type": "code",
                 "client_id": config.CLIENT_ID,
-                "redirect_uri": request.url_for("auth"),
+                "redirect_uri": request.url_for("auth") if config.FRONTEND_URL is None else f"{config.FRONTEND_URL}/login",
             })
         )
 

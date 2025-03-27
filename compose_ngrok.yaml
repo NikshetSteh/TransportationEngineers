@@ -163,6 +163,7 @@ services:
       - AUTH_TOKEN_URI=http://nginx/keycloak/realms/ai_site/protocol/openid-connect/token
       - USER_INFO_URI=http://nginx/keycloak/realms/ai_site/protocol/openid-connect/userinfo
       - ROBOT_API_URI=https://cufar.space/base_api/v1
+      - FRONTEND_URL=https://cufar.space
     restart: unless-stopped
 
 

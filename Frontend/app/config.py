@@ -14,6 +14,8 @@ class Config(BaseSettings):
 
     API_URI: str = "http://nginx"
 
+    FRONTEND_URL: str | None = None
+
     MAX_IMAGE_SIZE: int = int(1.25 * 8 * 1024 * 1024)
 
 
