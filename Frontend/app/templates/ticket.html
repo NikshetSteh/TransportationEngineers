@@ -128,8 +128,14 @@
                 return;
             }
 
+            const [hours, minutes] = selectedTime.split(":").map(Number);
+            const [year, month, day] = selectedDate.split("-").map(Number);
+
+            const isoDateTime = new Date(Date.UTC(year, month - 1, day, hours, minutes, 0)).toISOString();
+
+
             // Convert to ISO datetime format
-            const isoDateTime = new Date(`${selectedDate}T${selectedTime}:00`).toISOString();
+            // const isoDateTime = new Date(`${selectedDate}T${selectedTime}:00`).toISOString();
 
             const formData = {
                 wagon_number: document.getElementById("wagon_number").value,

@@ -2,7 +2,7 @@ import random
 
 from config import get_config
 from fastapi import HTTPException
-from frontend.schemes import TicketCreation
+from frontend.schemes import TicketCreation, Station
 from model.keycloak_users import KeycloakUser
 from model.ticket import Ticket as TicketModel
 from sqlalchemy import select
@@ -22,7 +22,7 @@ async def k_id_to_user_id(k_id: str, db: sessionmaker[AsyncSession]) -> str:
 
 
 async def get_user_last_ticket(
-    k_user_id: str, db: sessionmaker[AsyncSession]
+        k_user_id: str, db: sessionmaker[AsyncSession]
 ) -> Ticket | None:
     user_id = await k_id_to_user_id(k_user_id, db)
 
@@ -56,9 +56,35 @@ async def get_user_last_ticket(
 
 
 async def create_ticket_simplified(
-    ticket_data: TicketCreation, user_id: str, db: sessionmaker[AsyncSession]
+        ticket_data: TicketCreation, user_id: str, db: sessionmaker[AsyncSession]
 ) -> Ticket:
     config = get_config()
+
+    print("Time hour", ticket_data.date.hour)
+
+    # Fix
+    if ticket_data.station_id == Station.MOSCOW:
+        if ticket_data.date.hour == 8:
+            ticket_data.train_number = 1012
+        elif ticket_data.date.hour == 12:
+            ticket_data.train_number = 1013
+        elif ticket_data.date.hour == 16:
+            ticket_data.train_number = 1014
+        elif ticket_data.date.hour == 20:
+            ticket_data.train_number = 1015
+        else:
+            raise HTTPException(status_code=400, detail="Invalid time")
+    else:
+        if ticket_data.date.hour == 8:
+            ticket_data.train_number = 2012
+        elif ticket_data.date.hour == 12:
+            ticket_data.train_number = 2013
+        elif ticket_data.date.hour == 16:
+            ticket_data.train_number = 2014
+        elif ticket_data.date.hour == 20:
+            ticket_data.train_number = 2015
+        else:
+            raise HTTPException(status_code=400, detail="Invalid time")
 
     async with db() as session:
         # Check for existence of tickets
