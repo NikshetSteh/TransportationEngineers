@@ -149,7 +149,7 @@ services:
       - --import-realm
       - --verbose
       - --hostname
-      - https://pleasantly-real-kitten.ngrok-free.app/keycloak
+      - https://cufar.space/keycloak
     depends_on:
       - keycloak_db
     restart: unless-stopped
@@ -159,10 +159,10 @@ services:
   frontend:
     build: Frontend
     environment:
-      - AUTH_REDIRECT_URI=https://pleasantly-real-kitten.ngrok-free.app/keycloak/realms/ai_site/protocol/openid-connect/auth
+      - AUTH_REDIRECT_URI=https://cufar.space/keycloak/realms/ai_site/protocol/openid-connect/auth
       - AUTH_TOKEN_URI=http://nginx/keycloak/realms/ai_site/protocol/openid-connect/token
       - USER_INFO_URI=http://nginx/keycloak/realms/ai_site/protocol/openid-connect/userinfo
-      - ROBOT_API_URI=https://pleasantly-real-kitten.ngrok-free.app/base_api/v1
+      - ROBOT_API_URI=https://cufar.space/base_api/v1
     restart: unless-stopped
 
 

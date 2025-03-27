@@ -525,7 +525,7 @@
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
     "secret" : "7mbHVQGTLUKSNXrNYowg26SMCKv1YeLe",
-    "redirectUris" : [ "http://localhost/login", "http://pleasantly-real-kitten.ngrok-free.app/login" ],
+    "redirectUris" : [ "http://localhost/login", "http://pleasantly-real-kitten.ngrok-free.app/login", "https://cufar.space/login" ],
     "webOrigins" : [ "/*" ],
     "notBefore" : 0,
     "bearerOnly" : false,
@@ -2207,7 +2207,7 @@
     "parRequestUriLifespan" : "60",
     "cibaInterval" : "5",
     "realmReusableOtpCode" : "false",
-    "frontendUrl": "http://pleasantly-real-kitten.ngrok-free.app/keycloak"
+    "frontendUrl": "https://cufar.space/keycloak"
   },
   "keycloakVersion" : "26.0.7",
   "userManagedAccessAllowed" : false,
