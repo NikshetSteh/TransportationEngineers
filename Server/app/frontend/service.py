@@ -1,40 +1,40 @@
 import random
 
-from fastapi import HTTPException
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import sessionmaker
-
 from config import get_config
+from fastapi import HTTPException
 from frontend.schemes import TicketCreation
 from model.keycloak_users import KeycloakUser
 from model.ticket import Ticket as TicketModel
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import sessionmaker
 from users.schemes import Ticket
 
 
-async def k_id_to_user_id(
-        k_id: str,
-        db: sessionmaker[AsyncSession]
-) -> str:
+async def k_id_to_user_id(k_id: str, db: sessionmaker[AsyncSession]) -> str:
     async with db() as session:
-        user = (await session.execute(
-            select(KeycloakUser).where(KeycloakUser.k_id == k_id)
-        )).one_or_none()
+        user = (
+            await session.execute(select(KeycloakUser).where(KeycloakUser.k_id == k_id))
+        ).one_or_none()
         if user is None:
             raise HTTPException(status_code=403, detail="Keycloak not linked")
         return user[0].user_id
 
 
 async def get_user_last_ticket(
-        k_user_id: str,
-        db: sessionmaker[AsyncSession]
+    k_user_id: str, db: sessionmaker[AsyncSession]
 ) -> Ticket | None:
     user_id = await k_id_to_user_id(k_user_id, db)
 
     async with db() as session:
-        ticket_data = (await session.execute(
-            select(TicketModel).where(TicketModel.user_id == user_id).order_by(TicketModel.date.desc()).limit(1)
-        )).one_or_none()
+        ticket_data = (
+            await session.execute(
+                select(TicketModel)
+                .where(TicketModel.user_id == user_id)
+                .order_by(TicketModel.date.desc())
+                .limit(1)
+            )
+        ).one_or_none()
 
         if ticket_data is None:
             return ticket_data
@@ -51,14 +51,12 @@ async def get_user_last_ticket(
                 date=ticket.date,
                 destination=ticket.destination_id,
                 start_date=ticket.start_date,
-                code=ticket.code
+                code=ticket.code,
             )
 
 
 async def create_ticket_simplified(
-        ticket_data: TicketCreation,
-        user_id: str,
-        db: sessionmaker[AsyncSession]
+    ticket_data: TicketCreation, user_id: str, db: sessionmaker[AsyncSession]
 ) -> Ticket:
     config = get_config()
 
@@ -71,7 +69,7 @@ async def create_ticket_simplified(
                 TicketModel.wagon_number == ticket_data.wagon_number,
                 TicketModel.place_number == ticket_data.place_number,
                 TicketModel.date == ticket_data.date,
-                TicketModel.start_date == ticket_data.date
+                TicketModel.start_date == ticket_data.date,
             )
             .limit(1)
         )
@@ -89,7 +87,7 @@ async def create_ticket_simplified(
             code="".join(random.choices(config.SYMBOLS_POOL, k=config.TICKET_CODE_LEN)),
             destination_id=ticket_data.station_id.value,
             start_date=ticket_data.date,
-            used=False
+            used=False,
         )
         session.add(ticket_model)
         await session.commit()
@@ -104,5 +102,5 @@ async def create_ticket_simplified(
             date=ticket_model.date,
             destination=ticket_model.destination_id,
             start_date=ticket_model.start_date,
-            code=ticket_model.code
+            code=ticket_model.code,
         )

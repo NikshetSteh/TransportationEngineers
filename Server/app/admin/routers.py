@@ -1,16 +1,14 @@
 import random
 
 import bcrypt
-from fastapi import APIRouter, HTTPException, Path
-from fastapi_pagination import Page, paginate
-from sqlalchemy import delete, select
-
 import store_api.service
 from admin.schemes import *
 from auth.engineer_privileges import engineer_privileges_translations
 from config import get_config
 from db import DbDependency
 from face_api.service import delete_face, save_face
+from fastapi import APIRouter, HTTPException, Path
+from fastapi_pagination import Page, paginate
 from model.auth_cards import AuthCard as AuthCardModel
 from model.destinations_info import Attraction as AttractionModel
 from model.destinations_info import Hotel as HotelModel
@@ -23,6 +21,7 @@ from model.user import User as UserModel
 from robot.schemes import Attraction, Hotel, Robot
 from robot.service import get_attractions, get_hotels
 from schemes import EmptyResponse, TrainData
+from sqlalchemy import delete, select
 from users.schemes import Ticket, TicketCreation, User
 
 router = APIRouter()
@@ -31,21 +30,16 @@ config = get_config()
 
 
 @router.post("/user")
-async def add_user(
-        data: UserCreation,
-        db: DbDependency
-) -> User:
+async def add_user(data: UserCreation, db: DbDependency) -> User:
     async with db() as session:
-        users = (await session.execute(
-            select(UserModel).where(UserModel.name == data.name)
-        )).one_or_none()
+        users = (
+            await session.execute(select(UserModel).where(UserModel.name == data.name))
+        ).one_or_none()
 
         if users is not None:
             raise HTTPException(status_code=409, detail="User already exists")
 
-        user = UserModel(
-            name=data.name
-        )
+        user = UserModel(name=data.name)
         session.add(user)
         await session.flush()
 
@@ -59,14 +53,12 @@ async def add_user(
 
 @router.patch("/user/{user_id}/face")
 async def update_user_face(
-        user_id: str,
-        data: UserFaceUpdate,
-        db: DbDependency
+    user_id: str, data: UserFaceUpdate, db: DbDependency
 ) -> EmptyResponse:
     async with db() as session:
-        user = (await session.execute(
-            select(UserModel).where(UserModel.id == user_id)
-        )).one_or_none()
+        user = (
+            await session.execute(select(UserModel).where(UserModel.id == user_id))
+        ).one_or_none()
 
         if user is None:
             raise HTTPException(status_code=404, detail="User not found")
@@ -81,14 +73,11 @@ async def update_user_face(
 
 
 @router.delete("/user/face")
-async def delete_user_face(
-        user_id: str,
-        db: DbDependency
-) -> EmptyResponse:
+async def delete_user_face(user_id: str, db: DbDependency) -> EmptyResponse:
     async with db() as session:
-        user = (await session.execute(
-            select(UserModel).where(UserModel.id == user_id)
-        )).one_or_none()
+        user = (
+            await session.execute(select(UserModel).where(UserModel.id == user_id))
+        ).one_or_none()
 
         if user is None:
             raise HTTPException(status_code=404, detail="User not found")
@@ -102,36 +91,21 @@ async def delete_user_face(
 
 
 @router.get("/users")
-async def get_users(
-        db: DbDependency
-) -> Page[User]:
+async def get_users(db: DbDependency) -> Page[User]:
     async with db() as session:
-        users = (await session.execute(
-            select(UserModel)
-        )).fetchall()
+        users = (await session.execute(select(UserModel))).fetchall()
 
-    data = list(
-        map(
-            lambda x: User(
-                id=str(x[0].id),
-                name=x[0].name
-            ),
-            users
-        )
-    )
+    data = list(map(lambda x: User(id=str(x[0].id), name=x[0].name), users))
 
     return paginate(data)
 
 
 @router.delete("/users/{user_id}")
-async def delete_user(
-        user_id: str,
-        db: DbDependency
-) -> EmptyResponse:
+async def delete_user(user_id: str, db: DbDependency) -> EmptyResponse:
     async with db() as session:
-        user = (await session.execute(
-            select(UserModel).where(UserModel.id == user_id)
-        )).one_or_none()
+        user = (
+            await session.execute(select(UserModel).where(UserModel.id == user_id))
+        ).one_or_none()
 
         if user is None:
             raise HTTPException(status_code=404, detail="User not found")
@@ -139,12 +113,8 @@ async def delete_user(
         await session.execute(
             delete(KeycloakUserModel).where(KeycloakUserModel.user_id == user_id)
         )
-        await session.execute(
-            delete(TicketModel).where(TicketModel.user_id == user_id)
-        )
-        await session.execute(
-            delete(UserModel).where(UserModel.id == user_id)
-        )
+        await session.execute(delete(TicketModel).where(TicketModel.user_id == user_id))
+        await session.execute(delete(UserModel).where(UserModel.id == user_id))
         await session.commit()
 
     await delete_face(user_id)
@@ -153,39 +123,28 @@ async def delete_user(
 
 
 @router.post("/engineer")
-async def create_engineer(
-        data: EngineerCreation,
-        db: DbDependency
-) -> Engineer:
+async def create_engineer(data: EngineerCreation, db: DbDependency) -> Engineer:
     async with db() as session:
         hashed_password = bcrypt.hashpw(
-            data.password.encode("utf-8"),
-            bcrypt.gensalt(12)
+            data.password.encode("utf-8"), bcrypt.gensalt(12)
         ).decode("utf-8")
 
-        engineer = EngineerModel(
-            login=data.login,
-            password=hashed_password
-        )
+        engineer = EngineerModel(login=data.login, password=hashed_password)
         session.add(engineer)
         await session.commit()
 
-    return Engineer(
-        id=str(engineer.id),
-        login=engineer.login
-    )
+    return Engineer(id=str(engineer.id), login=engineer.login)
 
 
 @router.delete("/engineers/{engineer_id}")
-async def delete_engineer(
-        engineer_id: str,
-        db: DbDependency
-) -> EmptyResponse:
+async def delete_engineer(engineer_id: str, db: DbDependency) -> EmptyResponse:
     async with db() as session:
         print(engineer_id)
-        engineers = (await session.execute(
-            select(EngineerModel).where(EngineerModel.id == engineer_id)
-        )).one_or_none()
+        engineers = (
+            await session.execute(
+                select(EngineerModel).where(EngineerModel.id == engineer_id)
+            )
+        ).one_or_none()
 
         if engineers is None:
             raise HTTPException(status_code=404, detail="Engineer not found")
@@ -199,35 +158,24 @@ async def delete_engineer(
 
 
 @router.get("/engineers")
-async def get_engineer(
-        db: DbDependency
-) -> Page[Engineer]:
+async def get_engineer(db: DbDependency) -> Page[Engineer]:
     async with db() as session:
-        engineers = (await session.execute(
-            select(EngineerModel)
-        )).fetchall()
+        engineers = (await session.execute(select(EngineerModel))).fetchall()
 
-    data = list(
-        map(
-            lambda x: Engineer(
-                id=str(x[0].id),
-                login=x[0].login
-            ),
-            engineers
-        )
-    )
+    data = list(map(lambda x: Engineer(id=str(x[0].id), login=x[0].login), engineers))
     return paginate(data)
 
 
 @router.put("/engineer_privileges")
 async def update_engineer(
-        data: EngineerPrivilegesUpdate,
-        db: DbDependency
+    data: EngineerPrivilegesUpdate, db: DbDependency
 ) -> EmptyResponse:
     async with db() as session:
-        engineers = (await session.execute(
-            select(EngineerModel).where(EngineerModel.id == data.id)
-        )).one_or_none()
+        engineers = (
+            await session.execute(
+                select(EngineerModel).where(EngineerModel.id == data.id)
+            )
+        ).one_or_none()
 
         if engineers is None:
             raise HTTPException(status_code=404, detail="Engineer not found")
@@ -246,13 +194,9 @@ async def update_engineer(
 
 
 @router.get("/robots")
-async def get_robots(
-        db: DbDependency
-) -> Page[Robot]:
+async def get_robots(db: DbDependency) -> Page[Robot]:
     async with db() as session:
-        robots = (await session.execute(
-            select(RobotModel)
-        )).fetchall()
+        robots = (await session.execute(select(RobotModel))).fetchall()
 
     data = list(
         map(
@@ -261,35 +205,27 @@ async def get_robots(
                 robot_model_name=x[0].robot_model_name,
                 robot_model_id=x[0].robot_model_id,
             ),
-            robots
+            robots,
         )
     )
     return paginate(data)
 
 
 @router.delete("/robots/{robot_id}")
-async def delete_robot(
-        robot_id: str,
-        db: DbDependency
-) -> EmptyResponse:
+async def delete_robot(robot_id: str, db: DbDependency) -> EmptyResponse:
     async with db() as session:
-        await session.execute(
-            delete(RobotModel).where(RobotModel.id == robot_id)
-        )
+        await session.execute(delete(RobotModel).where(RobotModel.id == robot_id))
         await session.commit()
 
     return EmptyResponse()
 
 
 @router.post("/ticket")
-async def create_ticket(
-        data: TicketCreation,
-        db: DbDependency
-) -> Ticket:
+async def create_ticket(data: TicketCreation, db: DbDependency) -> Ticket:
     async with db() as session:
-        users = (await session.execute(
-            select(UserModel).where(UserModel.id == data.user_id)
-        )).one_or_none()
+        users = (
+            await session.execute(select(UserModel).where(UserModel.id == data.user_id))
+        ).one_or_none()
 
         if users is None:
             raise HTTPException(status_code=404, detail="User not found")
@@ -303,7 +239,7 @@ async def create_ticket(
             date=data.date,
             destination_id=data.destination,
             start_date=data.date,
-            code="".join(random.choices(config.SYMBOLS_POOL, k=config.TICKET_CODE_LEN))
+            code="".join(random.choices(config.SYMBOLS_POOL, k=config.TICKET_CODE_LEN)),
         )
         session.add(ticket)
         await session.commit()
@@ -318,32 +254,23 @@ async def create_ticket(
         date=ticket.date,
         destination=ticket.destination_id,
         start_date=ticket.start_date,
-        code=ticket.code
+        code=ticket.code,
     )
 
 
 @router.delete("/ticket/{ticket_id}")
-async def delete_ticket(
-        ticket_id: str,
-        db: DbDependency
-) -> EmptyResponse:
+async def delete_ticket(ticket_id: str, db: DbDependency) -> EmptyResponse:
     async with db() as session:
-        await session.execute(
-            delete(TicketModel).where(TicketModel.id == ticket_id)
-        )
+        await session.execute(delete(TicketModel).where(TicketModel.id == ticket_id))
         await session.commit()
 
     return EmptyResponse()
 
 
 @router.get("/tickets")
-async def get_tickets(
-        db: DbDependency
-) -> Page[Ticket]:
+async def get_tickets(db: DbDependency) -> Page[Ticket]:
     async with db() as session:
-        tickets = (await session.execute(
-            select(TicketModel)
-        )).fetchall()
+        tickets = (await session.execute(select(TicketModel))).fetchall()
 
     data = list(
         map(
@@ -357,42 +284,37 @@ async def get_tickets(
                 date=x[0].date,
                 destination=x[0].destination_id,
                 start_date=x[0].start_date,
-                code=x[0].code
+                code=x[0].code,
             ),
-            tickets
+            tickets,
         )
     )
     return paginate(data)
 
 
 @router.get("/destination/{destination_id}/hotels")
-async def get_destination_hotels(
-        db: DbDependency,
-        destination_id: str
-) -> Page[Hotel]:
+async def get_destination_hotels(db: DbDependency, destination_id: str) -> Page[Hotel]:
     return paginate(await get_hotels(destination_id, db))
 
 
 @router.get("/destination/{destination_id}/attractions")
 async def get_destination_attractions(
-        destination_id: str,
-        db: DbDependency,
+    destination_id: str,
+    db: DbDependency,
 ) -> Page[Attraction]:
     return paginate(await get_attractions(destination_id, db))
 
 
 @router.post("/destination/{destination_id}/hotel")
 async def create_destination_hotel(
-        destination_id: str,
-        data: HotelCreation,
-        db: DbDependency
+    destination_id: str, data: HotelCreation, db: DbDependency
 ) -> Hotel:
     async with db() as session:
         hotel = HotelModel(
             destination_id=destination_id,
             name=data.name,
             description=data.description,
-            logo_url=data.logo_url
+            logo_url=data.logo_url,
         )
         session.add(hotel)
         await session.commit()
@@ -401,22 +323,20 @@ async def create_destination_hotel(
         id=str(hotel.id),
         name=hotel.name,
         description=hotel.description,
-        logo_url=hotel.logo_url
+        logo_url=hotel.logo_url,
     )
 
 
 @router.post("/destination/{destination_id}/attraction")
 async def create_destination_attraction(
-        destination_id: str,
-        data: AttractionCreation,
-        db: DbDependency
+    destination_id: str, data: AttractionCreation, db: DbDependency
 ) -> Attraction:
     async with db() as session:
         attraction = AttractionModel(
             destination_id=destination_id,
             name=data.name,
             description=data.description,
-            logo_url=data.logo_url
+            logo_url=data.logo_url,
         )
         session.add(attraction)
         await session.commit()
@@ -425,19 +345,14 @@ async def create_destination_attraction(
         id=str(attraction.id),
         name=attraction.name,
         description=attraction.description,
-        logo_url=attraction.logo_url
+        logo_url=attraction.logo_url,
     )
 
 
 @router.delete("/destination_info/hotel/{hotel_id}")
-async def delete_destination_hotel(
-        hotel_id: str,
-        db: DbDependency
-) -> EmptyResponse:
+async def delete_destination_hotel(hotel_id: str, db: DbDependency) -> EmptyResponse:
     async with db() as session:
-        await session.execute(
-            delete(HotelModel).where(HotelModel.id == hotel_id)
-        )
+        await session.execute(delete(HotelModel).where(HotelModel.id == hotel_id))
         await session.commit()
 
     return EmptyResponse()
@@ -445,8 +360,7 @@ async def delete_destination_hotel(
 
 @router.delete("/destination_info/attraction/{attraction_id}")
 async def delete_destination_attraction(
-        attraction_id: str,
-        db: DbDependency
+    attraction_id: str, db: DbDependency
 ) -> EmptyResponse:
     async with db() as session:
         await session.execute(
@@ -458,14 +372,18 @@ async def delete_destination_attraction(
 
 @router.put("/engineer/{engineer_id}/auth_card")
 async def update_auth_card(
-        data: AuthCardCreation,
-        db: DbDependency,
-        engineer_id: str = Path(pattern="[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}")
+    data: AuthCardCreation,
+    db: DbDependency,
+    engineer_id: str = Path(
+        pattern="[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}"
+    ),
 ) -> EmptyResponse:
     async with db() as session:
-        engineers = (await session.execute(
-            select(EngineerModel).where(EngineerModel.id == engineer_id)
-        )).one_or_none()
+        engineers = (
+            await session.execute(
+                select(EngineerModel).where(EngineerModel.id == engineer_id)
+            )
+        ).one_or_none()
         if engineers is None:
             raise HTTPException(status_code=404, detail="Engineer not found")
 
@@ -476,9 +394,11 @@ async def update_auth_card(
             await session.commit()
             return EmptyResponse()
 
-        auth_cards = (await session.execute(
-            select(AuthCardModel).where(AuthCardModel.engineer_id == engineer_id)
-        )).one_or_none()
+        auth_cards = (
+            await session.execute(
+                select(AuthCardModel).where(AuthCardModel.engineer_id == engineer_id)
+            )
+        ).one_or_none()
         if auth_cards is not None:
             auth_card = auth_cards[0]
             auth_card.key = data.key
@@ -486,10 +406,7 @@ async def update_auth_card(
             await session.commit()
             return EmptyResponse()
 
-        auth_card = AuthCardModel(
-            engineer_id=engineer_id,
-            key=data.key
-        )
+        auth_card = AuthCardModel(engineer_id=engineer_id, key=data.key)
         session.add(auth_card)
         await session.commit()
 
@@ -498,29 +415,33 @@ async def update_auth_card(
 
 @router.post("/store/{store_id}/train")
 async def add_store_to_train(
-        train_data: TrainData,
-        db: DbDependency,
-        store_id: str = Path(pattern="[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}"),
+    train_data: TrainData,
+    db: DbDependency,
+    store_id: str = Path(
+        pattern="[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}"
+    ),
 ) -> EmptyResponse:
     store = await store_api.service.get_store(store_id)
     if store is None:
         raise HTTPException(status_code=404, detail="Store id not found")
 
     async with db() as session:
-        binding = (await session.execute(
-            select(TrainStore).where(
-                TrainStore.store_id == store_id,
-                TrainStore.train_number == train_data.train_number,
-                TrainStore.train_date == train_data.train_date
+        binding = (
+            await session.execute(
+                select(TrainStore).where(
+                    TrainStore.store_id == store_id,
+                    TrainStore.train_number == train_data.train_number,
+                    TrainStore.train_date == train_data.train_date,
+                )
             )
-        )).one_or_none()
+        ).one_or_none()
         if binding is not None:
             raise HTTPException(status_code=409, detail="Binding already exists")
 
         train_store = TrainStore(
             store_id=store_id,
             train_number=train_data.train_number,
-            train_date=train_data.train_date
+            train_date=train_data.train_date,
         )
         session.add(train_store)
         await session.commit()
@@ -529,32 +450,33 @@ async def add_store_to_train(
 
 
 @router.get("/train/stores")
-async def get_train_stores_ids(
-        train_data: TrainData,
-        db: DbDependency
-) -> Page[str]:
+async def get_train_stores_ids(train_data: TrainData, db: DbDependency) -> Page[str]:
     async with db() as session:
-        stores = (await session.execute(
-            select(TrainStore.store_id)
-            .where(TrainStore.train_number == train_data.train_number)
-            .where(TrainStore.train_date == train_data.train_date)
-        )).fetchall()
+        stores = (
+            await session.execute(
+                select(TrainStore.store_id)
+                .where(TrainStore.train_number == train_data.train_number)
+                .where(TrainStore.train_date == train_data.train_date)
+            )
+        ).fetchall()
 
     return paginate(list(map(lambda x: str(x[0]), stores)))
 
 
 @router.delete("/store/{store_id}/train/unbind")
 async def remove_store_from_train(
-        train_data: TrainData,
-        db: DbDependency,
-        store_id: str = Path(pattern="[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}"),
+    train_data: TrainData,
+    db: DbDependency,
+    store_id: str = Path(
+        pattern="[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}"
+    ),
 ) -> EmptyResponse:
     async with db() as session:
         await session.execute(
             delete(TrainStore).where(
                 TrainStore.train_number == train_data.train_number,
                 TrainStore.train_date == train_data.train_date,
-                TrainStore.store_id == store_id
+                TrainStore.store_id == store_id,
             )
         )
         await session.commit()
@@ -562,17 +484,14 @@ async def remove_store_from_train(
     return EmptyResponse()
 
 
-
 @router.post("/keycloak_user")
 async def create_keycloak_user(
-        keycloak_user: KeycloakUserCreation,
-        db: DbDependency
+    keycloak_user: KeycloakUserCreation, db: DbDependency
 ) -> EmptyResponse:
     async with db() as session:
-        session.add(KeycloakUserModel(
-            k_id=keycloak_user.k_id,
-            user_id=keycloak_user.user_id
-        ))
+        session.add(
+            KeycloakUserModel(k_id=keycloak_user.k_id, user_id=keycloak_user.user_id)
+        )
         await session.commit()
 
     return EmptyResponse()
@@ -580,12 +499,13 @@ async def create_keycloak_user(
 
 @router.delete("/keycloak_user")
 async def delete_keycloak_user(
-        keycloak_user: KeycloakUserCreation,
-        db: DbDependency
+    keycloak_user: KeycloakUserCreation, db: DbDependency
 ) -> EmptyResponse:
     async with db() as session:
         await session.execute(
-            delete(KeycloakUserModel).where(KeycloakUserModel.k_id == keycloak_user.k_id)
+            delete(KeycloakUserModel).where(
+                KeycloakUserModel.k_id == keycloak_user.k_id
+            )
         )
         await session.commit()
 

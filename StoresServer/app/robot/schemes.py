@@ -6,7 +6,9 @@ from pydantic import AfterValidator, BaseModel, Field
 
 def check_id(data: list[str]) -> list[str]:
     for i in data:
-        assert re.fullmatch("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", i)
+        assert re.fullmatch(
+            "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", i
+        )
 
     return data
 

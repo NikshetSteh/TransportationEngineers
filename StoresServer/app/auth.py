@@ -1,10 +1,9 @@
 from enum import Enum
 from typing import Annotated
 
-from fastapi import Depends, HTTPException, Request
-
 from config import get_config
 from db import AUTH_ROBOT_SESSION_DB, AUTH_STORE_SESSION_DB, RedisDependency
+from fastapi import Depends, HTTPException, Request
 
 
 class ClientType(Enum):
@@ -13,10 +12,7 @@ class ClientType(Enum):
 
 
 def auth_request(client_type: ClientType):
-    async def func(
-            request: Request,
-            redis_pool: RedisDependency
-    ) -> str:
+    async def func(request: Request, redis_pool: RedisDependency) -> str:
         db_index = -1
         if client_type == ClientType.ROBOT:
             db_index = AUTH_ROBOT_SESSION_DB

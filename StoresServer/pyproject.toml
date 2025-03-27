@@ -20,6 +20,7 @@ uvicorn = "^0.30.3"
 
 [tool.poetry.group.dev.dependencies]
 isort = "^5.13.2"
+black = "^25.1.0"
 
 [build-system]
 requires = ["poetry-core"]

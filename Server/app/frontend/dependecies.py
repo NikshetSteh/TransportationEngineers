@@ -1,13 +1,11 @@
 import base64
+import logging
 from typing import Annotated
 
 import aiohttp
 from aiohttp import FormData
-from fastapi import Request, Depends, HTTPException
-
 from config import get_config
-import logging
-
+from fastapi import Depends, HTTPException, Request
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +33,7 @@ async def keycloak_auth(request: Request) -> str:
                 ).decode()
                 }"
             },
-            data=form_data
+            data=form_data,
         )
         if response.status != 200:
             logger.debug("Try keycloak auth with invalid access token")

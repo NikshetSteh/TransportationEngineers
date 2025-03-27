@@ -3,16 +3,13 @@ import base64
 import cv2
 import numpy as np
 from chromadb.api import AsyncClientAPI
+from config import get_config
 from fastapi import HTTPException
 from insightface.app import FaceAnalysis
 
-from config import get_config
-
 
 async def search_face(
-        image: str,
-        face_model: FaceAnalysis,
-        chroma_db: AsyncClientAPI
+    image: str, face_model: FaceAnalysis, chroma_db: AsyncClientAPI
 ) -> None | str:
     image_bytes = base64.b64decode(image)
     image_array = np.frombuffer(image_bytes, dtype=np.uint8)
@@ -23,7 +20,10 @@ async def search_face(
     if len(faces) == 0:
         raise HTTPException(status_code=400, detail="No faces")
 
-    faces_by_square = sorted(faces, key=lambda x: (x["bbox"][2] - x["bbox"][0]) * (x["bbox"][3] - x["bbox"][1]))
+    faces_by_square = sorted(
+        faces,
+        key=lambda x: (x["bbox"][2] - x["bbox"][0]) * (x["bbox"][3] - x["bbox"][1]),
+    )
 
     face = faces_by_square[0]
 
@@ -35,8 +35,7 @@ async def search_face(
 
     collection = await chroma_db.get_or_create_collection("faces")
     users = await collection.query(
-        query_embeddings=face["embedding"].tolist(),
-        n_results=1
+        query_embeddings=face["embedding"].tolist(), n_results=1
     )
 
     config = get_config()
@@ -53,10 +52,7 @@ async def search_face(
 
 
 async def save_face(
-        image: str,
-        user_id: str,
-        model: FaceAnalysis,
-        chroma_db: AsyncClientAPI
+    image: str, user_id: str, model: FaceAnalysis, chroma_db: AsyncClientAPI
 ) -> None:
     image_bytes = base64.b64decode(image)
     image_array = np.frombuffer(image_bytes, dtype=np.uint8)
@@ -88,10 +84,7 @@ async def save_face(
 
     collection = await chroma_db.get_or_create_collection("faces")
 
-    user = await collection.query(
-        query_embeddings=embedding.tolist(),
-        n_results=1
-    )
+    user = await collection.query(query_embeddings=embedding.tolist(), n_results=1)
 
     config = get_config()
     if len(user["distances"][0]) > 0 and user["distances"][0][0] < config.THRESHOLD:
@@ -103,17 +96,12 @@ async def save_face(
     )
 
 
-async def delete_face(
-        user_id: str,
-        chroma_db: AsyncClientAPI
-) -> None:
+async def delete_face(user_id: str, chroma_db: AsyncClientAPI) -> None:
     collection = await chroma_db.get_or_create_collection("faces")
     await collection.delete(ids=[user_id])
 
 
-async def get_all_users(
-        chroma_db: AsyncClientAPI
-) -> list[str]:
+async def get_all_users(chroma_db: AsyncClientAPI) -> list[str]:
     collection = await chroma_db.get_or_create_collection("faces")
     users = await collection.query(n_results=await collection.count())
     return users["ids"]

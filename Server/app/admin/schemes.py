@@ -1,6 +1,5 @@
-from pydantic import BaseModel, Field
-
 from auth.engineer_privileges import EngineerPrivileges
+from pydantic import BaseModel, Field
 
 
 class UserCreation(BaseModel):

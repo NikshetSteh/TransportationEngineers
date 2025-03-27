@@ -1,7 +1,6 @@
+from model.base import Base
 from sqlalchemy import UUID, Column, ForeignKey
 from sqlalchemy.orm import Mapped, relationship
-
-from model.base import Base
 
 
 class KeycloakUser(Base):
