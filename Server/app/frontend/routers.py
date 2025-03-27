@@ -5,8 +5,8 @@ from config import get_config
 from db import DbDependency
 from face_api.service import save_face, delete_face
 from frontend.dependecies import KeycloakAuthRequired
-from frontend.schemes import WebhookRequest, Face
-from frontend.service import get_user_last_ticket, k_id_to_user_id
+from frontend.schemes import WebhookRequest, Face, TicketCreation
+from frontend.service import get_user_last_ticket, k_id_to_user_id, create_ticket_simplified
 from loggers import base_logger
 from schemes import EmptyResponse
 from users.schemes import Ticket
@@ -98,3 +98,14 @@ async def keycloak_listener(
             request_data.model_dump_json(indent=4)
         )
     )
+
+
+@router.post("/tickets")
+async def create_ticket(
+        ticket_data: TicketCreation,
+        k_id: KeycloakAuthRequired,
+        db: DbDependency
+) -> Ticket:
+    user_id = await k_id_to_user_id(k_id, db)
+
+    return await create_ticket_simplified(ticket_data, user_id, db)

@@ -1,8 +1,12 @@
+import random
+
 from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import sessionmaker
 
+from config import get_config
+from frontend.schemes import TicketCreation
 from model.keycloak_users import KeycloakUser
 from model.ticket import Ticket as TicketModel
 from users.schemes import Ticket
@@ -29,7 +33,7 @@ async def get_user_last_ticket(
 
     async with db() as session:
         ticket_data = (await session.execute(
-            select(TicketModel).where(TicketModel.user_id == user_id)
+            select(TicketModel).where(TicketModel.user_id == user_id).order_by(TicketModel.date.desc()).limit(1)
         )).one_or_none()
 
         if ticket_data is None:
@@ -47,4 +51,42 @@ async def get_user_last_ticket(
                 date=ticket.date,
                 destination=ticket.destination_id,
                 start_date=ticket.start_date,
+                code=ticket.code
             )
+
+
+async def create_ticket_simplified(
+        ticket_data: TicketCreation,
+        user_id: str,
+        db: sessionmaker[AsyncSession]
+) -> Ticket:
+    config = get_config()
+
+    async with db() as session:
+        ticket_model = TicketModel(
+            user_id=user_id,
+            train_number=ticket_data.train_number,
+            wagon_number=ticket_data.wagon_number,
+            place_number=ticket_data.place_number,
+            date=ticket_data.date,
+            station_id=ticket_data.station_id.value,
+            code="".join(random.choices(config.SYMBOLS_POOL, k=config.TICKET_CODE_LEN)),
+            destination_id=ticket_data.station_id.value,
+            start_date=ticket_data.date,
+            used=False
+        )
+        session.add(ticket_model)
+        await session.commit()
+
+        return Ticket(
+            id=str(ticket_model.id),
+            user_id=str(ticket_model.user_id),
+            train_number=ticket_model.train_number,
+            wagon_number=ticket_model.wagon_number,
+            place_number=ticket_model.place_number,
+            station_id=ticket_model.station_id,
+            date=ticket_model.date,
+            destination=ticket_model.destination_id,
+            start_date=ticket_model.start_date,
+            code=ticket_model.code
+        )

@@ -32,10 +32,28 @@ if (accessToken) {
             seat_number_html = document.getElementById("seat_number");
             seat_number_html.innerHTML = data.place_number;
 
-            const all = document.getElementsByClassName('authorized');
-            for (let i = 0; i < all.length; i++) {
-                all[i].style.display = 'block';
-            }
+            const dateObj = new Date(data.date);
+
+            const formattedDate = dateObj.toLocaleString("ru-RU", {
+                weekday: "long",  // "Monday"
+                year: "numeric",  // "2024"
+                month: "long",    // "March"
+                day: "numeric",   // "27"
+                hour: "2-digit",  // "2"
+                minute: "2-digit",// "30"
+                hour12: false      // "PM" (can be false for 24-hour format)
+            });
+
+
+            departure_time_html = document.getElementById("departure_time");
+            departure_time_html.innerHTML = formattedDate;
+
+            train_number_html = document.getElementById("train_number");
+            train_number_html.innerHTML = data.train_number;
+
+
+            const ticket_block = document.getElementById('ticket');
+            ticket_block.style.display = 'block';
         })
         .catch(error => {
             console.error("Error:", error); // Handle errors
