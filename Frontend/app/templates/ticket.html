@@ -107,7 +107,6 @@
     document.addEventListener("DOMContentLoaded", function () {
         const form = document.getElementById("ticket-form");
         const errorMessage = document.getElementById("error-message");
-        const formCard = document.getElementById("form-card");
         const successMessage = document.getElementById("success-message");
         const dateInput = document.getElementById("date");
         const timeInput = document.getElementById("time");
@@ -116,13 +115,6 @@
         // Restrict date input to future dates only
         const today = new Date().toISOString().split("T")[0];
         dateInput.setAttribute("min", today);
-
-        let destinationInput = "SPB";
-
-        // Update destination_id based on station_id
-        stationSelect.addEventListener("change", function () {
-            destinationInput = stationSelect.value === "MOSCOW" ? "SPB" : "MOSCOW";
-        });
 
         form.addEventListener("submit", function (event) {
             event.preventDefault(); // Prevent page reload
@@ -143,7 +135,7 @@
                 wagon_number: document.getElementById("wagon_number").value,
                 place_number: document.getElementById("place_number").value,
                 station_id: stationSelect.value,
-                destination_id: destinationInput,
+                destination_id: stationSelect.value === "MOSCOW" ? "SPB" : "MOSCOW",
                 date: isoDateTime
             };
 
@@ -160,6 +152,9 @@
                         form.classList.add("hidden");
                         successMessage.classList.remove("hidden");
                     } else {
+                        if (response.status === 409) {
+                            throw new Error("Выбранное место занято");
+                        }
                         const errorText = await response.text();
                         throw new Error(errorText || "Ошибка оформления билета");
                     }

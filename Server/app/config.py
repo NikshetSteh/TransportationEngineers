@@ -21,7 +21,7 @@ class Config(BaseSettings):
 
     TICKET_CODE_LEN: int = 128
 
-    KEYCLOAK_INTROSPECTIVE_ENDPOINT: str = "http://localhost:8090/realms/ai_site/protocol/openid-connect/userinfo"
+    KEYCLOAK_INTROSPECTIVE_ENDPOINT: str = "http://localhost/keycloak/realms/ai_site/protocol/openid-connect/userinfo"
 
     KEYCLOAK_WEBHOOK_LOGIN: str = "admin"
     KEYCLOAK_WEBHOOK_PASSWORD: str = "password"

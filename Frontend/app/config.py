@@ -6,9 +6,9 @@ class Config(BaseSettings):
     CLIENT_ID: str = "ai_site"
     CLIENT_SECRET: str = "7mbHVQGTLUKSNXrNYowg26SMCKv1YeLe"
 
-    AUTH_REDIRECT_URI: str = "http://localhost:8080/keycloak/realms/ai_site/protocol/openid-connect/auth"
-    AUTH_TOKEN_URI: str = "http://localhost:8080/keycloak/realms/ai_site/protocol/openid-connect/token"
-    USER_INFO_URI: str = "http://localhost:8080/keycloak/realms/ai_site/protocol/openid-connect/userinfo"
+    AUTH_REDIRECT_URI: str = "http://localhost/keycloak/realms/ai_site/protocol/openid-connect/auth"
+    AUTH_TOKEN_URI: str = "http://localhost/keycloak/realms/ai_site/protocol/openid-connect/token"
+    USER_INFO_URI: str = "http://localhost/keycloak/realms/ai_site/protocol/openid-connect/userinfo"
 
     API_URI: str = "http://nginx"
 

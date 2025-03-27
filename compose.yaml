@@ -31,6 +31,8 @@ services:
     environment:
       - CHROMA_DB_PORT=8000
       - CHROMA_DB_HOST=chromadb
+    ports:
+      - "8070:8000"
     volumes:
       - face_model:/root/.insightface/models
     depends_on:
@@ -100,13 +102,13 @@ services:
       - --import-realm
       - --verbose
       - --hostname 
-      - http://localhost:8080/keycloak
+      - http://localhost/keycloak
   frontend:
     build: Frontend
     ports:
       - "8000:8000"
     environment:
-      - auth_redirect_uri=http://localhost:8080/keycloak/realms/ai_site/protocol/openid-connect/auth
+      - auth_redirect_uri=http://localhost/keycloak/realms/ai_site/protocol/openid-connect/auth
       - auth_token_uri=http://nginx/keycloak/realms/ai_site/protocol/openid-connect/token
       - user_info_uri=http://nginx/keycloak/realms/ai_site/protocol/openid-connect/userinfo
 volumes:

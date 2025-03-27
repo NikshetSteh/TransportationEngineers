@@ -63,6 +63,22 @@ async def create_ticket_simplified(
     config = get_config()
 
     async with db() as session:
+        # Check for existence of tickets
+        tickets = await session.execute(
+            select(TicketModel)
+            .where(
+                TicketModel.train_number == ticket_data.train_number,
+                TicketModel.wagon_number == ticket_data.wagon_number,
+                TicketModel.place_number == ticket_data.place_number,
+                TicketModel.date == ticket_data.date,
+                TicketModel.start_date == ticket_data.date
+            )
+            .limit(1)
+        )
+        tickets = tickets.scalar()
+        if tickets is not None:
+            raise HTTPException(status_code=409, detail="Ticket already exists")
+
         ticket_model = TicketModel(
             user_id=user_id,
             train_number=ticket_data.train_number,

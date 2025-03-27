@@ -15,7 +15,7 @@ from model.auth_cards import AuthCard as AuthCardModel
 from model.destinations_info import Attraction as AttractionModel
 from model.destinations_info import Hotel as HotelModel
 from model.engineer import Engineer as EngineerModel
-from model.keycloak_users import KeycloakUser
+from model.keycloak_users import KeycloakUser as KeycloakUserModel
 from model.robot import Robot as RobotModel
 from model.ticket import Ticket as TicketModel
 from model.train_stores import TrainStore
@@ -136,6 +136,9 @@ async def delete_user(
         if user is None:
             raise HTTPException(status_code=404, detail="User not found")
 
+        await session.execute(
+            delete(KeycloakUserModel).where(KeycloakUserModel.user_id == user_id)
+        )
         await session.execute(
             delete(TicketModel).where(TicketModel.user_id == user_id)
         )
@@ -566,7 +569,7 @@ async def create_keycloak_user(
         db: DbDependency
 ) -> EmptyResponse:
     async with db() as session:
-        session.add(KeycloakUser(
+        session.add(KeycloakUserModel(
             k_id=keycloak_user.k_id,
             user_id=keycloak_user.user_id
         ))
@@ -582,7 +585,7 @@ async def delete_keycloak_user(
 ) -> EmptyResponse:
     async with db() as session:
         await session.execute(
-            delete(KeycloakUser).where(KeycloakUser.k_id == keycloak_user.k_id)
+            delete(KeycloakUserModel).where(KeycloakUserModel.k_id == keycloak_user.k_id)
         )
         await session.commit()
 
