@@ -111,7 +111,7 @@ async def create_ticket_simplified(
             date=ticket_data.date,
             station_id=ticket_data.station_id.value,
             code="".join(random.choices(config.SYMBOLS_POOL, k=config.TICKET_CODE_LEN)),
-            destination_id=ticket_data.station_id.value,
+            destination_id=ticket_data.destination_id.value,
             start_date=ticket_data.date,
             used=False,
         )
