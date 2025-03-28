@@ -70,7 +70,7 @@ class UserMenu:
         self.attractions_layout = process_scroll_area(self.ui.scrollArea_2)
         self.timer = QTimer()
         self.timer.timeout.connect(self.load_data)
-        self.timer.start(1000)
+        self.timer.start(10000)
 
         self.ui.pushButton.clicked.connect(
             lambda: self.fsm.change_state(self.last_state)
