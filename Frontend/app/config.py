@@ -16,7 +16,7 @@ class Config(BaseSettings):
 
     FRONTEND_URL: str | None = None
 
-    MAX_IMAGE_SIZE: int = int(1.25 * 8 * 1024 * 1024)
+    MAX_IMAGE_SIZE: int = int(8 * 8 * 1024 * 1024)
 
 
 @lru_cache

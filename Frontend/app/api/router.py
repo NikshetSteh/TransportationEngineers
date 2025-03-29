@@ -34,23 +34,20 @@ async def add_biometric(
     if len(contents) > config.MAX_IMAGE_SIZE:
         raise HTTPException(status_code=400, detail="File is too large (max 1.25MB).")
 
-    try:
-        image = Image.open(io.BytesIO(contents))
+    image = Image.open(io.BytesIO(contents))
 
-        if image.format not in ["PNG", "JPEG", "JPG"]:
-            raise HTTPException(status_code=400, detail=f"Unsupported image format. Allowed: PNG, JPEG, JPG")
+    if image.format not in ["PNG", "JPEG", "JPG"]:
+        raise HTTPException(status_code=400, detail=f"Unsupported image format. Allowed: PNG, JPEG, JPG")
 
-        if image.width < 100 or image.height < 100:
-            raise HTTPException(status_code=400, detail=f"Image too small. Min size: {100}x{100}px")
+    if image.width < 100 or image.height < 100:
+        raise HTTPException(status_code=400, detail=f"Image too small. Min size: {100}x{100}px")
 
-        if image.width * image.height > 1000000:
-            raise HTTPException(status_code=400, detail=f"Image too large")
+    if image.width > 10_000 or image.height > 10_000:
+        raise HTTPException(status_code=400, detail=f"Image too large")
 
-        buffered = io.BytesIO()
-        image.save(buffered, format="PNG")
-        image_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
-    except Exception:
-        raise HTTPException(status_code=400, detail="Invalid image file.")
+    buffered = io.BytesIO()
+    image.save(buffered, format="JPEG")
+    image_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
 
     async with ClientSession() as session:
         async with session.post(

@@ -9,7 +9,7 @@ from insightface.app import FaceAnalysis
 
 
 async def search_face(
-    image: str, face_model: FaceAnalysis, chroma_db: AsyncClientAPI
+        image: str, face_model: FaceAnalysis, chroma_db: AsyncClientAPI
 ) -> None | str:
     image_bytes = base64.b64decode(image)
     image_array = np.frombuffer(image_bytes, dtype=np.uint8)
@@ -52,13 +52,13 @@ async def search_face(
 
 
 async def save_face(
-    image: str, user_id: str, model: FaceAnalysis, chroma_db: AsyncClientAPI
+        image: str, user_id: str, model: FaceAnalysis, chroma_db: AsyncClientAPI
 ) -> None:
     image_bytes = base64.b64decode(image)
     image_array = np.frombuffer(image_bytes, dtype=np.uint8)
     image = cv2.imdecode(image_array, flags=cv2.IMREAD_COLOR)
 
-    if image.shape[0] * image.shape[1] > 1000000:
+    if image.shape[0] > 10_000 or image.shape[1] > 10_000:
         raise HTTPException(status_code=400, detail="Image too big")
 
     if image.shape[0] < 100 or image.shape[1] < 100:

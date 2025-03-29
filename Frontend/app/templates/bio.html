@@ -11,7 +11,7 @@
     }
 
     .form-card {
-        box-shadow: 0px 0px 8px 0px rgba(34, 60, 80, 0.7);
+        box-shadow: 0 0 8px 0 rgba(34, 60, 80, 0.7);
         padding: 32px;
         border-radius: 16px;
         text-align: center;
@@ -68,13 +68,13 @@
             });
 
             if (response.ok) {
-                formCard.innerHTML = '<h1>Успешно загружено!</h1><button onclick="location.href=\'/profile\'">Вернуться в профиль</button>';
+                formCard.innerHTML = '<h1 style="margin-bottom: 24px">Успешно загружено!</h1><button onclick="location.href=\'/profile\'">Вернуться в профиль</button>';
             } else {
-                messageDiv.textContent = "Ошибка загрузки.";
+                messageDiv.textContent = "Ошибка загрузки: " + await response.text();
                 messageDiv.style.color = "red";
             }
         } catch (error) {
-            messageDiv.textContent = "Ошибка сети.";
+            messageDiv.textContent = "Ошибка сети: " + error.message;
             messageDiv.style.color = "red";
         }
     });

@@ -60,28 +60,26 @@ async def create_ticket_simplified(
 ) -> Ticket:
     config = get_config()
 
-    print("Time hour", ticket_data.date.hour)
-
     # Fix
     if ticket_data.station_id == Station.MOSCOW:
-        if ticket_data.date.hour == 8:
+        if ticket_data.date.hour == 5:
             ticket_data.train_number = 1012
-        elif ticket_data.date.hour == 12:
+        elif ticket_data.date.hour == 9:
             ticket_data.train_number = 1013
-        elif ticket_data.date.hour == 16:
+        elif ticket_data.date.hour == 13:
             ticket_data.train_number = 1014
-        elif ticket_data.date.hour == 20:
+        elif ticket_data.date.hour == 17:
             ticket_data.train_number = 1015
         else:
             raise HTTPException(status_code=400, detail="Invalid time")
     else:
-        if ticket_data.date.hour == 8:
+        if ticket_data.date.hour == 5:
             ticket_data.train_number = 2012
-        elif ticket_data.date.hour == 12:
+        elif ticket_data.date.hour == 9:
             ticket_data.train_number = 2013
-        elif ticket_data.date.hour == 16:
+        elif ticket_data.date.hour == 13:
             ticket_data.train_number = 2014
-        elif ticket_data.date.hour == 20:
+        elif ticket_data.date.hour == 17:
             ticket_data.train_number = 2015
         else:
             raise HTTPException(status_code=400, detail="Invalid time")
