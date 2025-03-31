@@ -3,35 +3,34 @@ import random
 import uuid
 
 import bcrypt
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import padding
-from fastapi import HTTPException, Request
-from sqlalchemy import delete as db_delete
-from sqlalchemy import select as db_select
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import sessionmaker
-
 from auth.client_type import ClientType
 from auth.engineer_privileges import (EngineerPrivileges,
                                       engineer_privileges_translations)
 from config import get_config
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import padding
 from db import (AUTH_ROBOT_REQUEST_DB, AUTH_ROBOT_SESSION_DB,
                 AUTH_STORE_REQUEST_DB, AUTH_STORE_SESSION_DB, RedisDependency)
+from fastapi import HTTPException, Request
 from model.active_store import ActiveStore
 from model.engineer import Engineer
 from model.robot import Robot as RobotModel
 from redis_async import RedisPool
 from robot.schemes import Robot
+from sqlalchemy import delete as db_delete
+from sqlalchemy import select as db_select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import sessionmaker
 from store_api.schemes import Store
 from store_api.service import get_store
 
 
 async def create_login_code(
-        public_key: str | None,
-        redis_db_index: int,
-        redis_pool: RedisPool,
-        object_id: str | None = None,
+    public_key: str | None,
+    redis_db_index: int,
+    redis_pool: RedisPool,
+    object_id: str | None = None,
 ) -> tuple[str, str]:
     config = get_config()
 
@@ -49,16 +48,15 @@ async def create_login_code(
     else:
         public_key_text = public_key
         public_key = serialization.load_pem_public_key(
-            public_key_text.encode(),
-            backend=default_backend()
+            public_key_text.encode(), backend=default_backend()
         )
         encrypted_data = public_key.encrypt(
             data.encode(),
             padding.OAEP(
                 mgf=padding.MGF1(algorithm=hashes.SHA256()),
                 algorithm=hashes.SHA256(),
-                label=None
-            )
+                label=None,
+            ),
         )
 
     request_id = str(uuid.uuid4())
@@ -73,15 +71,12 @@ async def create_login_code(
 
 
 async def validate_engineer(
-        login: str,
-        password: str,
-        db: sessionmaker[AsyncSession],
-        privilege: int
+    login: str, password: str, db: sessionmaker[AsyncSession], privilege: int
 ) -> Engineer:
     async with db() as db_session:
-        users = (await db_session.execute(
-            db_select(Engineer).where(Engineer.login == login)
-        )).one_or_none()
+        users = (
+            await db_session.execute(db_select(Engineer).where(Engineer.login == login))
+        ).one_or_none()
 
         if users is None:
             raise HTTPException(status_code=401, detail="Invalid credentials")
@@ -98,19 +93,19 @@ async def validate_engineer(
 
 
 async def create_new_login_for_robot(
-        login: str,
-        password: str,
-        public_key: str,
-        robot_model_id: str,
-        robot_model_name: str,
-        db: sessionmaker[AsyncSession]
+    login: str,
+    password: str,
+    public_key: str,
+    robot_model_id: str,
+    robot_model_name: str,
+    db: sessionmaker[AsyncSession],
 ) -> Robot:
     async with db() as db_session:
         await validate_engineer(
             login,
             password,
             db,
-            engineer_privileges_translations[EngineerPrivileges.ROBOT_LOGIN]
+            engineer_privileges_translations[EngineerPrivileges.ROBOT_LOGIN],
         )
 
         await db_session.execute(
@@ -120,7 +115,7 @@ async def create_new_login_for_robot(
         robot = RobotModel(
             public_key=public_key,
             robot_model_id=robot_model_id,
-            robot_model_name=robot_model_name
+            robot_model_name=robot_model_name,
         )
 
         db_session.add(robot)
@@ -129,23 +124,23 @@ async def create_new_login_for_robot(
     return Robot(
         id=str(robot.id),
         robot_model_id=robot.robot_model_id,
-        robot_model_name=robot.robot_model_name
+        robot_model_name=robot.robot_model_name,
     )
 
 
 async def create_new_login_for_store(
-        login: str,
-        password: str,
-        public_key: str,
-        store_id: str,
-        db: sessionmaker[AsyncSession]
+    login: str,
+    password: str,
+    public_key: str,
+    store_id: str,
+    db: sessionmaker[AsyncSession],
 ) -> Store:
     async with db() as db_session:
         await validate_engineer(
             login,
             password,
             db,
-            engineer_privileges_translations[EngineerPrivileges.STORE_LOGIN]
+            engineer_privileges_translations[EngineerPrivileges.STORE_LOGIN],
         )
 
         store = await get_store(store_id)
@@ -154,10 +149,7 @@ async def create_new_login_for_store(
             db_delete(ActiveStore).where(ActiveStore.id == store_id)
         )
 
-        store_model = ActiveStore(
-            id=store.id,
-            public_key=public_key
-        )
+        store_model = ActiveStore(id=store.id, public_key=public_key)
 
         db_session.add(store_model)
         await db_session.commit()
@@ -166,10 +158,10 @@ async def create_new_login_for_store(
 
 
 async def create_login_code_for_client(
-        client_id: str,
-        redis_pool: RedisPool,
-        db: sessionmaker[AsyncSession],
-        client_type: ClientType
+    client_id: str,
+    redis_pool: RedisPool,
+    db: sessionmaker[AsyncSession],
+    client_type: ClientType,
 ) -> tuple[str, str]:
     ClientModelClass = None
     client_db_index = 0
@@ -181,24 +173,26 @@ async def create_login_code_for_client(
         client_db_index = AUTH_STORE_REQUEST_DB
 
     async with db() as db_session:
-        robots = (await db_session.execute(
-            db_select(ClientModelClass).where(ClientModelClass.id == client_id)
-        )).one_or_none()
+        robots = (
+            await db_session.execute(
+                db_select(ClientModelClass).where(ClientModelClass.id == client_id)
+            )
+        ).one_or_none()
         client: RobotModel | ActiveStore | None = None if robots is None else robots[0]
 
     return await create_login_code(
         client if client is None else client.public_key,
         client_db_index,
         redis_pool,
-        str(client.id) if client is not None else None
+        str(client.id) if client is not None else None,
     )
 
 
 async def create_session(
-        login_request_id: str,
-        login_data: str,
-        redis_pool: RedisPool,
-        client_type: ClientType
+    login_request_id: str,
+    login_data: str,
+    redis_pool: RedisPool,
+    client_type: ClientType,
 ) -> str:
     client_db_request_index = 0
     client_db_session_index = 0
@@ -235,10 +229,7 @@ async def create_session(
 
 
 def auth_request(client_type: ClientType):
-    async def func(
-            request: Request,
-            redis_pool: RedisDependency
-    ) -> str:
+    async def func(request: Request, redis_pool: RedisDependency) -> str:
         db_index = -1
         if client_type == ClientType.ROBOT:
             db_index = AUTH_ROBOT_SESSION_DB
@@ -261,4 +252,5 @@ def auth_request(client_type: ClientType):
                 return robot_id
             else:
                 raise HTTPException(status_code=401, detail="Invalid credentials")
+
     return func

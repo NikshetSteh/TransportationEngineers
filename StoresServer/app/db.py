@@ -1,11 +1,10 @@
 from typing import Annotated
 
+from config import get_config
 from fastapi import Depends
+from redis_async.redis import RedisPool
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
-
-from config import get_config
-from redis_async.redis import RedisPool
 
 db_session_factory: sessionmaker[AsyncSession] | None = None
 redit_pool: RedisPool | None = None
@@ -19,7 +18,11 @@ async def create_db_connection_factory() -> None:
 
     # noinspection PyTypeChecker
     factory = sessionmaker(
-        engine, class_=AsyncSession, expire_on_commit=False, autoflush=False, autocommit=False
+        engine,
+        class_=AsyncSession,
+        expire_on_commit=False,
+        autoflush=False,
+        autocommit=False,
     )
 
     db_session_factory = factory

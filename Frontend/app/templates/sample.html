@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Покупка билета на поезд</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        h2 {
+            text-align: center;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        input, select, button {
+            width: 100%;
+            margin: 5px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        #response {
+            text-align: center;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Покупка билета</h2>
+        <form id="ticketForm">
+            <input type="number" id="train_number" placeholder="Номер поезда" required>
+            <input type="number" id="wagon_number" placeholder="Номер вагона" required>
+            <input type="number" id="place_number" placeholder="Номер места" required>
+            <select id="station_id" required>
+                <option value="Москва">Москва</option>
+                <option value="Питер">Питер</option>
+            </select>
+            <input type="text" id="destination" placeholder="Пункт назначения" required>
+            <input type="datetime-local" id="date" required>
+            <input type="datetime-local" id="start_date" required>
+            <button type="submit">Купить билет</button>
+        </form>
+        <p id="response"></p>
+    </div>
+
+    <script>
+        document.getElementById("ticketForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const data = {
+                train_number: parseInt(document.getElementById("train_number").value),
+                wagon_number: parseInt(document.getElementById("wagon_number").value),
+                place_number: parseInt(document.getElementById("place_number").value),
+                station_id: document.getElementById("station_id").value,
+                destination: document.getElementById("destination").value,
+                date: new Date(document.getElementById("date").value).toISOString(),
+                start_date: new Date(document.getElementById("start_date").value).toISOString()
+            };
+
+            fetch("https://api.example.com/buy-ticket", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                document.getElementById("response").innerText = Билет куплен! ID: ${result.id};
+            })
+            .catch(error => {
+                document.getElementById("response").innerText = "Ошибка при покупке билета";
+            });
+        });
+    </script>
+</body>
+</html>

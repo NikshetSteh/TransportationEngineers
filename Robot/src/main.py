@@ -168,7 +168,25 @@ async def main(global_loop) -> NoReturn:
         config = get_config()
 
         if is_login():
-            await login("", session)
+            try:
+                await login("", session)
+            except Exception as e:
+                print(e)
+
+                # Try new login
+                engineer_login = input("Enter engineer login: ")
+                engineer_password = input("Enter engineer password: ")
+
+                await new_login(
+                    engineer_login,
+                    engineer_password,
+                    "",
+                    config.ROBOT_MODEL_ID,
+                    config.ROBOT_MODEL_NAME,
+                    session
+                )
+
+                await login("", session)
         else:
             engineer_login = input("Enter engineer login: ")
             engineer_password = input("Enter engineer password: ")

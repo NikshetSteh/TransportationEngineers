@@ -6,7 +6,7 @@
       <sourceFolder url="file://$MODULE_DIR$/app/static" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/.venv" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.12 virtualenv at D:\Projects\RT\NextGen\TransportationEngineers\Frontend\.venv" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.12.4 WSL (Ubuntu-22.04): (/home/nikshet/Projects/TransportationEngineers/Frontend/.venv/bin/python)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="jsqr" level="application" />
   </component>

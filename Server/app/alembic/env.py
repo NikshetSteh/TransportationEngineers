@@ -1,7 +1,5 @@
 from logging.config import fileConfig
 
-from sqlalchemy import create_engine, pool
-
 from alembic import context
 from config import get_config as get_app_config
 # noinspection PyUnresolvedReferences
@@ -14,15 +12,16 @@ from model.destinations_info import Attraction, Hotel
 # noinspection PyUnresolvedReferences
 from model.engineer import Engineer
 # noinspection PyUnresolvedReferences
+from model.keycloak_users import KeycloakUser
+# noinspection PyUnresolvedReferences
 from model.robot import Robot
 # noinspection PyUnresolvedReferences
 from model.ticket import Ticket
 # noinspection PyUnresolvedReferences
 from model.train_stores import TrainStore
 # noinspection PyUnresolvedReferences
-from model.keycloak_users import KeycloakUser
-# noinspection PyUnresolvedReferences
 from model.user import User
+from sqlalchemy import create_engine, pool
 
 config = context.config
 
@@ -66,14 +65,13 @@ def run_migrations_online() -> None:
 
     """
     app_config = get_app_config()
-    connectable = create_engine(app_config.DB_URI_ALEMBIC,
-                                poolclass=pool.NullPool,
-                                )
+    connectable = create_engine(
+        app_config.DB_URI_ALEMBIC,
+        poolclass=pool.NullPool,
+    )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()

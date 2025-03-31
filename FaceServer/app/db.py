@@ -2,9 +2,8 @@ from typing import Annotated
 
 import chromadb
 from chromadb.api import AsyncClientAPI
-from fastapi import Depends
-
 from config import get_config
+from fastapi import Depends
 
 chroma_client: AsyncClientAPI | None = None
 
@@ -17,8 +16,7 @@ async def get_chroma_db() -> AsyncClientAPI:
 
     config = get_config()
     chroma_client = await chromadb.AsyncHttpClient(
-        host=config.CHROMA_DB_HOST,
-        port=config.CHROMA_DB_PORT
+        host=config.CHROMA_DB_HOST, port=config.CHROMA_DB_PORT
     )
     return chroma_client
 

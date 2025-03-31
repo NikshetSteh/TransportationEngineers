@@ -10,6 +10,13 @@
             </JupyterConnectionParameters>
           </value>
         </entry>
+        <entry key="D:/Projects/DarkForest/Utils/Table2SQL/.idea/Table2SQL.iml">
+          <value>
+            <JupyterConnectionParameters>
+              <option name="managed" value="true" />
+            </JupyterConnectionParameters>
+          </value>
+        </entry>
       </map>
     </option>
   </component>

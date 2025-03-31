@@ -1,0 +1,177 @@
+{% extends 'template.html' %}
+
+{% block head %}
+<script src="/site/static/auth.js"></script>
+{% endblock %}
+
+{% block content %}
+<style>
+    .form-container {
+        display: flex;
+        width: 100%;
+        height: 100vh;
+        justify-content: center;
+        align-items: center;
+        padding: 0;
+    }
+
+    .form-card {
+        box-shadow: 0 0 8px 0 rgba(34, 60, 80, 0.7);
+        padding: 32px;
+        border-radius: 16px;
+        background: white;
+        text-align: center;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    input, select, button {
+        padding: 8px 16px;
+        border-radius: 8px;
+        border: solid 1px black;
+    }
+
+    button {
+        cursor: pointer;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .error-message {
+        color: red;
+    }
+
+    .success-message {
+        color: green;
+        font-weight: bold;
+    }
+</style>
+
+<div class="form-container">
+    <div class="form-card" id="form-card">
+        <form id="ticket-form">
+            <h1>Оформление билета</h1>
+
+            <input type="date" id="date" required>
+
+            <select id="time" required>
+                <option value="" disabled selected>Выберите время</option>
+                <option value="08:00">08:00</option>
+                <option value="12:00">12:00</option>
+                <option value="16:00">16:00</option>
+                <option value="20:00">20:00</option>
+            </select>
+
+            <select id="wagon_number" required>
+                <option value="" disabled selected>Выберите вагон</option>
+                {% for i in range(1, 10) %}
+                <option value="{{ i }}">{{ i }}</option>
+                {% endfor %}
+            </select>
+
+            <select id="place_number" required>
+                <option value="" disabled selected>Выберите место</option>
+                {% for i in range(1, 50) %}
+                <option value="{{ i }}">{{ i }}</option>
+                {% endfor %}
+            </select>
+
+            <select id="station_id" required>
+                <option value="" disabled selected>Выберите станцию</option>
+                <option value="MOSCOW">Москва</option>
+                <option value="SPB">Санкт-Петербург</option>
+            </select>
+
+            <!--            <input type="text" id="destination_id" disabled required placeholder="Пункт назначения">-->
+
+
+            <button type="submit">Купить билет</button>
+            <p class="error-message hidden" id="error-message"></p>
+        </form>
+
+        <div class="hidden" id="success-message">
+            <h2 class="success-message" style="margin-bottom: 24px">Билет успешно оформлен!</h2>
+            <button onclick="window.location.href='/profile'">Вернуться в профиль</button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("ticket-form");
+        const errorMessage = document.getElementById("error-message");
+        const successMessage = document.getElementById("success-message");
+        const dateInput = document.getElementById("date");
+        const timeInput = document.getElementById("time");
+        const stationSelect = document.getElementById("station_id");
+
+        // Restrict date input to future dates only
+        const today = new Date().toISOString().split("T")[0];
+        dateInput.setAttribute("min", today);
+
+        form.addEventListener("submit", function (event) {
+            event.preventDefault(); // Prevent page reload
+
+            const selectedDate = dateInput.value;
+            const selectedTime = timeInput.value;
+
+            if (!selectedDate || !selectedTime) {
+                errorMessage.textContent = "Выберите дату и время";
+                errorMessage.classList.remove("hidden");
+                return;
+            }
+
+            const [hours, minutes] = selectedTime.split(":").map(Number);
+            const [year, month, day] = selectedDate.split("-").map(Number);
+
+            const isoDateTime = new Date(Date.UTC(year, month - 1, day, hours - 3, minutes, 0)).toISOString();
+
+
+            // Convert to ISO datetime format
+            // const isoDateTime = new Date(`${selectedDate}T${selectedTime}:00`).toISOString();
+
+            const formData = {
+                wagon_number: document.getElementById("wagon_number").value,
+                place_number: document.getElementById("place_number").value,
+                station_id: stationSelect.value,
+                destination_id: stationSelect.value === "MOSCOW" ? "SPB" : "MOSCOW",
+                date: isoDateTime
+            };
+
+            fetch("/base_api/v1/frontend/tickets", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${getCookie("access_token")}`
+                },
+                body: JSON.stringify(formData)
+            })
+                .then(async response => {
+                    if (response.ok) {
+                        form.classList.add("hidden");
+                        successMessage.classList.remove("hidden");
+                    } else {
+                        if (response.status === 409) {
+                            throw new Error("Выбранное место занято");
+                        }
+                        const errorText = await response.text();
+                        throw new Error(errorText || "Ошибка оформления билета");
+                    }
+                })
+                .catch(error => {
+                    errorMessage.textContent = error.message || "Ошибка сети, попробуйте снова";
+                    errorMessage.classList.remove("hidden");
+                });
+        });
+    });
+</script>
+
+
+{% endblock %}

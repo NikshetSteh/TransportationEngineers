@@ -525,7 +525,7 @@
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
     "secret" : "7mbHVQGTLUKSNXrNYowg26SMCKv1YeLe",
-    "redirectUris" : [ "http://localhost:8000/login" ],
+    "redirectUris" : [ "http://localhost/login", "http://pleasantly-real-kitten.ngrok-free.app/login" ],
     "webOrigins" : [ "/*" ],
     "notBefore" : 0,
     "bearerOnly" : false,
@@ -1447,7 +1447,10 @@
   },
   "smtpServer" : { },
   "eventsEnabled" : false,
-  "eventsListeners" : [ "jboss-logging" ],
+  "eventsListeners" : [ 
+      "jboss-logging",
+      "webhook-http"
+  ],
   "enabledEventTypes" : [ ],
   "adminEventsEnabled" : false,
   "adminEventsDetailsEnabled" : false,
@@ -2204,7 +2207,7 @@
     "parRequestUriLifespan" : "60",
     "cibaInterval" : "5",
     "realmReusableOtpCode" : "false",
-    "frontendUrl": "http://localhost:8080/keycloak"
+    "frontendUrl": "http://localhost/keycloak"
   },
   "keycloakVersion" : "26.0.7",
   "userManagedAccessAllowed" : false,

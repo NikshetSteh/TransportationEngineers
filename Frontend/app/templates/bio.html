@@ -1,0 +1,82 @@
+{% extends 'template.html' %}
+{% block content %}
+<style>
+    .form-container {
+        display: flex;
+        width: 100%;
+        height: 100vh;
+        justify-content: center;
+        align-items: center;
+        padding: 0;
+    }
+
+    .form-card {
+        box-shadow: 0 0 8px 0 rgba(34, 60, 80, 0.7);
+        padding: 32px;
+        border-radius: 16px;
+        text-align: center;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    input, select, button {
+        padding: 8px 16px;
+        border-radius: 8px;
+        border: solid 1px black;
+    }
+
+    .message {
+        margin-top: 16px;
+        font-weight: bold;
+    }
+</style>
+<div class="form-container">
+    <div class="form-card" id="formCard">
+        <form id="faceForm">
+            <h1>Загрузка биометрии</h1>
+            <input type="file" id="file" name="file" accept="image/png, image/jpeg" required />
+            <button type="submit">Сохранить</button>
+            <div id="message" class="message"></div>
+        </form>
+    </div>
+</div>
+<script>
+    document.getElementById('faceForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+
+        const formData = new FormData();
+        const fileInput = document.getElementById('file');
+        const messageDiv = document.getElementById('message');
+        const formCard = document.getElementById('formCard');
+
+        if (fileInput.files.length === 0) {
+            messageDiv.textContent = "Выберите файл";
+            messageDiv.style.color = "red";
+            return;
+        }
+
+        formData.append('file', fileInput.files[0]);
+
+        try {
+            const response = await fetch('/api/v1/users/face', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                formCard.innerHTML = '<h1 style="margin-bottom: 24px">Успешно загружено!</h1><button onclick="location.href=\'/profile\'">Вернуться в профиль</button>';
+            } else {
+                messageDiv.textContent = "Ошибка загрузки: " + await response.text();
+                messageDiv.style.color = "red";
+            }
+        } catch (error) {
+            messageDiv.textContent = "Ошибка сети: " + error.message;
+            messageDiv.style.color = "red";
+        }
+    });
+</script>
+{% endblock %}

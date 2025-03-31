@@ -17,6 +17,10 @@ services:
         condition: service_started
       store_server:
         condition: service_started
+    restart: unless-stopped
+
+
+
   store_server:
     build: StoresServer
     environment:
@@ -26,23 +30,33 @@ services:
     depends_on:
       store_db:
         condition: service_started
+    restart: unless-stopped
+
+
+
   face_server:
     build: FaceServer
     environment:
       - CHROMA_DB_PORT=8000
       - CHROMA_DB_HOST=chromadb
+    ports:
+      - "8050:8000"
     volumes:
       - face_model:/root/.insightface/models
     depends_on:
       chromadb:
         condition: service_started
+    restart: unless-stopped
+
+
+
   nginx:
     image: nginx:1.27-alpine
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ./DebugData/static:/app/static
     ports:
-      - "8080:80"
+      - "80:80"
     depends_on:
       store_server:
         condition: service_started
@@ -50,14 +64,26 @@ services:
         condition: service_started
       face_server:
         condition: service_started
+    restart: unless-stopped
+
+
+
   redis:
     image: "redis:alpine"
+    restart: unless-stopped
+
+
+
   chromadb:
     image: chromadb/chroma
     environment:
       - PERSIST_DIRECTORY=/chroma/chroma
     volumes:
       - chroma_data:/chroma/chroma
+    restart: unless-stopped
+
+
+
   base_db:
     image: postgres:14-alpine
     ports:
@@ -69,6 +95,10 @@ services:
       - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
       - base_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+
+
   store_db:
     image: postgres:14-alpine
     ports:
@@ -80,24 +110,65 @@ services:
       - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
       - stores_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+
+
+  keycloak_db:
+    image: postgres:14-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=TransportEngineersKeycloak
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - keycloak_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+
+
   keycloak:
     image: quay.io/keycloak/keycloak:latest
-    ports:
-      - "8090:8080"
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: TheRealAdmin
       KC_BOOTSTRAP_ADMIN_PASSWORD: TheR@alAdmin)
       KC_HTTP_RELATIVE_PATH: /keycloak
+      WEBHOOK_HTTP_BASE_PATH: "http://base_server:8000/base_api/v1/frontend/keycloak_listener"
+      WEBHOOK_HTTP_AUTH_USERNAME: "admin"
+      WEBHOOK_HTTP_AUTH_PASSWORD: "password"
+      KC_DB: postgres
+      KC_DB_URL_HOST: keycloak_db
+      KC_DB_URL_DATABASE: TransportEngineersKeycloak
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: root
     volumes:
       - ./keycloak_realm.json:/opt/keycloak/data/import/main_realm.json
+      - ./KeycloakPlugins:/opt/keycloak/providers:ro
     command:
       - start-dev
       - --import-realm
       - --verbose
-      - --hostname 
-      - http://localhost:8080/keycloak
+      - --hostname
+      - http://localhost/keycloak
+    depends_on:
+      - keycloak_db
+    restart: unless-stopped
+
+
+
+  frontend:
+    build: Frontend
+    environment:
+      - auth_redirect_uri=http://localhost/keycloak/realms/ai_site/protocol/openid-connect/auth
+      - auth_token_uri=http://nginx/keycloak/realms/ai_site/protocol/openid-connect/token
+      - user_info_uri=http://nginx/keycloak/realms/ai_site/protocol/openid-connect/userinfo
+    restart: unless-stopped
+
+
+
 volumes:
   base_data:
   stores_data:
   chroma_data:
   face_model:
+  keycloak_data:

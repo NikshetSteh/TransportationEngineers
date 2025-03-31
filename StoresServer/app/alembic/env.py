@@ -1,7 +1,5 @@
 from logging.config import fileConfig
 
-from sqlalchemy import create_engine, pool
-
 from alembic import context
 from config import get_config as get_app_config
 from model.base import Base
@@ -13,6 +11,7 @@ from model.item import PurchaseItem, StoreItem
 from model.store import Store
 # noinspection PyUnresolvedReferences
 from model.task import Task
+from sqlalchemy import create_engine, pool
 
 config = context.config
 
@@ -56,14 +55,13 @@ def run_migrations_online() -> None:
 
     """
     app_config = get_app_config()
-    connectable = create_engine(app_config.DB_URI_ALEMBIC,
-                                poolclass=pool.NullPool,
-                                )
+    connectable = create_engine(
+        app_config.DB_URI_ALEMBIC,
+        poolclass=pool.NullPool,
+    )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()

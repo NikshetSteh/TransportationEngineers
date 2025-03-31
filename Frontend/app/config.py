@@ -3,12 +3,20 @@ from functools import lru_cache
 
 
 class Config(BaseSettings):
-    client_id: str = "ai_site"
-    client_secret: str = "7mbHVQGTLUKSNXrNYowg26SMCKv1YeLe"
+    CLIENT_ID: str = "ai_site"
+    CLIENT_SECRET: str = "7mbHVQGTLUKSNXrNYowg26SMCKv1YeLe"
 
-    auth_redirect_uri: str = "http://localhost:8080/keycloak/realms/ai_site/protocol/openid-connect/auth"
-    auth_token_uri: str = "http://localhost:8080/keycloak/realms/ai_site/protocol/openid-connect/token"
-    user_info_uri: str = "http://localhost:8080/keycloak/realms/ai_site/protocol/openid-connect/userinfo"
+    AUTH_REDIRECT_URI: str = "http://localhost/keycloak/realms/ai_site/protocol/openid-connect/auth"
+    AUTH_TOKEN_URI: str = "http://localhost/keycloak/realms/ai_site/protocol/openid-connect/token"
+    USER_INFO_URI: str = "http://localhost/keycloak/realms/ai_site/protocol/openid-connect/userinfo"
+
+    ROBOT_API_URI: str = "http://localhost/base_api/v1"
+
+    API_URI: str = "http://nginx"
+
+    FRONTEND_URL: str | None = None
+
+    MAX_IMAGE_SIZE: int = int(8 * 8 * 1024 * 1024)
 
 
 @lru_cache

@@ -1,7 +1,6 @@
 from typing import Optional
 
 from pydantic import BaseModel, Field
-
 from store_api.store_types import StoreType
 
 

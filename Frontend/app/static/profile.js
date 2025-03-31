@@ -12,7 +12,7 @@ function getCookie(name) {
 const accessToken = getCookie("access_token");
 
 if (accessToken) {
-    fetch("http://localhost:8080/base_api/v1/frontend/get_ticket", {
+    fetch(window.ROBOT_API + "/frontend/get_ticket", {
         method: "GET",
         headers: {
             "Authorization": `Bearer ${accessToken}`,
@@ -32,10 +32,28 @@ if (accessToken) {
             seat_number_html = document.getElementById("seat_number");
             seat_number_html.innerHTML = data.place_number;
 
-            const all = document.getElementsByClassName('authorized');
-            for (let i = 0; i < all.length; i++) {
-                all[i].style.display = 'block';
-            }
+            const dateObj = new Date(data.date);
+
+            const formattedDate = dateObj.toLocaleString("ru-RU", {
+                weekday: "long",  // "Monday"
+                year: "numeric",  // "2024"
+                month: "long",    // "March"
+                day: "numeric",   // "27"
+                hour: "2-digit",  // "2"
+                minute: "2-digit",// "30"
+                hour12: false      // "PM" (can be false for 24-hour format)
+            });
+
+
+            departure_time_html = document.getElementById("departure_time");
+            departure_time_html.innerHTML = formattedDate;
+
+            train_number_html = document.getElementById("train_number");
+            train_number_html.innerHTML = data.train_number;
+
+
+            const ticket_block = document.getElementById('ticket');
+            ticket_block.style.display = 'block';
         })
         .catch(error => {
             console.error("Error:", error); // Handle errors
@@ -44,31 +62,24 @@ if (accessToken) {
     console.error("Access token not found in cookies.");
 }
 
-function decodeBase64Unicode(encodedStr) {
-    try {
-        // Decode base64 and handle Unicode characters
-        return decodeURIComponent(
-            Array.from(atob(encodedStr))
-                .map(c => `%${c.charCodeAt(0).toString(16).padStart(2, '0')}`)
-                .join("")
-        );
-    } catch (e) {
-        console.error("Failed to decode base64 string with Unicode:", e);
-        return null;
-    }
-}
 
-const encodedUsername = getCookie("given_name");
-if (encodedUsername) {
-    const username = decodeBase64Unicode(encodedUsername);
-    if (username) {
-        document.getElementById("name").textContent = `Здравствуйте, ${username}!`;
-    } else {
-        console.error("Failed to decode username.");
-    }
-} else {
-    console.error("Username cookie not found.");
-}
+fetch("/api/v1/users", {
+    method: "GET",
+    headers: {
+        "Content-Type": "application/json",
+    },
+})
+    .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
 
-
-
+            return response.json();
+        }
+    )
+    .then(data => {
+        document.getElementById("name").textContent = `Здравствуйте, ${data.username}!`;
+    })
+    .catch(error => {
+        console.error("Error:", error);
+    });
