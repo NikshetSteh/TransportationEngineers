@@ -55,6 +55,10 @@ async def keycloak_listener(
 ) -> None:
     config = get_config()
 
+    logger.debug(
+        "Keycloak webhook received:\n{0}".format(request_data.model_dump_json(indent=4))
+    )
+
     if (
         credentials.username != config.KEYCLOAK_WEBHOOK_LOGIN
         or credentials.password != config.KEYCLOAK_WEBHOOK_PASSWORD
@@ -87,10 +91,6 @@ async def keycloak_listener(
             logger.info(
                 "User deleted from keycloak: id='{0}'".format(request_data.userId)
             )
-
-    logger.debug(
-        "Keycloak webhook received:\n{0}".format(request_data.model_dump_json(indent=4))
-    )
 
 
 @router.post("/tickets")

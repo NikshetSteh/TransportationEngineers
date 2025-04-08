@@ -2,7 +2,7 @@ import random
 
 from config import get_config
 from fastapi import HTTPException
-from frontend.schemes import TicketCreation, Station
+from frontend.schemes import Station, TicketCreation
 from model.keycloak_users import KeycloakUser
 from model.ticket import Ticket as TicketModel
 from sqlalchemy import select
@@ -22,7 +22,7 @@ async def k_id_to_user_id(k_id: str, db: sessionmaker[AsyncSession]) -> str:
 
 
 async def get_user_last_ticket(
-        k_user_id: str, db: sessionmaker[AsyncSession]
+    k_user_id: str, db: sessionmaker[AsyncSession]
 ) -> Ticket | None:
     user_id = await k_id_to_user_id(k_user_id, db)
 
@@ -56,7 +56,7 @@ async def get_user_last_ticket(
 
 
 async def create_ticket_simplified(
-        ticket_data: TicketCreation, user_id: str, db: sessionmaker[AsyncSession]
+    ticket_data: TicketCreation, user_id: str, db: sessionmaker[AsyncSession]
 ) -> Ticket:
     config = get_config()
 

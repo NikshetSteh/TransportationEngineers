@@ -49,6 +49,8 @@ async def get_redis() -> RedisPool:
 DbDependency = Annotated[sessionmaker[AsyncSession], Depends(get_db_connection_factory)]
 RedisDependency = Annotated[RedisPool, Depends(get_redis)]
 
+DB = sessionmaker[AsyncSession]
+
 AUTH_ROBOT_REQUEST_DB = 0
 AUTH_ROBOT_SESSION_DB = 1
 AUTH_STORE_REQUEST_DB = 2
