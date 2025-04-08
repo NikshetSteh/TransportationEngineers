@@ -1,40 +1,5 @@
 import background from "../../assets/background.png";
-import logo from "../../assets/icon.svg";
-import Button from "react-bootstrap/Button";
-import {useAuth} from "react-oidc-context";
-import {JSX} from "react/jsx-runtime";
-import IntrinsicAttributes = JSX.IntrinsicAttributes;
-
-// Props for Header Component
-interface HeaderProps extends IntrinsicAttributes {
-    onSignIn: () => void;
-    onSignUp: () => void;
-    onSignOut: () => void;
-    isAuthenticated: boolean;
-}
-
-// Header Component
-const Header = ({onSignIn, onSignUp, onSignOut, isAuthenticated}: HeaderProps) => (
-    <header className="padding-0 d-flex justify-content-between align-items-center bg-secondary text-white">
-        {/* auto width */}
-        <div
-            className="align-self-stretch w-auto base-background d-flex justify-content-center align-items-cente icon-container">
-            <img src={logo} alt="Robot Logo" className="base-background"/>
-        </div>
-        <div className="p-3 h-auto">
-            {!isAuthenticated ?
-                <>
-                    <Button variant="primary" className="me-2" onClick={onSignIn}>Войти</Button>
-                    <Button variant="secondary" onClick={onSignUp}>Зарегистрироваться</Button>
-                </> :
-                <>
-                    <Button variant="secondary" onClick={onSignOut}>Выйти</Button>
-                </>}
-            {/*<Button variant="primary" className="me-2">Войти</Button>*/}
-            {/*<Button variant="secondary">Зарегистрироваться</Button>*/}
-        </div>
-    </header>
-);
+import Header from "../Header.tsx";
 
 const HeroSection = () => (
     <section
@@ -102,12 +67,10 @@ const Footer = () => (
 
 // Main IndexPage Component
 const Index = () => {
-    const auth = useAuth()
-
     return (
         <div className="d-flex flex-column min-vh-100">
             {/* Header */}
-            <Header onSignIn={auth.signinRedirect} onSignUp={auth.signinRedirect} onSignOut={auth.signoutRedirect} isAuthenticated={auth.isAuthenticated}/>
+            <Header/>
 
             {/* Hero Section */}
             <HeroSection/>

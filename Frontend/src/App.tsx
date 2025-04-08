@@ -1,9 +1,10 @@
 import './App.css'
 import {Route, Routes} from 'react-router';
-import Index from "./components/pages";
-import Profile from "./components/pages/profile";
-import { useAuth } from "react-oidc-context";
+import Index from "./components/pages/Index.tsx";
+import Profile from "./components/pages/Profile.tsx";
+import {useAuth} from "react-oidc-context";
 import {JSX} from "react";
+import Login from "./components/pages/Login.tsx";
 
 
 function PrivateRoute({children}: { children: JSX.Element }) {
@@ -32,6 +33,8 @@ function App() {
                     <Profile/>
                 </PrivateRoute>
             }/>
+
+            <Route path="/login" element={<Login/>}/>
         </Routes>
     )
 }
