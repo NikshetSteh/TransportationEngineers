@@ -121,6 +121,8 @@ services:
       - POSTGRES_PASSWORD=root
       - POSTGRES_DB=TransportEngineersKeycloak
       - PGDATA=/var/lib/postgresql/data/pgdata
+    ports:
+      - "5490:5432"
     volumes:
       - keycloak_data:/var/lib/postgresql/data
     restart: unless-stopped
@@ -149,16 +151,16 @@ services:
       - ./KeycloakPlugins:/opt/keycloak/providers:ro
       - ./KeycloakTheme:/opt/keycloak/themes/KeycloakTheme:ro
     command:
-      - start
+      - start-dev
       - --import-realm
       - --verbose
       - --hostname
       - https://cufar.space/keycloak
       - --proxy-headers=xforwarded
-      - --log-level=DEBUG
+      - --log-level=INFO
     depends_on:
       - keycloak_db
-    restart: unless-stopped
+      # restart: unless-stopped
 
 
 

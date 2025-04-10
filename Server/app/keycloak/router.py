@@ -2,6 +2,8 @@ from db import DbDependency
 from fastapi import APIRouter
 from keycloak.schemes import *
 from keycloak.service import *
+from schemes import EmptyResponse
+from users.service import delete_user
 
 router = APIRouter()
 
@@ -27,7 +29,12 @@ async def delete_user_handler(user_id: str, db: DbDependency) -> None:
 
 @router.get("/users/id/{user_id}")
 async def get_user_by_id_handler(user_id: str, db: DbDependency) -> ProvidedUser:
-    return await get_user_by_attribute("id", user_id, db)
+    user =  await get_user_by_attribute("id", user_id, db)
+
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    return user
 
 
 @router.get("/users/username/{username}")
