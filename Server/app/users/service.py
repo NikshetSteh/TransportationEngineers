@@ -31,11 +31,11 @@ async def create_user(username: str, kid: str, db: sessionmaker):
     return User(id=str(user.id), name=username)
 
 
-async def delete_user(user_id: str, db: sessionmaker):
+async def delete_user(user_id: str, db: sessionmaker) -> None:
     async with db() as session:
         user = (
             await session.execute(select(UserModel).where(UserModel.id == user_id))
-        ).one_or_none()
+        ).scalar()
 
         if user is None:
             raise HTTPException(status_code=404, detail="User not found")
@@ -50,5 +50,5 @@ async def delete_user(user_id: str, db: sessionmaker):
 
         await delete_face(user_id)
 
-        await session.delete(user[0])
+        await session.delete(user)
         await session.commit()

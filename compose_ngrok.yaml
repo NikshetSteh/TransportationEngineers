@@ -7,7 +7,7 @@ services:
       - DB_URI=postgresql+asyncpg://postgres:root@base_db:5432/TransportEngineers
       - DB_URI_ALEMBIC=postgresql+psycopg2://postgres:root@base_db:5432/TransportEngineers
       - REDIS_URI=redis://redis:6379
-      - KEYCLOAK_INTROSPECTIVE_ENDPOINT=http://nginx:80/keycloak/realms/ai_site/protocol/openid-connect/token/introspect
+      - KEYCLOAK_INTROSPECTIVE_ENDPOINT=http://nginx/keycloak/realms/ai_site/protocol/openid-connect/userinfo
     depends_on:
       base_db:
         condition: service_started
@@ -53,7 +53,7 @@ services:
   nginx:
     image: nginx:1.27-alpine
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx_ngrok.conf:/etc/nginx/nginx.conf:ro
       - ./DebugData/static:/app/static
     ports:
       - "80:80"
@@ -121,6 +121,8 @@ services:
       - POSTGRES_PASSWORD=root
       - POSTGRES_DB=TransportEngineersKeycloak
       - PGDATA=/var/lib/postgresql/data/pgdata
+    ports:
+      - "5490:5432"
     volumes:
       - keycloak_data:/var/lib/postgresql/data
     restart: unless-stopped
@@ -133,6 +135,9 @@ services:
       KC_BOOTSTRAP_ADMIN_USERNAME: TheRealAdmin
       KC_BOOTSTRAP_ADMIN_PASSWORD: TheR@alAdmin)
       KC_HTTP_RELATIVE_PATH: /keycloak
+      KC_HTTP_ENABLED: true
+      KC_HOSTNAME: cufar.space
+      KC_PROXY: edge
       WEBHOOK_HTTP_BASE_PATH: "http://base_server:8000/base_api/v1/frontend/keycloak_listener"
       WEBHOOK_HTTP_AUTH_USERNAME: "admin"
       WEBHOOK_HTTP_AUTH_PASSWORD: "password"
@@ -142,28 +147,25 @@ services:
       KC_DB_USERNAME: postgres
       KC_DB_PASSWORD: root
     volumes:
-      - ./keycloak_realm_ngrok.json:/opt/keycloak/data/import/main_realm.json
+      - ./keycloak_realm_ngrok.json:/opt/keycloak/data/import/main_realm.json:ro
       - ./KeycloakPlugins:/opt/keycloak/providers:ro
+      - ./KeycloakTheme:/opt/keycloak/themes/KeycloakTheme:ro
     command:
       - start-dev
       - --import-realm
       - --verbose
       - --hostname
       - https://cufar.space/keycloak
+      - --proxy-headers=xforwarded
+      - --log-level=INFO
     depends_on:
       - keycloak_db
-    restart: unless-stopped
+      # restart: unless-stopped
 
 
 
   frontend:
     build: Frontend
-    environment:
-      - AUTH_REDIRECT_URI=https://cufar.space/keycloak/realms/ai_site/protocol/openid-connect/auth
-      - AUTH_TOKEN_URI=http://nginx/keycloak/realms/ai_site/protocol/openid-connect/token
-      - USER_INFO_URI=http://nginx/keycloak/realms/ai_site/protocol/openid-connect/userinfo
-      - ROBOT_API_URI=https://cufar.space/base_api/v1
-      - FRONTEND_URL=https://cufar.space
     restart: unless-stopped
 
 

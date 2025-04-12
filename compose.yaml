@@ -142,8 +142,9 @@ services:
       KC_DB_USERNAME: postgres
       KC_DB_PASSWORD: root
     volumes:
-      - ./keycloak_realm.json:/opt/keycloak/data/import/main_realm.json
+      - ./keycloak_realm.json:/opt/keycloak/data/import/main_realm.json:ro
       - ./KeycloakPlugins:/opt/keycloak/providers:ro
+      - ./KeycloakTheme:/opt/keycloak/themes/KeycloakTheme:ro
     command:
       - start-dev
       - --import-realm

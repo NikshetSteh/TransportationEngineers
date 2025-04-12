@@ -7,7 +7,7 @@ std_handler = logging.StreamHandler()
 std_handler.setLevel(logging.DEBUG)
 
 formatter = logging.Formatter(
-    "%(asctime)s %(levelname)s %(message)s %(pathname)s:%(lineno)d"
+    "%(asctime)s %(levelname)s %(pathname)s:%(lineno)d %(message)s"
 )
 std_handler.setFormatter(formatter)
 
