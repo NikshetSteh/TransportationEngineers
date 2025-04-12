@@ -66,8 +66,6 @@ class CustomUserAdapter(
     }
 
     override fun getAttributes(): MutableMap<String, List<String>> {
-
-
         val attrs = mutableMapOf<String, List<String>>()
         attrs["ENABLED"] = listOf("true")
         attrs["EMAIL_VERIFIED"] = listOf("true")

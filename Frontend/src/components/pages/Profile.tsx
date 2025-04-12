@@ -9,29 +9,9 @@ interface UserInfoProps {
     email: string;
 }
 
+
 function UserInfo({fullName, email}: UserInfoProps) {
-    const [oldPassword, setOldPassword] = useState<string>("");
-    const [newPassword, setNewPassword] = useState<string>("");
 
-    const handlePasswordUpdate = () => {
-        if (!oldPassword || !newPassword) {
-            alert("Please fill in both old and new passwords.");
-            return;
-        }
-
-        // Simulate API call to update password
-        axios
-            .post("/api/update-password", {oldPassword, newPassword})
-            .then(() => {
-                alert("Password updated successfully!");
-                setOldPassword("");
-                setNewPassword("");
-            })
-            .catch((error) => {
-                alert("Failed to update password. Please check your old password.");
-                console.error(error);
-            });
-    };
 
     return <div className="card mb-4">
         <div className="card-body">
@@ -67,29 +47,6 @@ function UserInfo({fullName, email}: UserInfoProps) {
                 {/*</Button>*/}
             </p>
             {/*)}*/}
-
-            <hr/>
-
-            <h3 className="fs-5 fw-bold">Обновление пароля</h3>
-            <div className="mb-3">
-                <input
-                    type="password"
-                    placeholder="Старый пароль"
-                    value={oldPassword}
-                    onChange={(e) => setOldPassword(e.target.value)}
-                    className="form-control mb-2"
-                />
-                <input
-                    type="password"
-                    placeholder="Новый пароль"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    className="form-control mb-2"
-                />
-                <Button onClick={handlePasswordUpdate} variant="primary">
-                    Обновить пароль
-                </Button>
-            </div>
         </div>
     </div>
 }
@@ -145,7 +102,7 @@ const ProfilePage: React.FC = () => {
             }
         };
 
-        fetchBiometrics();
+        void fetchBiometrics();
     }, [auth.isLoading]);
 
     // Fetch current tickets
@@ -161,7 +118,7 @@ const ProfilePage: React.FC = () => {
             }
         };
 
-        fetchTickets();
+        void fetchTickets();
     }, [auth.isLoading]);
 
     useEffect(

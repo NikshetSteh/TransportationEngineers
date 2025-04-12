@@ -8,9 +8,10 @@ import {AuthProvider} from "react-oidc-context";
 const oidcConfig = {
     authority: "https://cufar.space/keycloak/realms/ai_site",
     client_id: "ai_site",
-    redirect_uri: "https://cufar.space/profile",
+    redirect_uri: "https://cufar.space/login",
     // redirect_uri: "http://localhost:5173/profile",
-    loadUserInfo: true
+    loadUserInfo: true,
+    silent_redirect_uri: "/login"
 };
 
 createRoot(document.getElementById('root')!).render(

@@ -2,30 +2,20 @@ import random
 
 from config import get_config
 from fastapi import HTTPException
-from frontend.schemes import Station, TicketCreation
-from model.keycloak_users import KeycloakUser
+from frontend.schemes import Station, TicketCreation, PasswordChangeRequest
 from model.ticket import Ticket as TicketModel
+from model.user import User as UserModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import sessionmaker
 from users.schemes import Ticket
 
-
-async def k_id_to_user_id(k_id: str, db: sessionmaker[AsyncSession]) -> str:
-    async with db() as session:
-        user = (
-            await session.execute(select(KeycloakUser).where(KeycloakUser.k_id == k_id))
-        ).one_or_none()
-        if user is None:
-            raise HTTPException(status_code=403, detail="Keycloak not linked")
-        return user[0].user_id
+from bcrypt import checkpw, hashpw, gensalt
 
 
 async def get_user_last_ticket(
-    k_user_id: str, db: sessionmaker[AsyncSession]
+        user_id: str, db: sessionmaker[AsyncSession]
 ) -> Ticket | None:
-    user_id = await k_id_to_user_id(k_user_id, db)
-
     async with db() as session:
         ticket_data = (
             await session.execute(
@@ -56,7 +46,7 @@ async def get_user_last_ticket(
 
 
 async def create_ticket_simplified(
-    ticket_data: TicketCreation, user_id: str, db: sessionmaker[AsyncSession]
+        ticket_data: TicketCreation, user_id: str, db: sessionmaker[AsyncSession]
 ) -> Ticket:
     config = get_config()
 

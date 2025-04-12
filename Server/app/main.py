@@ -3,7 +3,7 @@ from auth.routers import router as auth_router
 from db import create_db_connection_factory
 from fastapi import APIRouter, FastAPI
 from fastapi_pagination import add_pagination
-from frontend.routers import router as frontend_router
+from frontend.router import router as frontend_router
 from keycloak.router import router as keycloak_user_router
 from robot.routers import router as robot_router
 

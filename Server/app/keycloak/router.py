@@ -1,8 +1,8 @@
-from db import DbDependency
 from fastapi import APIRouter
+
+from db import DbDependency
 from keycloak.schemes import *
 from keycloak.service import *
-from schemes import EmptyResponse
 from users.service import delete_user
 
 router = APIRouter()

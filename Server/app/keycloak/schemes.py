@@ -1,6 +1,13 @@
 from pydantic import BaseModel, Field
 
 
+def keycloak_id_strip(s: str) -> str:
+    if s.startswith("f:"):
+        return s.split(":")[2]
+
+    return s
+
+
 class ProvidedUserBase(BaseModel):
     username: str = ""
     full_name: str = ""

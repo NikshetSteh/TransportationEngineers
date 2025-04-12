@@ -7,7 +7,7 @@ services:
       - DB_URI=postgresql+asyncpg://postgres:root@base_db:5432/TransportEngineers
       - DB_URI_ALEMBIC=postgresql+psycopg2://postgres:root@base_db:5432/TransportEngineers
       - REDIS_URI=redis://redis:6379
-      - KEYCLOAK_INTROSPECTIVE_ENDPOINT=http://nginx:80/keycloak/realms/ai_site/protocol/openid-connect/token/introspect
+      - KEYCLOAK_INTROSPECTIVE_ENDPOINT=http://nginx/keycloak/realms/ai_site/protocol/openid-connect/userinfo
     depends_on:
       base_db:
         condition: service_started
