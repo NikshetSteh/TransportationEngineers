@@ -105,3 +105,9 @@ async def get_all_users(chroma_db: AsyncClientAPI) -> list[str]:
     collection = await chroma_db.get_or_create_collection("faces")
     users = await collection.query(n_results=await collection.count())
     return users["ids"]
+
+
+async def check_for_existing_user(user_id: str, chroma_db: AsyncClientAPI) -> bool:
+    collection = await chroma_db.get_or_create_collection("faces")
+    result = await collection.get(ids=[user_id])
+    return len(result["ids"]) > 0

@@ -16,3 +16,6 @@ class EmptyResponse(BaseModel):
 
 class User(BaseModel):
     user_id: str
+
+class ExistingCheckResponse(BaseModel):
+    status: bool

@@ -5,6 +5,7 @@ import Profile from "./components/pages/Profile.tsx";
 import {useAuth} from "react-oidc-context";
 import {JSX} from "react";
 import Login from "./components/pages/Login.tsx";
+import BiometricsForm from "./components/pages/BiometricsForm.tsx";
 
 
 function PrivateRoute({children}: { children: JSX.Element }) {
@@ -31,6 +32,12 @@ function App() {
             <Route path="/profile" element={
                 <PrivateRoute>
                     <Profile/>
+                </PrivateRoute>
+            }/>
+
+            <Route path="/profile/biometrics/upload" element={
+                <PrivateRoute>
+                    <BiometricsForm/>
                 </PrivateRoute>
             }/>
 

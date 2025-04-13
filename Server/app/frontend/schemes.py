@@ -4,10 +4,6 @@ from enum import Enum
 from pydantic import BaseModel, Field
 
 
-class Face(BaseModel):
-    face: str | None = Field(max_length=int(1.25 * 8 * 1024 * 1024), default=None)
-
-
 class Station(Enum):
     MOSCOW = "MOSCOW"
     SPB = "SPB"

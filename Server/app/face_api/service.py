@@ -9,7 +9,7 @@ async def save_face(image: str, user_id: str) -> None:
     async with aiohttp.ClientSession() as session:
         url = f"{config.FACE_API}/face"
         async with session.post(
-            url, json={"image": image, "user_id": user_id}
+                url, json={"image": image, "user_id": user_id}
         ) as response:
             if response.status == 200:
                 return
@@ -46,5 +46,17 @@ async def delete_face(user_id: str) -> None:
         async with session.delete(url) as response:
             if response.status == 200:
                 return
+            else:
+                raise Exception(f"Error: {response.status}, {await response.json()}")
+
+
+async def check_for_existence(user_id: str) -> bool:
+    config = get_config()
+
+    async with aiohttp.ClientSession() as session:
+        url = f"{config.FACE_API}/check/{user_id}"
+        async with session.get(url) as response:
+            if response.status == 200:
+                return (await response.json())["status"]
             else:
                 raise Exception(f"Error: {response.status}, {await response.json()}")

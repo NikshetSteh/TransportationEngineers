@@ -1,9 +1,8 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, UploadFile
 
 from db import DbDependency
 from face_api.service import delete_face, save_face
 from frontend.dependecies import KeycloakAuthRequired
-from frontend.schemes import Face, PasswordChangeRequest
 from frontend.service import *
 from schemes import EmptyResponse
 from users.schemes import Ticket
@@ -12,7 +11,7 @@ router = APIRouter()
 
 
 @router.get("/get_ticket")
-async def get_ticket(user_id: KeycloakAuthRequired, db: DbDependency) -> Ticket:
+async def get_ticket_router(user_id: KeycloakAuthRequired, db: DbDependency) -> Ticket:
     ticket = await get_user_last_ticket(
         user_id,
         db,
@@ -24,20 +23,33 @@ async def get_ticket(user_id: KeycloakAuthRequired, db: DbDependency) -> Ticket:
     return ticket
 
 
-@router.post("/face")
-async def add_face(
-        user_id: KeycloakAuthRequired, face: Face
+@router.post("/faces")
+async def add_face_router(
+        user_id: KeycloakAuthRequired,
+        file: UploadFile | None = None
 ) -> EmptyResponse:
-    if face.face is not None:
-        await save_face(face.face, user_id)
+    if file is not None:
+        await create_face(file, user_id)
     else:
         await delete_face(user_id)
 
     return EmptyResponse()
 
 
+@router.get("/faces")
+async def check_face_for_existence_router(
+        user_id: KeycloakAuthRequired
+) -> EmptyResponse:
+    is_exist = await check_face_for_existence(user_id)
+
+    if not is_exist:
+        raise HTTPException(status_code=404, detail="Face not found")
+
+    return EmptyResponse()
+
+
 @router.post("/tickets")
-async def create_ticket(
+async def create_ticket_router(
         user_id: KeycloakAuthRequired, ticket_data: TicketCreation, db: DbDependency
 ) -> Ticket:
     return await create_ticket_simplified(ticket_data, user_id, db)

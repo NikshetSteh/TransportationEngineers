@@ -2,7 +2,7 @@ from db import ChromaDependency
 from face_model import FaceModelDependency
 from fastapi import APIRouter, HTTPException
 from schemes import *
-from service import delete_face, save_face, search_face
+from service import delete_face, save_face, search_face, check_for_existing_user
 
 router = APIRouter()
 
@@ -41,3 +41,10 @@ async def get_faces_handler(chromadb: ChromaDependency) -> list[User]:
     collection = await chromadb.get_or_create_collection("faces")
     users = await collection.get()
     return [User(user_id=user_id) for user_id in users["ids"]]
+
+
+@router.get("/check/{user_id}")
+async def check_user_for_existence(user_id: str, chromadb: ChromaDependency) -> ExistingCheckResponse:
+    return ExistingCheckResponse(
+        status=await check_for_existing_user(user_id, chromadb),
+    )

@@ -1,16 +1,16 @@
+import base64
 import random
 
-from config import get_config
-from fastapi import HTTPException
-from frontend.schemes import Station, TicketCreation, PasswordChangeRequest
-from model.ticket import Ticket as TicketModel
-from model.user import User as UserModel
+from fastapi import HTTPException, UploadFile
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import sessionmaker
-from users.schemes import Ticket
 
-from bcrypt import checkpw, hashpw, gensalt
+from config import get_config
+from face_api.service import check_for_existence, save_face
+from frontend.schemes import Station, TicketCreation
+from model.ticket import Ticket as TicketModel
+from users.schemes import Ticket
 
 
 async def get_user_last_ticket(
@@ -118,3 +118,16 @@ async def create_ticket_simplified(
             start_date=ticket_model.start_date,
             code=ticket_model.code,
         )
+
+
+async def check_face_for_existence(user_id: str) -> bool:
+    return await check_for_existence(user_id)
+
+
+async def create_face(file: UploadFile, user_id: str) -> None:
+    content = await file.read()
+    base64_data = base64.b64encode(content).decode("utf-8")
+
+    await save_face(base64_data, user_id)
+
+

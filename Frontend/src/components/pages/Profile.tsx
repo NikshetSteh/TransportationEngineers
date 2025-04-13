@@ -3,6 +3,7 @@ import axios from "axios";
 import React, {useState, useEffect} from "react";
 import {useAuth} from "react-oidc-context";
 import Header from "../Header.tsx";
+import Footer from "../Footer.tsx";
 
 interface UserInfoProps {
     fullName: string;
@@ -11,47 +12,19 @@ interface UserInfoProps {
 
 
 function UserInfo({fullName, email}: UserInfoProps) {
-
-
     return <div className="card mb-4">
         <div className="card-body">
             <h2 className="card-title fs-3 fw-bold">Информация о пользователе</h2>
             <p>
                 <strong>ФИО:</strong> {fullName}
             </p>
-            {/*{editMode ? (*/}
-            {/*    <div>*/}
-            {/*        <input*/}
-            {/*            type="email"*/}
-            {/*            value={newEmail}*/}
-            {/*            onChange={(e) => setNewEmail(e.target.value)}*/}
-            {/*            className="form-control mb-2"*/}
-            {/*            placeholder="Введите новый email"*/}
-            {/*        />*/}
-            {/*        <Button onClick={handleEmailUpdate} variant="primary" className="me-2">*/}
-            {/*            Сохранить Email*/}
-            {/*        </Button>*/}
-            {/*        <Button onClick={() => setEditMode(false)} variant="secondary">*/}
-            {/*            Отмена*/}
-            {/*        </Button>*/}
-            {/*    </div>*/}
-            {/*) : (*/}
             <p>
                 <strong>Email:</strong> {email}
-                {/*<Button*/}
-                {/*    // onClick={() => setEditMode(true)}*/}
-                {/*    variant="link"*/}
-                {/*    className="ms-2 p-0 text-decoration-none"*/}
-                {/*>*/}
-                {/*    Редактировать*/}
-                {/*</Button>*/}
             </p>
-            {/*)}*/}
         </div>
     </div>
 }
 
-// Define types for API responses
 interface BiometricsResponse {
     available: boolean;
 }
@@ -60,7 +33,6 @@ interface TicketsResponse {
     tickets: string[];
 }
 
-// Define types for user data
 interface UserData {
     fullName: string;
     email: string;
@@ -69,43 +41,41 @@ interface UserData {
 const ProfilePage: React.FC = () => {
     const auth = useAuth()
 
-    // State for user data
     const [userData, setUserData] = useState<UserData>({
         fullName: "Unknown",
         email: "Unknown",
     });
 
-    // const [editMode, setEditMode] = useState(false);
-    // const [newEmail, setNewEmail] = useState<string>(userData.email);
-
-    // State for password update
-    // const [oldPassword, setOldPassword] = useState<string>("");
-    // const [newPassword, setNewPassword] = useState<string>("");
-
-    // State for biometrics
     const [biometricsAvailable, setBiometricsAvailable] = useState<boolean>(false);
     const [loadingBiometrics, setLoadingBiometrics] = useState<boolean>(true);
 
-    // State for tickets
     const [tickets, setTickets] = useState<string[]>([]);
 
-    // Fetch biometrics availability
     useEffect(() => {
+        if (auth.isLoading) {
+            return
+        }
+
         const fetchBiometrics = async () => {
-            try {
-                const response = await axios.get<BiometricsResponse>("/api/biometrics");
-                setBiometricsAvailable(response.data.available);
-            } catch (error) {
-                console.error("Error fetching biometrics:", error);
-            } finally {
-                setLoadingBiometrics(false);
+            const response = await axios.get<BiometricsResponse>("/base_api/v1/frontend/faces", {
+                headers: {
+                    Authorization: `Bearer ${auth.user?.access_token}`,
+                },
+                validateStatus: (status: number) => status == 200 || status == 404,
+            });
+            if (response.status == 200) {
+                setBiometricsAvailable(true);
+            } else if (response.status == 404) {
+                setBiometricsAvailable(false);
+            } else {
+                throw new Error("Unexpected status code");
             }
+            setLoadingBiometrics(false);
         };
 
         void fetchBiometrics();
-    }, [auth.isLoading]);
+    }, [auth.isLoading, auth.user?.access_token]);
 
-    // Fetch current tickets
     useEffect(() => {
         const fetchTickets = async () => {
             try {
@@ -135,14 +105,6 @@ const ProfilePage: React.FC = () => {
         return <div>Loading...</div>;
     }
 
-    // Handle email update
-    // const handleEmailUpdate = () => {
-    //     setUserData((prev) => ({...prev, email: newEmail}));
-    //     setEditMode(false);
-    //     alert("Email updated successfully!");
-    // };
-
-
     return (
         <div className="d-flex flex-column min-vh-100">
             <Header/>
@@ -161,7 +123,7 @@ const ProfilePage: React.FC = () => {
                         ) : biometricsAvailable ? (
                             <p>Биометрия доступна.</p>
                         ) : (
-                            <Button href="/upload-biometrics" variant="success">
+                            <Button href="/profile/biometrics/upload" variant="success">
                                 Загрузить биометрию
                             </Button>
                         )}
@@ -195,22 +157,7 @@ const ProfilePage: React.FC = () => {
                 </div>
             </div>
 
-            {/* Footer */}
-            <footer className="py-3 bg-secondary text-white text-center mt-auto">
-                <p className="mb-1">© 2025 Высокоскоростные железные дороги</p>
-                <ul className="list-unstyled">
-                    <li>
-                        <a href="#" className="text-white text-decoration-none">
-                            Политика конфиденциальности
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" className="text-white text-decoration-none">
-                            Пользовательское соглашение
-                        </a>
-                    </li>
-                </ul>
-            </footer>
+            <Footer/>
         </div>
     );
 };
