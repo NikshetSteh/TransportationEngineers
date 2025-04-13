@@ -1,19 +1,23 @@
-from admin.routers import router as admin_router
-from auth.routers import router as auth_router
-from db import create_db_connection_factory
+from contextlib import asynccontextmanager
+
 from fastapi import APIRouter, FastAPI
 from fastapi_pagination import add_pagination
+
+from admin.routers import router as admin_router
+from auth.routers import router as auth_router
+from db import create_db_connection_factory, close_db_connection_factory
 from frontend.router import router as frontend_router
 from keycloak.router import router as keycloak_user_router
 from robot.routers import router as robot_router
 
 
+@asynccontextmanager
 async def lifespan(_):
     await create_db_connection_factory()
     yield
+    await close_db_connection_factory()
 
 
-# noinspection PyTypeChecker
 app = FastAPI(lifespan=lifespan)
 
 api = APIRouter()

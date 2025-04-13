@@ -3,15 +3,17 @@ from typing import Annotated
 from config import get_config
 from fastapi import Depends
 from redis_async import RedisPool
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, AsyncEngine
 from sqlalchemy.orm import sessionmaker
 
 db_session_factory: sessionmaker[AsyncSession] | None = None
 redit_pool: RedisPool | None = None
+engine: AsyncEngine | None = None
 
 
 async def create_db_connection_factory() -> None:
     global db_session_factory
+    global engine
 
     config = get_config()
     engine = create_async_engine(config.DB_URI, echo=config.SHOW_DB_ECHO)
@@ -33,6 +35,13 @@ async def get_db_connection_factory() -> sessionmaker[AsyncSession]:
         await create_db_connection_factory()
 
     return db_session_factory
+
+
+async def close_db_connection_factory() -> None:
+    global engine
+
+    if engine is not None:
+        await engine.dispose()
 
 
 async def get_redis() -> RedisPool:
