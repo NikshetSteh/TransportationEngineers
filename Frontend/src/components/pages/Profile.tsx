@@ -4,6 +4,7 @@ import React, {useState, useEffect} from "react";
 import {useAuth} from "react-oidc-context";
 import Header from "../Header.tsx";
 import Footer from "../Footer.tsx";
+import Tickets from "../Tickets.tsx";
 
 interface UserInfoProps {
     fullName: string;
@@ -29,9 +30,6 @@ interface BiometricsResponse {
     available: boolean;
 }
 
-interface TicketsResponse {
-    tickets: string[];
-}
 
 interface UserData {
     fullName: string;
@@ -49,7 +47,6 @@ const ProfilePage: React.FC = () => {
     const [biometricsAvailable, setBiometricsAvailable] = useState<boolean>(false);
     const [loadingBiometrics, setLoadingBiometrics] = useState<boolean>(true);
 
-    const [tickets, setTickets] = useState<string[]>([]);
 
     useEffect(() => {
         if (auth.isLoading) {
@@ -61,7 +58,7 @@ const ProfilePage: React.FC = () => {
                 headers: {
                     Authorization: `Bearer ${auth.user?.access_token}`,
                 },
-                validateStatus: (status: number) => status == 200 || status == 404,
+                    validateStatus: (status: number) => status == 200 || status == 404,
             });
             if (response.status == 200) {
                 setBiometricsAvailable(true);
@@ -76,20 +73,6 @@ const ProfilePage: React.FC = () => {
         void fetchBiometrics();
     }, [auth.isLoading, auth.user?.access_token]);
 
-    useEffect(() => {
-        const fetchTickets = async () => {
-            try {
-                const response = await axios.get<TicketsResponse>("/api/tickets");
-                if (response.data.tickets) {
-                    setTickets(response.data.tickets);
-                }
-            } catch (error) {
-                console.error("Error fetching tickets:", error);
-            }
-        };
-
-        void fetchTickets();
-    }, [auth.isLoading]);
 
     useEffect(
         () => {
@@ -131,30 +114,7 @@ const ProfilePage: React.FC = () => {
                 </div>
 
                 {/* Tickets Section */}
-                <div className="card mb-4">
-                    <div className="card-body">
-                        <h2 className="card-title fs-3 fw-bold">Ваши билеты</h2>
-                        {tickets.length > 0 ? (
-                            <ul className="list-group">
-                                {tickets.map((ticket, index) => (
-                                    <li key={index} className="list-group-item">
-                                        {ticket}
-                                    </li>
-                                ))}
-                            </ul>
-                        ) : (
-                            <p>
-                                У вас нет билетов.{" "}
-                                <Button href="/buy-tickets" variant="primary">
-                                    Купить билеты
-                                </Button>
-                            </p>
-                        )}
-                        <Button href="/all-tickets" variant="secondary" className="mt-3">
-                            Посмотреть полную историю билетов
-                        </Button>
-                    </div>
-                </div>
+                <Tickets/>
             </div>
 
             <Footer/>

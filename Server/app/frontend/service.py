@@ -131,3 +131,24 @@ async def create_face(file: UploadFile, user_id: str) -> None:
     await save_face(base64_data, user_id)
 
 
+async def get_user_tickets(user_id: str, db: sessionmaker[AsyncSession]) -> list[Ticket]:
+    async with db() as session:
+        tickets = (
+            await session.execute(select(TicketModel).where(TicketModel.user_id == user_id))
+        ).fetchall()
+
+    return [
+        Ticket(
+            id=str(ticket[0].id),
+            user_id=str(ticket[0].user_id),
+            train_number=ticket[0].train_number,
+            wagon_number=ticket[0].wagon_number,
+            place_number=ticket[0].place_number,
+            station_id=ticket[0].station_id,
+            date=ticket[0].date,
+            destination=ticket[0].destination_id,
+            start_date=ticket[0].start_date,
+            code=ticket[0].code,
+        )
+        for ticket in tickets
+    ]

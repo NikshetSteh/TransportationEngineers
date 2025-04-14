@@ -1,7 +1,8 @@
-from fastapi import APIRouter, UploadFile
+from fastapi import APIRouter
+from fastapi_pagination import paginate, Page
 
 from db import DbDependency
-from face_api.service import delete_face, save_face
+from face_api.service import delete_face
 from frontend.dependecies import KeycloakAuthRequired
 from frontend.service import *
 from schemes import EmptyResponse
@@ -21,6 +22,11 @@ async def get_ticket_router(user_id: KeycloakAuthRequired, db: DbDependency) -> 
         raise HTTPException(status_code=404, detail="Ticket not found")
 
     return ticket
+
+
+@router.get("/tickets")
+async def get_tickets_router(user_id: KeycloakAuthRequired, db: DbDependency) -> Page[Ticket]:
+    return paginate(await get_user_tickets(user_id, db))
 
 
 @router.post("/faces")
