@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import Header from "../Header.tsx";
 import Footer from "../Footer.tsx";
 import axios from "axios";
-import {useAuth} from "react-oidc-context";
+import { useAuth } from "react-oidc-context";
+import {Link} from "react-router";
 
 function BiometricsForm() {
     const [photo, setPhoto] = useState<File | null>(null);
     const [uploading, setUploading] = useState(false);
     const [message, setMessage] = useState("");
+    const [uploadSuccess, setUploadSuccess] = useState(false);
 
     const auth = useAuth();
 
@@ -19,7 +21,7 @@ function BiometricsForm() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!photo) {
-            setMessage("Please select a photo.");
+            setMessage("Пожалуйста, выберите фото.");
             return;
         }
 
@@ -28,56 +30,85 @@ function BiometricsForm() {
 
         setUploading(true);
         setMessage("");
+        setUploadSuccess(false);
 
-        // try {
-        //     const response = await fetch("/base_api/v1/frontend/faces", {
-        //         method: "POST",
-        //         body: formData,
-        //     });
-        //
-        //     if (!response.ok) {
-        //         throw new Error("Upload failed");
-        //     }
-        //
-        //     const data = await response.json();
-        //     setMessage("Upload successful: " + data.filename);
-        // } catch (error) {
-        //     setMessage("Error uploading file.");
-        // } finally {
-        //     setUploading(false);
-        // }
-        const response = await axios.post("/base_api/v1/frontend/faces", formData, {
-            headers: {
-                authorization: `Bearer ${auth.user?.access_token}`,
-            },
-        })
+        try {
+            const response = await axios.post("/base_api/v1/frontend/faces", formData, {
+                headers: {
+                    authorization: `Bearer ${auth.user?.access_token}`,
+                },
+            });
 
-        if (response.status === 200) {
-            setMessage("Upload successful: " + response.data.filename);
-        } else {
-            setMessage("Error uploading file.");
+            if (response.status === 200) {
+                setMessage("Загрузка успешна");
+                setUploadSuccess(true);
+            } else {
+                setMessage("Ошибка при загрузке файла.");
+            }
+        } catch (error) {
+            console.error(error);
+            setMessage("Произошла ошибка при загрузке.");
         }
+
         setUploading(false);
     };
 
     return (
-        <div className="d-flex flex-column min-vh-100">
-            <Header/>
+        <div className="d-flex flex-column min-vh-100 bg-light">
+            <Header />
 
-            <div className="container my-4 flex-grow-1">
-                <h2>Upload your photo</h2>
-                <form onSubmit={handleSubmit}>
-                    <div className="mb-3">
-                        <input type="file" accept="image/*" onChange={handleFileChange} />
+            <main className="container my-5 flex-grow-1">
+                <div className="row justify-content-center">
+                    <div className="col-md-6">
+                        <div className="card shadow">
+                            <div className="card-body">
+                                <h2 className="card-title text-center mb-4">Загрузите ваше фото</h2>
+
+                                <form onSubmit={handleSubmit}>
+                                    <div className="mb-3">
+                                        <label htmlFor="photo" className="form-label">
+                                            Выберите изображение:
+                                        </label>
+                                        <input
+                                            id="photo"
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleFileChange}
+                                            className="form-control"
+                                        />
+                                    </div>
+
+                                    <div className="d-grid">
+                                        <button
+                                            type="submit"
+                                            className="btn btn-primary"
+                                            disabled={uploading}
+                                        >
+                                            {uploading ? "Загрузка..." : "Отправить"}
+                                        </button>
+                                    </div>
+                                </form>
+
+                                {message && (
+                                    <div className="alert alert-info mt-4 text-center" role="alert">
+                                        {message}
+                                    </div>
+                                )}
+
+                                {uploadSuccess && (
+                                    <div className="d-grid mt-3">
+                                        <Link to="/profile" className="btn btn-success">
+                                            Вернуться в профиль
+                                        </Link>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </div>
-                    <button type="submit" className="btn btn-primary" disabled={uploading}>
-                        {uploading ? "Uploading..." : "Submit"}
-                    </button>
-                </form>
-                {message && <div className="mt-3 alert alert-info">{message}</div>}
-            </div>
+                </div>
+            </main>
 
-            <Footer/>
+            <Footer />
         </div>
     );
 }

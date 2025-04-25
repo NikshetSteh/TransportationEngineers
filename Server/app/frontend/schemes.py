@@ -1,7 +1,12 @@
-from datetime import datetime
+import datetime
 from enum import Enum
+from typing import Annotated
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, AfterValidator
+
+
+def date_timezone_converter(date: datetime.datetime) -> datetime.datetime:
+    return date.astimezone(datetime.timezone(datetime.timedelta(hours=3)))
 
 
 class Station(Enum):
@@ -15,7 +20,7 @@ class TicketCreation(BaseModel):
     place_number: int
     station_id: Station
     destination_id: Station
-    date: datetime
+    date: Annotated[datetime.datetime, AfterValidator(date_timezone_converter)]
 
 
 class PasswordChangeRequest(BaseModel):
