@@ -1,58 +1,61 @@
 
 .btn-primary {
-  --bs-btn-bg: #e21a1a;
-  --bs-btn-hover-bg: #b81515;
-  --bs-btn-border-width: 0;
+    --bs-btn-bg: #e21a1a;
+    --bs-btn-hover-bg: #b81515;
+    --bs-btn-border-width: 0;
 }
 
 
 .base-color {
-  color: #e21a1a;
+    color: #e21a1a;
 }
 
 .base-background {
-  background-color: #e21a1a;
+    background-color: #e21a1a;
 }
 
 .padding-0 {
-  padding: 0;
+    padding: 0;
 }
 
 .icon-container {
-  padding: 20px 25px;
+    padding: 20px 25px;
 }
 
 
-
-
 @media (max-width: 768px) {
-  .logo {
-    width: 50px;
-    height: auto;
-  }
+    .logo {
+        width: 50px;
+        height: auto;
+    }
 
-  .display-1 {
-    font-size: 2.5rem;
-  }
+    .display-1 {
+        font-size: 2.5rem;
+    }
 
-  .display-4 {
-    font-size: 1.5rem;
-  }
+    .display-4 {
+        font-size: 1.5rem;
+    }
 
-  .fs-2 {
-    font-size: 1.25rem;
-  }
+    .fs-2 {
+        font-size: 1.25rem;
+    }
 
-  .fs-5 {
-    font-size: 1rem;
-  }
+    .fs-5 {
+        font-size: 1rem;
+    }
 
-  .w-75 {
-    width: 90%;
-  }
+    .w-75 {
+        width: 90%;
+    }
 
-  .info-block {
-    max-width: 100%; /* Allow full width on smaller screens */
-    padding: 0 1rem; /* Add horizontal padding for better readability */
-  }
+    .info-block {
+        max-width: 100%; /* Allow full width on smaller screens */
+        padding: 0 1rem; /* Add horizontal padding for better readability */
+    }
+}
+
+
+.without-after::after {
+    display: none !important;
 }
