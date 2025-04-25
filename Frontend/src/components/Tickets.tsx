@@ -109,7 +109,14 @@ function Tickets() {
         <>
             <div className="card shadow-sm">
                 <div className="card-body">
-                    <h2 className="card-title fs-4 fw-bold mb-4">📄 Мои билеты</h2>
+                    {/*<h2 className="card-title fs-4 fw-bold mb-4">📄 Мои билеты</h2>*/}
+                    <div className="d-flex justify-content-between align-items-center mb-4">
+                        <h2 className="card-title fs-4 fw-bold">📄 Мои билеты</h2>
+                        <Button variant="primary" href={"/tickets/buy"}>
+                            Купить билеты
+                        </Button>
+                    </div>
+
                     {auth.isLoading || isLoading ? (
                         <p>🔄 Загрузка...</p>
                     ) : tickets.length > 0 ? (
